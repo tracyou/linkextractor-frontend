@@ -1,0 +1,120 @@
+input CreatePancakeInput {
+  diameter: Int!
+}
+
+input CreatePancakeStackInput {
+  name: String!
+  pancakes: [ID!]!
+}
+
+scalar Date
+
+scalar DateTime
+
+"""
+Arbitrary data encoded in JavaScript Object Notation. See https://www.json.org.
+"""
+scalar JSON
+
+type Mutation {
+  createPancake(input: CreatePancakeInput!): Pancake!
+  createPancakeStack(input: CreatePancakeStackInput!): PancakeStack!
+  deletePancake(id: ID!): Boolean!
+  deletePancakeStack(id: ID!): Boolean!
+  updatePancake(input: UpdatePancakeInput!): Pancake!
+  updatePancakeStack(input: UpdatePancakeStackInput!): PancakeStack!
+}
+
+"""Allows ordering a list of records."""
+input OrderByClause {
+  """The column that is used for ordering."""
+  column: String!
+
+  """The direction that is used for ordering."""
+  order: SortOrder!
+}
+
+"""
+Aggregate functions when ordering by a relation without specifying a column.
+"""
+enum OrderByRelationAggregateFunction {
+  """Amount of items."""
+  COUNT
+}
+
+"""
+Aggregate functions when ordering by a relation that may specify a column.
+"""
+enum OrderByRelationWithColumnAggregateFunction {
+  """Average."""
+  AVG
+
+  """Amount of items."""
+  COUNT
+
+  """Maximum."""
+  MAX
+
+  """Minimum."""
+  MIN
+
+  """Sum."""
+  SUM
+}
+
+type Pancake {
+  createdAt: DateTime!
+  diameter: Int!
+  id: ID!
+  stack: PancakeStack
+  updatedAt: DateTime!
+}
+
+type PancakeStack {
+  createdAt: DateTime!
+  id: ID!
+  name: String!
+  pancakes: [Pancake!]!
+  updatedAt: DateTime!
+}
+
+type Query {
+  pancakeById(id: ID!): Pancake!
+  pancakeStackById(id: ID!): PancakeStack!
+  pancakeStacks: [PancakeStack!]!
+  pancakes: [Pancake!]!
+}
+
+"""Directions for ordering a list of records."""
+enum SortOrder {
+  """Sort records in ascending order."""
+  ASC
+
+  """Sort records in descending order."""
+  DESC
+}
+
+"""
+Specify if you want to include or exclude trashed results from a query.
+"""
+enum Trashed {
+  """Only return trashed results."""
+  ONLY
+
+  """Return both trashed and non-trashed results."""
+  WITH
+
+  """Only return non-trashed results."""
+  WITHOUT
+}
+
+input UpdatePancakeInput {
+  diameter: Int!
+  id: ID!
+}
+
+input UpdatePancakeStackInput {
+  id: ID!
+  name: String!
+  pancakes: [ID!]!
+}

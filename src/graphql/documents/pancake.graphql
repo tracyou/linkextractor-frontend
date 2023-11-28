@@ -1,0 +1,5 @@
+query Pancakes {
+    pancakes {
+        ...Pancake
+    }
+}

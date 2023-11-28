@@ -1,0 +1,7 @@
+fragment Pancake on Pancake {
+    id
+}
+
+fragment PancakeStack on PancakeStack {
+    id
+}
