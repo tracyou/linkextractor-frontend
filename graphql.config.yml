@@ -1,0 +1,52 @@
+x-formatting:
+  eslint-script  : &eslint-script   'bash -vc "npx eslint --fix --no-ignore \$1 &> /dev/null; exit 0" -- '
+  ts-file-header : &ts-file-header  "// noinspection JSUnusedGlobalSymbols\n"
+
+x-scalars           : &scalar-map
+  Upload            : File
+  Date              : string
+  DateTime          : string
+  JSON              : string
+
+# ------------------------------------------------------------------------------
+#      GraphQL CLI config
+# ------------------------------------------------------------------------------
+
+projects:
+  api:
+    schema:
+      - ${SCHEMA_ENDPOINT:"http://localhost:8000/graphql"}
+    documents: src/graphql/documents/*.graphql
+    include: src/graphql/api-schema.ts
+    extensions:
+      codegen:
+        overwrite: true
+        hooks:
+          afterOneFileWrite:
+            - *eslint-script
+        generates:
+          ./src/graphql/api-schema.ts:
+            config:
+              scalars: *scalar-map
+            plugins:
+              - add:
+                  content: *ts-file-header
+              - typescript:
+                  skipTypename: true
+                  strictScalars: true
+                  immutableTypes: true
+                  declarationKind: interface
+                  inlineFragmentTypes: combine
+              - typescript-operations:
+                  skipTypename: true
+                  strictScalars: true
+                  immutableTypes: true
+                  declarationKind: interface
+                  inlineFragmentTypes: combine
+              - typescript-react-apollo:
+                  skipTypename: true
+                  strictScalars: true
+                  inlineFragmentTypes: combine
+          .src/graphql/schema.graphql:
+            plugins:
+              - schema-ast
