@@ -1,0 +1,30 @@
+/* Footer.css */
+
+/* Footer container styles */
+.footer {
+    width: 100%;
+    border-top: 8px solid #B2D7EA;
+    background-color: #cce0ff;
+    padding: 1.5rem 0;
+}
+
+
+/* Footer link styles */
+a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+    color: #003366;
+    text-decoration: none;
+}
+
+/* Footer link icon styles */
+.footer-link-icon {
+    width: 18px;
+}
+
+/* Footer link hover styles */
+.footer-link:hover {
+    text-decoration: underline;
+}
