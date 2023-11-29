@@ -6,9 +6,7 @@ import router from "./react-router";
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
         <RouterProvider router={router}/>
-      </header>
     </div>
   );
 }

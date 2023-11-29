@@ -1,15 +1,12 @@
-import {createBrowserRouter} from "react-router-dom";
+import {createBrowserRouter, redirect} from "react-router-dom";
 import path from "path";
+import Navbar from "./components/Navbar/Navbar";
 
 const router = createBrowserRouter([
     {
         path:"/",
-        element:""//name of the view page or component
-    },
-    {
-        path:"/",
-        element:""//name of the view page or component
-    },
+        element: <Navbar/>//name of the view page or component
+    }
 
 ])
 
