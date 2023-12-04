@@ -1,9 +1,8 @@
-import {createBrowserRouter, redirect} from "react-router-dom";
-import path from "path";
+import {createBrowserRouter} from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Layout from "./components/Layout/Layout";
-import Footer from "./components/Footer/Footer";
 import ImportXML from "./views/ImportXML";
+import EditArticle from "./components/EditArticle/EditArticle";
 
 const router = createBrowserRouter([
     {
@@ -17,10 +16,13 @@ const router = createBrowserRouter([
             {
                 path:"/navbar",
                 element:<Navbar></Navbar>
-            }
+            },
+            {
+                path: "/editarticle",
+                element: <EditArticle/>,
+            },
         ],
     }
 
 ])
-
 export default router;
