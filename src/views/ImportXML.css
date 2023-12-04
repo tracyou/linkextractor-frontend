@@ -1,0 +1,16 @@
+
+
+/* Navbar styles */
+.importButtonContainer {
+
+    display: flex;
+    justify-content: flex-end;
+    background-color: #B2D7EA;
+    height: 2.2rem;
+    align-items: stretch;
+}
+
+input::file-selector-button{
+    background-color: darkgray;
+    height: 100%;
+}
