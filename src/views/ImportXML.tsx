@@ -5,13 +5,13 @@ const FileUploader = () => {
 
     const [artikelen, setArtikelen] = React.useState([
         {
-            naam: 'Artikel 1',
+            name: 'Artikel 1',
         },
         {
-            naam: 'Artikel 2',
+            name: 'Artikel 2',
         },
         {
-            naam: 'Artikel 3',
+            name: 'Artikel 3',
         },
     ]);
 
@@ -19,18 +19,9 @@ const FileUploader = () => {
 
     const handleFileSelect = (selectedFile: File) => {
         setFile(selectedFile);
-        // Do something with the file, e.g., read its content
-        if (selectedFile) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const content = e.target?.result as string;
-                console.log(content);
-            };
-
-            reader.readAsText(selectedFile);
-            artikelen.push({naam:selectedFile.name.toString()})
+        artikelen.push({name:selectedFile.name.toString()})
         }
-    };
+
 
 
 
@@ -50,7 +41,7 @@ const FileUploader = () => {
                 <div className="artikelen">
                     {artikelen.map((artikel, index) => (
                             <div key={index} className="artikel">
-                            <h2>{artikel.naam}</h2>
+                            <h2>{artikel.name}</h2>
                         </div>
                     ))}
                 </div>
