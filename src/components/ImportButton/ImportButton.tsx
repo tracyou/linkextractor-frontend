@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './ImportButton.css';
 
-const ImportButton = () => {
+type ImportButtonProps = {
+    onFileSelect: (file: File) => void;
+};
+
+const ImportButton: React.FC<ImportButtonProps> = ({ onFileSelect }) => {
+    const [file, setFile] = useState<File | null>(null);
+
     const handleButtonClick = () => {
         const fileInput = document.getElementById('file') as HTMLInputElement | null;
         if (fileInput) {
@@ -9,11 +15,18 @@ const ImportButton = () => {
         }
     };
 
+    const handleFileChange = ({ target: { files } }: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFile = files![0];
+        setFile(selectedFile);
+        onFileSelect(selectedFile);
+        console.log(selectedFile)
+    };
+
     return (
         <div className="import-button" onClick={handleButtonClick}>
             Import
-            <img src={require("./../../imgs/import.png")} alt="Import Icon"/>
-            <input id="file" type="file" hidden/>
+            <img src={require('./../../imgs/import.png')} alt="Import Icon" />
+            <input id="file" type="file" hidden onChange={handleFileChange} />
         </div>
     );
 };
