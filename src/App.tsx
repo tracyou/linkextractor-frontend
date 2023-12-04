@@ -2,15 +2,15 @@ import React from 'react';
 import './App.css';
 import {RouterProvider} from "react-router-dom";
 import router from "./react-router";
+import CssBaseline from '@mui/material/CssBaseline';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <RouterProvider router={router}/>
-      </header>
-    </div>
-  );
+    return (
+        <>
+            <CssBaseline enableColorScheme={true}/>
+            <RouterProvider router={router}/>
+        </>
+    );
 }
 
 export default App;

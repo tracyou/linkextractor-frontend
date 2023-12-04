@@ -1,10 +1,11 @@
 import {createBrowserRouter} from "react-router-dom";
-import path from "path";
+import EditArticle from "./components/EditArticle/EditArticle";
+import React  from 'react';
 
 const router = createBrowserRouter([
     {
-        path:"/",
-        element:""//name of the view page or component
+        path:"/editarticle",
+        element:<EditArticle/>,
     },
     {
         path:"/",
