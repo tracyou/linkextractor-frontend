@@ -6,10 +6,11 @@ type ImportButtonProps = {
 };
 
 const ImportButton: React.FC<ImportButtonProps> = ({ onFileSelect }) => {
-    const [file, setFile] = useState<File | null>(null);
+
+    const [file, setFile] = useState<File>();
 
     const handleButtonClick = () => {
-        const fileInput = document.getElementById('file') as HTMLInputElement | null;
+        const fileInput = document.getElementById('file');
         if (fileInput) {
             fileInput.click();
         }

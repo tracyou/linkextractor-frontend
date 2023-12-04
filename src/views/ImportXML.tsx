@@ -15,14 +15,12 @@ const FileUploader = () => {
         },
     ]);
 
-    const [file, setFile] = useState<File | null>(null);
+    const [file, setFile] = useState<File>();
 
     const handleFileSelect = (selectedFile: File) => {
         setFile(selectedFile);
         artikelen.push({name:selectedFile.name.toString()})
         }
-
-
 
 
     return (
