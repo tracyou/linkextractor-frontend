@@ -1,12 +1,23 @@
-import React, { FC } from 'react';
-import { NavbarWrapper } from './Navbar.styled';
+// Navbar.js
+import React from 'react';
+import { Link } from 'react-router-dom';
+import './Navbar.css';
 
-interface NavbarProps {}
-
-const Navbar: FC<NavbarProps> = () => (
- <NavbarWrapper>
-    Navbar Component
- </NavbarWrapper>
+const Navbar = () => (
+    <>
+        <div className="logoContainer">
+            <img src={require('../../imgs/logo.png')} alt="Logo" />
+        </div>
+        <div className="nav">
+            <nav>
+                <ul>
+                    <li className="active">
+                        <Link to="/">Navbar</Link>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </>
 );
 
 export default Navbar;

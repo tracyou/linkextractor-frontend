@@ -1,14 +1,14 @@
 import React from 'react';
 import './App.css';
-import {RouterProvider} from "react-router-dom";
+import {Outlet, RouterProvider} from "react-router-dom";
 import router from "./react-router";
+import Footer from "./components/Footer/Footer";
+import Layout from "./components/Layout/Layout";
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
         <RouterProvider router={router}/>
-      </header>
     </div>
   );
 }

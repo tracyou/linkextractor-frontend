@@ -1,5 +1,5 @@
 // @ts-ignore
 import styled from 'styled-components';
 
-export const NavbarWrapper = styled.div`
+export const FooterWrapper = styled.div`
 `;
