@@ -7,6 +7,7 @@ import './Layout.css'
 import EditArticle from "../EditArticle/EditArticle";
 import TextAnnotator from "../TextAnnotator/TextAnnotator";
 import HomePage from "../HomePage/HomePage";
+import ApiDemo from "../ApiDemo/ApiDemo";
 
 const Layout = () => {
 
@@ -23,6 +24,7 @@ const Layout = () => {
                         <Route path="/navbar" element={<Navbar/>}/>
                         <Route path="/editarticle" element={<EditArticle/>}/>
                         <Route path="/annotate" element={<TextAnnotator/>}/>
+                        <Route path={"/test"} element={<ApiDemo/>}/>
                     </Routes>
                 </div>
 
