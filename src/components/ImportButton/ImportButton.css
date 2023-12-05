@@ -1,0 +1,23 @@
+.import-button {
+    display: flex;
+    height: 100%;
+    width: 5%;
+    justify-content: space-between;
+    background-color: lightgray;
+    align-items: center;
+    padding-right: 2rem;
+    padding-left: 2rem;
+    border-radius: 5%;
+    margin-right: 3rem;
+
+}
+
+
+.import-button img {
+    max-height: 2rem;
+    max-width: 2rem;
+    background-color: lightgray;
+    margin-left: 1rem;
+}
+
+
