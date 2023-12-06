@@ -9,7 +9,7 @@ import HomePage from "./components/HomePage/HomePage";
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <HomePage/>
+        element: <Layout/>
         // ,
         // children: [{
         //     element: <Navbar/>

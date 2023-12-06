@@ -20,8 +20,13 @@ const FileUploader = () => {
     const handleFileSelect = (selectedFile: File) => {
         setFile(selectedFile);
         artikelen.push({name:selectedFile.name.toString()})
-        }
+        console.log(selectedFile)
+    }
+        
+    const showFile = () =>{
+        console.log("test")
 
+    }
 
     return (
         <>
@@ -33,13 +38,13 @@ const FileUploader = () => {
             </div>
             <div className="imported-content-container">
                 <h1>
-                    artieklen
+                    artikelen
                 </h1>
 
                 <div className="artikelen">
                     {artikelen.map((artikel, index) => (
                             <div key={index} className="artikel">
-                            <h2>{artikel.name}</h2>
+                            <h2 onClick={showFile}>{artikel.name}</h2>
                         </div>
                     ))}
                 </div>
