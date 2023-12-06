@@ -11,8 +11,12 @@ const router = createBrowserRouter([
         element: <Layout/>,
         children: [
             {
-                path: "/importedArtikels",
+                path: "/import-xml",
                 element:<ImportXML></ImportXML>
+            },
+            {
+                path:"/navbar",
+                element:<Navbar></Navbar>
             }
         ],
     }
