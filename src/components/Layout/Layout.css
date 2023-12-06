@@ -1,0 +1,11 @@
+
+.layout-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
+}
+
+.content-area {
+    flex: 1;
+    margin-bottom: 500px;
+}
