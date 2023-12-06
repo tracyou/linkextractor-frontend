@@ -3,22 +3,28 @@ import Navbar from "../Navbar/Navbar";  // Adjust the path based on your file st
 import Footer from "../Footer/Footer";
 import {Route, Routes} from "react-router-dom";
 import ImportXML from "../../views/ImportXML";
+import './Layout.css'
 
 const Layout = () => (
 
 
     <div>
-        <Navbar></Navbar>
-        <switch>
-            <Routes>
-                <Route path="/import-xml" element={<ImportXML/>} />
-                <Route path="/navbar" element={<Navbar/>} />
-            </Routes>
+        <div className="layout-container">
 
-            {/* Add more routes as needed */}
-            {/* <Route path="/some-other-path" component={SomeOtherComponent} /> */}
-        </switch>
-        <Footer></Footer>
+            <Navbar></Navbar>
+            <switch>
+                <div className="content-area">
+
+                    <Routes>
+                        <Route path="/import-xml" element={<ImportXML/>}/>
+                        <Route path="/navbar" element={<Navbar/>}/>
+                    </Routes>
+                </div>
+
+            </switch>
+            <Footer></Footer>
+        </div>
+
     </div>
 );
 
