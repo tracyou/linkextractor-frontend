@@ -9,6 +9,7 @@
     padding-left: 2rem;
     border-radius: 5%;
     margin-right: 3rem;
+    min-width: 70px;
 
 }
 
@@ -16,8 +17,9 @@
 .import-button img {
     max-height: 2rem;
     max-width: 2rem;
-    background-color: lightgray;
-    margin-left: 1rem;
+    padding-left: 1rem;
+
+
 }
 
 
