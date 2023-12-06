@@ -1,82 +1,90 @@
 import React from "react";
-import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
+import Grid from '@mui/material/Unstable_Grid2';
 import Box from '@mui/material/Box';
-import {Card, CardContent, InputLabel, MenuItem, Select, Typography} from "@mui/material";
+import {Card, CardContent, InputLabel, MenuItem, Select} from "@mui/material";
+import {State} from "react-powerplug";
+import {TextAnnotator} from "react-text-annotate";
+import {Blue, DarkBlue, LightBlue} from "../../stylesheets/Colors";
 
 const EditArticle = () => {
-    const [law, setLaw] = React.useState<string>("");
-    const [selectedText, setSelectedText] = React.useState<string>("");
-    const [referenceElement, setReferenceElement] = React.useState<
-        HTMLElement | NullableVirtualElement | undefined | null
-    >(null);
+    const text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum\n" +
+        "                                has\n" +
+        "                                been\n" +
+        "                                the\n" +
+        "                                industry&aposs standard dummy text ever since the 1500s, when an unknown printer took a\n" +
+        "                                galley of\n" +
+        "                                type and\n" +
+        "                                scrambled it to make a type specimen book. It has survived not only five centuries, but\n" +
+        "                                also\n" +
+        "                                the\n" +
+        "                                leap\n" +
+        "                                into electronic typesetting, remaining essentially unchanged. It was popularised in the\n" +
+        "                                1960s with\n" +
+        "                                the\n" +
+        "                                release of Letraset sheets containing Lorem Ipsum passages, and more recently with\n" +
+        "                                desktop\n" +
+        "                                publishing"
 
-    type NullableVirtualElement = {
-        getBoundingClientRect: () => DOMRect | null;
+    const TAG_COLORS: Record<string, string> = {
+        'Afleidingsregel': LightBlue,
+        'Rechtssubject': DarkBlue,
+        'Rechtsbetrekking': Blue,
     };
-    const selectionChange = React.useCallback(() => {
-        const selection = window.getSelection();
-        if (selection) {
-            const selectedText = selection.toString();
-            if (selection.isCollapsed || !selectedText.length) {
-                setSelectedText('');
-            }
-            setSelectedText(selectedText);
-        }
-        const virtualReference: NullableVirtualElement = {
-            getBoundingClientRect: () => {
-                return window
-                    .getSelection()
-                    ?.getRangeAt(0)
-                    .getBoundingClientRect() as DOMRect | null;
-            }
-        };
-        setReferenceElement(virtualReference);
-    }, [setSelectedText]);
-    document.onselectionchange = () => {
-        selectionChange();
-    }
+
     return (
         <Box sx={{flexGrow: 1}}>
             <Grid container spacing={5}>
-                <Grid xs>
-                    {selectedText &&
-                      <Card>
-                        <CardContent>
-                          <Typography sx={{fontSize: 18}}>
-                            Te annoteren woord: {selectedText}
-                          </Typography>
-                          <InputLabel id="demo-simple-select-label">Wetgeving</InputLabel>
-                          <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={law}
-                            label="Wetgeving"
-                            fullWidth
-                            onChange={e => setLaw(e.target.value)}
-                          >
-                            <MenuItem value={1}>Afleidingsregel</MenuItem>
-                            <MenuItem value={2}>Rechtssubject</MenuItem>
-                            <MenuItem value={3}>Rechtsbetrekking</MenuItem>
-                          </Select>
-                        </CardContent>
-                      </Card>}
-                </Grid>
-                <Grid xs={5}>
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been
-                    the
-                    industry&aposs standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                    type and
-                    scrambled it to make a type specimen book. It has survived not only five centuries, but also the
-                    leap
-                    into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with
-                    the
-                    release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop
-                    publishing
-                </Grid>
-                <Grid xs>
-                </Grid>
+                <State initial={{value: [{start: 0, end: 0, tag: ''}], tag: ''}}>
+                    {({state, setState}) => (
+                        <>
+                            <Grid xs>
+                                <Card>
+                                    <CardContent>
+                                        <InputLabel id="demo-simple-select-label">Wetgeving</InputLabel>
+                                        <Select
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            value={state.tag}
+                                            label="Wetgeving"
+                                            fullWidth
+                                            onChange={(e) => setState({tag: e.target.value})}
+                                        >
+                                            <MenuItem value={'Afleidingsregel'}>Afleidingsregel</MenuItem>
+                                            <MenuItem value={'Rechtssubject'}>Rechtssubject</MenuItem>
+                                            <MenuItem value={'Rechtbetrekking'}>Rechtsbetrekking</MenuItem>
+                                        </Select>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                            <Grid xs={5}>
+                                <TextAnnotator
+                                    style={{
+                                        maxWidth: 500,
+                                        lineHeight: 1.5,
+                                    }}
+                                    content={text}
+                                    value={state.value}
+                                    onChange={(value) => {
+                                        setState({value});
+                                    }}
+                                    getSpan={(span) => ({
+                                        ...span,
+                                        tag: state.tag,
+                                        color: TAG_COLORS[state.tag],
+                                    })}
+                                />
+                                {/*Testing the value*/}
+                                <pre style={{fontSize: 12, lineHeight: 1.2}}>
+        {JSON.stringify(state, null, 2)}
+      </pre>
+                            </Grid>
+                            <Grid xs></Grid>
+                        </>
+                    )}
+                </State>
             </Grid>
         </Box>
-    )
-}
+    );
+};
+
 export default EditArticle;
