@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import './ImportXML.css'
 import ImportButton from "../components/ImportButton/ImportButton";
-const FileUploader = () => {
+const ImportXML = () => {
 
     const [artikelen, setArtikelen] = React.useState([
         {
@@ -33,7 +33,7 @@ const FileUploader = () => {
             </div>
             <div className="imported-content-container">
                 <h1>
-                    artieklen
+                    Artikelen
                 </h1>
 
                 <div className="artikelen">
@@ -50,4 +50,4 @@ const FileUploader = () => {
     );
 };
 
-export default FileUploader;
+export default ImportXML;
