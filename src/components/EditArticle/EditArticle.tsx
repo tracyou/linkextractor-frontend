@@ -1,7 +1,7 @@
 import React from "react";
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import Box from '@mui/material/Box';
-import {Badge, Card, CardContent, InputLabel, MenuItem, Select, Typography} from "@mui/material";
+import {Card, CardContent, InputLabel, MenuItem, Select, Typography} from "@mui/material";
 
 const EditArticle = () => {
     const [law, setLaw] = React.useState<string>("");
@@ -40,7 +40,6 @@ const EditArticle = () => {
             <Grid container spacing={5}>
                 <Grid xs>
                     {selectedText &&
-                        //TODO Make seperate component
                       <Card>
                         <CardContent>
                           <Typography sx={{fontSize: 18}}>
@@ -55,14 +54,7 @@ const EditArticle = () => {
                             fullWidth
                             onChange={e => setLaw(e.target.value)}
                           >
-                            <MenuItem value={1}>
-                              <Badge
-                                color={}
-                                anchorOrigin={{
-                                    vertical: 'bottom',
-                                    horizontal: 'left',
-                                }}>
-                              </Badge> Afleidingsregel</MenuItem>
+                            <MenuItem value={1}>Afleidingsregel</MenuItem>
                             <MenuItem value={2}>Rechtssubject</MenuItem>
                             <MenuItem value={3}>Rechtsbetrekking</MenuItem>
                           </Select>
