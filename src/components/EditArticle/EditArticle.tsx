@@ -2,9 +2,9 @@ import React from "react";
 import Grid from '@mui/material/Unstable_Grid2';
 import Box from '@mui/material/Box';
 import {Card, CardContent, InputLabel, MenuItem, Select} from "@mui/material";
-import {State} from "react-powerplug";
-import {TextAnnotator} from "react-text-annotate";
 import {Blue, DarkBlue, LightBlue} from "../../stylesheets/Colors";
+import {init} from "@graphql-codegen/cli";
+import {TextAnnotate} from "react-text-annotate-blend";
 
 const EditArticle = () => {
     const text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum\n" +
@@ -24,7 +24,12 @@ const EditArticle = () => {
         "                                release of Letraset sheets containing Lorem Ipsum passages, and more recently with\n" +
         "                                desktop\n" +
         "                                publishing"
+    const [value, setValue] = React.useState(init);
+    const [tag, setTag] = React.useState("Afleidingsregel");
 
+    const handleChange = (value) => {
+        setValue(value);
+    };
     const TAG_COLORS: Record<string, string> = {
         'Afleidingsregel': LightBlue,
         'Rechtssubject': DarkBlue,
@@ -34,54 +39,43 @@ const EditArticle = () => {
     return (
         <Box sx={{flexGrow: 1}}>
             <Grid container spacing={5}>
-                <State initial={{value: [{start: 0, end: 0, tag: ''}], tag: ''}}>
-                    {({state, setState}) => (
-                        <>
-                            <Grid xs>
-                                <Card>
-                                    <CardContent>
-                                        <InputLabel id="demo-simple-select-label">Wetgeving</InputLabel>
-                                        <Select
-                                            labelId="demo-simple-select-label"
-                                            id="demo-simple-select"
-                                            value={state.tag}
-                                            label="Wetgeving"
-                                            fullWidth
-                                            onChange={(e) => setState({tag: e.target.value})}
-                                        >
-                                            <MenuItem value={'Afleidingsregel'}>Afleidingsregel</MenuItem>
-                                            <MenuItem value={'Rechtssubject'}>Rechtssubject</MenuItem>
-                                            <MenuItem value={'Rechtbetrekking'}>Rechtsbetrekking</MenuItem>
-                                        </Select>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                            <Grid xs={5}>
-                                <TextAnnotator
-                                    style={{
-                                        maxWidth: 500,
-                                        lineHeight: 1.5,
-                                    }}
-                                    content={text}
-                                    value={state.value}
-                                    onChange={(value) => {
-                                        setState({value});
-                                    }}
-                                    getSpan={(span) => ({
-                                        ...span,
-                                        tag: state.tag,
-                                        color: TAG_COLORS[state.tag],
-                                    })}
-                                />
-                                {/*Testing the value*/}
-                                <pre style={{fontSize: 12, lineHeight: 1.2}}>
-        {JSON.stringify(state, null, 2)}
-      </pre>
-                            </Grid>
-                            <Grid xs></Grid>
-                        </>
-                    )}
-                </State>
+                        <Grid xs>
+                            <Card>
+                                <CardContent>
+                                    <InputLabel id="demo-simple-select-label">Wetgeving</InputLabel>
+                                    <Select
+                                        labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        value={tag}
+                                        label="Wetgeving"
+                                        fullWidth
+                                        onChange={(e) => setTag(e.target.value)}
+                                    >
+                                        <MenuItem value={'Afleidingsregel'}>Afleidingsregel</MenuItem>
+                                        <MenuItem value={'Rechtssubject'}>Rechtssubject</MenuItem>
+                                        <MenuItem value={'Rechtbetrekking'}>Rechtsbetrekking</MenuItem>
+                                    </Select>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid xs={5}>
+                            <TextAnnotate
+                                style={{
+                                    fontSize: "1.2rem",
+                                }}
+                                content={text}
+                                onChange={handleChange}
+                                value={value}
+                                getSpan={(span) => ({
+                                    ...span,
+                                    tag: tag,
+                                    color: TAG_COLORS[tag],
+                                })}
+                            />
+                            {/*Testing the value*/}
+
+                        </Grid>
+                        <Grid xs></Grid>
             </Grid>
         </Box>
     );
