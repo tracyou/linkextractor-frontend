@@ -41,14 +41,17 @@ const EditArticle = () => {
         <Box sx={{flexGrow: 1}}>
             <Grid container spacing={5}>
                 <Grid xs>
-                    <Card>
+                    <Card
+                        style={{backgroundColor: LightBlue}}
+                        variant="outlined"
+                    >
                         <CardContent>
-                            <InputLabel id="demo-simple-select-label">Wetgeving</InputLabel>
+                            <InputLabel id="demo-simple-select-label">Begrip</InputLabel>
                             <Select
+                                style={{backgroundColor: '#ffffff'}}
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
                                 value={tag}
-                                label="Wetgeving"
                                 fullWidth
                                 onChange={(e) => setTag(e.target.value)}
                             >
@@ -72,11 +75,11 @@ const EditArticle = () => {
                             ...span,
                             tag: tag,
                             color: TAG_COLORS[tag],
-                        })}></TextAnnotate>
+                        })}/>
                     {/*Testing the value*/}
-                    <pre style={{fontSize: 12, lineHeight: 1.2}}>
-        {JSON.stringify(value, null, 2)}
-      </pre>
+                    {/*              <pre style={{fontSize: 12, lineHeight: 1.2}}>*/}
+                    {/*  {JSON.stringify(value, null, 2)}*/}
+                    {/*</pre>*/}
                 </Grid>
                 <Grid xs></Grid>
             </Grid>
