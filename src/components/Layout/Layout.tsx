@@ -5,6 +5,7 @@ import {Route, Routes} from "react-router-dom";
 import ImportXML from "../../views/ImportXML";
 import './Layout.css'
 import EditArticle from "../EditArticle/EditArticle";
+import TextAnnotator from "../TextAnnotator/TextAnnotator";
 
 const Layout = () => (
 
@@ -20,6 +21,7 @@ const Layout = () => (
                         <Route path="/import-xml" element={<ImportXML/>}/>
                         <Route path="/navbar" element={<Navbar/>}/>
                         <Route path="/editarticle" element={<EditArticle/>}/>
+                        <Route path="/annotate" element={<TextAnnotator/>}/>
                     </Routes>
                 </div>
 
