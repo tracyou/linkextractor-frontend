@@ -21,6 +21,8 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.20.0",
     "react-scripts": "5.0.1",
+    "react-text-annotate-blend": "^1.1.0",
+    "styled-components": "^6.1.1",
     "react-xml-parser": "^1.1.8",
     "web-vitals": "^2.1.4"
   },
@@ -51,7 +53,6 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@graphql-cli/codegen": "^3.0.4",
     "@graphql-codegen/add": "^5.0.0",
     "@graphql-codegen/cli": "4.0.1",
