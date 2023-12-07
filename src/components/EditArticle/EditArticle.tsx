@@ -1,9 +1,11 @@
 import React from "react";
 import Grid from '@mui/material/Unstable_Grid2';
 import Box from '@mui/material/Box';
-import {Card, CardContent, InputLabel, MenuItem, Select} from "@mui/material";
+import {Button, Card, CardContent, InputLabel, MenuItem, Select, Stack, TextField} from "@mui/material";
 import {Blue, DarkBlue, LightBlue} from "../../stylesheets/Colors";
 import {AnnotateTag, TextAnnotate} from "react-text-annotate-blend";
+import {Title} from "../../stylesheets/Fonts";
+import styles from "./EditArticle.module.css";
 
 const EditArticle = () => {
     const init: AnnotateTag[] = [];
@@ -39,16 +41,29 @@ const EditArticle = () => {
 
     return (
         <Box sx={{flexGrow: 1}}>
+            <Grid
+                alignItems="center"
+                justifyContent="center"
+                container
+            >
+                <h1 style={Title}>Artikel 80</h1>
+            </Grid>
             <Grid container spacing={5}>
-                <Grid xs>
+                <Grid xs={4}>
                     <Card
-                        style={{backgroundColor: LightBlue}}
+                        style={{borderColor: LightBlue}}
                         variant="outlined"
                     >
                         <CardContent>
+                            <Grid
+                                alignItems="center"
+                                justifyContent="center"
+                                container
+                            >
                             <InputLabel id="demo-simple-select-label">Begrip</InputLabel>
+                            </Grid>
                             <Select
-                                style={{backgroundColor: '#ffffff'}}
+                                className={styles.inputMargin}
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
                                 value={tag}
@@ -59,13 +74,30 @@ const EditArticle = () => {
                                 <MenuItem value={'Rechtssubject'}>Rechtssubject</MenuItem>
                                 <MenuItem value={'Rechtbetrekking'}>Rechtsbetrekking</MenuItem>
                             </Select>
+                            <TextField
+                                style={{marginTop: '1rem'}}
+                                id="outlined-basic"
+                                label="Commentaar"
+                                fullWidth/>
+                            <Stack
+                                direction="row"
+                                spacing={8}
+                                className={styles.inputMargin}
+                                alignItems="center"
+                                justifyContent="center">
+                                <Button variant="contained" color="error">
+                                    Annuleren
+                                </Button>
+                                <Button variant="contained" color="success">
+                                    Toevoegen
+                                </Button>
+                            </Stack>
                         </CardContent>
                     </Card>
                 </Grid>
-                <Grid xs={5}>
+                <Grid xs={8}>
                     <TextAnnotate
                         style={{
-                            maxWidth: 500,
                             lineHeight: 1.5,
                         }}
                         content={text}
@@ -81,7 +113,6 @@ const EditArticle = () => {
                     {/*  {JSON.stringify(value, null, 2)}*/}
                     {/*</pre>*/}
                 </Grid>
-                <Grid xs></Grid>
             </Grid>
         </Box>
     );
