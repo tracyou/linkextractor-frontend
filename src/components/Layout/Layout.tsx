@@ -1,9 +1,10 @@
-import React, {ReactNode} from 'react';
+import React from 'react';
 import Navbar from "../Navbar/Navbar";  // Adjust the path based on your file structure
 import Footer from "../Footer/Footer";
 import {Route, Routes} from "react-router-dom";
 import ImportXML from "../../views/ImportXML";
 import './Layout.css'
+import EditArticle from "../EditArticle/EditArticle";
 
 const Layout = () => (
 
@@ -18,6 +19,7 @@ const Layout = () => (
                     <Routes>
                         <Route path="/import-xml" element={<ImportXML/>}/>
                         <Route path="/navbar" element={<Navbar/>}/>
+                        <Route path="/editarticle" element={<EditArticle/>}/>
                     </Routes>
                 </div>
 

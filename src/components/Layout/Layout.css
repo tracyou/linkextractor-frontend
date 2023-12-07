@@ -6,6 +6,8 @@
 }
 
 .content-area {
+    margin-top: 3rem;
+    margin-left: 10rem;
     flex: 1;
     margin-bottom: 500px;
 }
