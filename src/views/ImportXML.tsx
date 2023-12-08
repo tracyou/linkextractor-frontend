@@ -1,14 +1,15 @@
-import React, {useState} from "react";
+import React, {SetStateAction, useState} from "react";
 import './ImportXML.css'
 import ImportButton from "../components/ImportButton/ImportButton";
 import ViewXML from "./ViewXML";
-import Navbar from "../components/Navbar/Navbar";
+import SharedVariables from "../SharedVariables";
 import Footer from "../components/Footer/Footer";
-import {
-    SetStateAction
-} from "../../../../../../../../../Program Files/JetBrains/IntelliJ IDEA 2022.2.1/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external/react";
+import sharedVariables from "../SharedVariables";
+
 
 const ImportXML = () => {
+
+    new SharedVariables();
 
 
     const [fileContent, setFileContent] = useState("")
@@ -25,7 +26,7 @@ const ImportXML = () => {
         },
     ]);
 
-    const [file, setFile] = useState<File>();
+    const [file, setFile] = useState<File|null>();
     const [viewXML, setViewXML] = useState<SetStateAction<any>>();
 
     const handleFileSelect = (selectedFile: File) => {
@@ -38,17 +39,22 @@ const ImportXML = () => {
                 const content = e.target?.result as string;
                 setFileContent(content)//save the file content inthe variable to be used later
                 setViewXML(<ViewXML name={selectedFile.name} data={content}/>);
+                sharedVariables.setFile(file)
+                console.log(sharedVariables.getFile()?.name)
             };
             reader.readAsText(selectedFile);//read the file content
         }
     }
 
+const handleOnClick= () =>{
 
+    window.location.href = '/ViewXML.tsx';
+
+}
 
 
     return (
         <>
-            <Navbar></Navbar>
             <div className="importButtonContainer">
 
                 <ImportButton onFileSelect={handleFileSelect}/>
@@ -62,14 +68,13 @@ const ImportXML = () => {
                 <div className="artikelen">
                     {artikelen.map((artikel, index) => (
 
-                        <div key={index} className="artikel">
+                        <div key={index} className="artikel" onClick={handleOnClick}>
                             <h2>{artikel.name}</h2>
                         </div>
                     ))}
                 </div>
-                {viewXML}
+                {/*{viewXML}*/}
             </div>
-            <Footer></Footer>
         </>
     );
 };

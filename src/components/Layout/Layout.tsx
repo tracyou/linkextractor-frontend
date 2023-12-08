@@ -4,6 +4,8 @@ import Footer from "../Footer/Footer";
 import {Route, Routes} from "react-router-dom";
 import ImportXML from "../../views/ImportXML";
 import './Layout.css'
+import HomePage from "../HomePage/HomePage";
+import ViewXML from "../../views/ViewXML";
 
 const Layout = () => (
 
@@ -16,8 +18,10 @@ const Layout = () => (
                 <div className="content-area">
 
                     <Routes>
-                        {/*<Route path="/import-xml" element={<ImportXML/>}/>*/}
+                        <Route path="/" element={<HomePage/>}/>
+                        <Route path="/import-xml" element={<ImportXML/>}/>
                         <Route path="/navbar" element={<Navbar/>}/>
+                        <Route path="/navbar" element={<ViewXML/>}/>
                     </Routes>
                 </div>
 
