@@ -2,15 +2,10 @@ import React, {SetStateAction, useState} from "react";
 import './ImportXML.css'
 import ImportButton from "../components/ImportButton/ImportButton";
 import ViewXML from "./ViewXML";
-import SharedVariables from "../SharedVariables";
 import Footer from "../components/Footer/Footer";
-import sharedVariables from "../SharedVariables";
 
 
 const ImportXML = () => {
-
-    new SharedVariables();
-
 
     const [fileContent, setFileContent] = useState("")
 
@@ -39,18 +34,17 @@ const ImportXML = () => {
                 const content = e.target?.result as string;
                 setFileContent(content)//save the file content inthe variable to be used later
                 setViewXML(<ViewXML name={selectedFile.name} data={content}/>);
-                sharedVariables.setFile(file)
-                console.log(sharedVariables.getFile()?.name)
+
             };
             reader.readAsText(selectedFile);//read the file content
         }
     }
 
-const handleOnClick= () =>{
+    const handleOnClick= () =>{
 
-    window.location.href = '/ViewXML.tsx';
+        window.location.href = '/ViewXML.tsx';
 
-}
+    }
 
 
     return (

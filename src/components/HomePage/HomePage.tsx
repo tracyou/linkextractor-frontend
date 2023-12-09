@@ -3,6 +3,7 @@ import Navbar from "../Navbar/Navbar";  // Adjust the path based on your file st
 import Footer from "../Footer/Footer";
 import {Outlet, redirect} from "react-router-dom";
 import './HomePage.css';
+import '../../views/ImportXML.css'
 
 
 const handleClick = () => {
@@ -11,7 +12,7 @@ const handleClick = () => {
 const HomePage = () => (
 
 
-    <div>
+    <div className='importButtonContainer'>
         <h1>Wat is de annotatietool</h1>
 
         <div id="button" >

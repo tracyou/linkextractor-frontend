@@ -7,7 +7,7 @@ import Footer from "./components/Footer/Footer";
 import HomePage from "./components/HomePage/HomePage";
 import ImportXML from "./views/ImportXML";
 import ViewXML from "./views/ViewXML";
-// import ViewXML from "./views/ViewXML";
+
 
 const router = createBrowserRouter([
     {
@@ -16,7 +16,7 @@ const router = createBrowserRouter([
         children: [
             {
                 path: "/import-xml",
-                element: <ImportXML></ImportXML>
+                element: <ImportXML/>
             },
             {
                 path: "/navbar",
@@ -26,11 +26,11 @@ const router = createBrowserRouter([
                 path: '/',
                 element: <HomePage/>
             },
-            {
-                path: '/view-xml',
-                element: <ViewXML />
-
-            }
+            // {
+            //     path: '/view-xml',
+            //     element: <ViewXML  data={} name={}/>
+            //
+            // }
         ],
     }
 
