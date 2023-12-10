@@ -12,7 +12,6 @@
     display: flex;
     justify-content: space-between;
     background-color: #006699;
-    height: 2.2rem;
     align-items: stretch;
     padding-left: 11rem  ;
     border-bottom: 8px solid #B2D7EA;
@@ -26,7 +25,7 @@
     display: flex;
 }
 
-/* Navbar list item styles */   
+/* Navbar list item styles */
 .nav li {
     margin-right: 1rem;
     height: 100%;

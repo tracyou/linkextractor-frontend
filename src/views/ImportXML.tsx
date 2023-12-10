@@ -43,7 +43,7 @@ const ImportXML = () => {
 
     const handleOnClick= () =>{
 
-        window.location.href = '/ViewXML.tsx';
+        window.location.href = '/annotate';
 
     }
 

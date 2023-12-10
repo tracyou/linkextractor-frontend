@@ -1,39 +1,38 @@
-import {createBrowserRouter, redirect} from "react-router-dom";
-import React, {Component} from 'react';
-import path from "path";
+import {createBrowserRouter} from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Layout from "./components/Layout/Layout";
-import Footer from "./components/Footer/Footer";
-import HomePage from "./components/HomePage/HomePage";
 import ImportXML from "./views/ImportXML";
-import ViewXML from "./views/ViewXML";
-
-
+import EditArticle from "./components/EditArticle/EditArticle";
+import React from "react";
+import TextAnnotator from "./components/TextAnnotator/TextAnnotator";
+import HomePage from "./components/HomePage/HomePage";
 const router = createBrowserRouter([
     {
         path: "/",
         element: <Layout/>,
         children: [
             {
+                path: '/',
+                element: <HomePage/>
+            },
+            {
                 path: "/import-xml",
                 element: <ImportXML/>
             },
             {
-                path: "/navbar",
-                element: <Navbar></Navbar>
+                path:"/navbar",
+                element:<Navbar/>
             },
             {
-                path: '/',
-                element: <HomePage/>
+                path: "/editarticle",
+                element: <EditArticle/>,
             },
-            // {
-            //     path: '/view-xml',
-            //     element: <ViewXML  data={} name={}/>
-            //
-            // }
+            {
+                path: "/annotate",
+                element: <TextAnnotator/>,
+            },
         ],
     }
-
 ])
 
 export default router;
