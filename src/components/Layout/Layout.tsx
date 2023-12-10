@@ -6,6 +6,7 @@ import ImportXML from "../../views/ImportXML";
 import './Layout.css'
 import EditArticle from "../EditArticle/EditArticle";
 import TextAnnotator from "../TextAnnotator/TextAnnotator";
+import HomePage from "../HomePage/HomePage";
 
 const Layout = () => {
 
@@ -17,6 +18,7 @@ const Layout = () => {
             <switch>
                 <div className="content-area">
                     <Routes>
+                        <Route path="/" element={<HomePage/>}/>
                         <Route path="/import-xml" element={<ImportXML/>}/>
                         <Route path="/navbar" element={<Navbar/>}/>
                         <Route path="/editarticle" element={<EditArticle/>}/>
