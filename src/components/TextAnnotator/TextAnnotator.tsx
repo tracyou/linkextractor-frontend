@@ -12,6 +12,7 @@ import {
     SelectChangeEvent, TextField
 } from "@mui/material";
 import AnnotatedText from './AnnotatedText';
+import {Title} from "../../stylesheets/Fonts";
 
 interface Annotation {
     start: number;
@@ -114,10 +115,17 @@ const TextAnnotator = () => {
 
         return (
             <Box sx={{flexGrow: 1}}>
+                <Grid
+                    alignItems="center"
+                    justifyContent="center"
+                    container
+                >
+                    <h1 style={Title}>Artikel 80</h1>
+                </Grid>
                 <Grid container spacing={5}>
                     <Grid xs>
                         <Card
-                            style={{backgroundColor: LightBlue, visibility: isSelected ? "visible" : "hidden"}}
+                            style={{visibility: isSelected ? "visible" : "hidden"}}
                             variant="outlined"
                         >
                             <CardContent>
@@ -142,10 +150,12 @@ const TextAnnotator = () => {
                                            value={comment}
                                            fullWidth
                                            onChange={(e) => handleCommentInput(e)}/>
-                                <div style={{display: "flex", flexDirection: "row", gap: "2em", marginTop: "2em"}}>
+                                <div style={{display: "flex", flexDirection: "row", gap: "2em", marginTop: "2em",
+                                    alignItems: "center",
+                                    justifyContent: "center"}}>
                                     <Button variant={"contained"} color={"success"} size={"large"}
                                             onClick={() => handleAddAnnotation()}>Toevoegen</Button>
-                                    <Button variant={"outlined"} color={"error"} size={"large"}
+                                    <Button variant={"contained"} color={"error"} size={"large"}
                                             onClick={() => handleClose()}>Sluiten</Button>
                                 </div>
                             </CardContent>
@@ -162,9 +172,9 @@ const TextAnnotator = () => {
                             />
                         </div>
                         {/*Testing the value*/}
-                        <pre style={{fontSize: 12, lineHeight: 1.2}}>
-                      {JSON.stringify(annotations, null, 2)}
-                    </pre>
+                    {/*    <pre style={{fontSize: 12, lineHeight: 1.2}}>*/}
+                    {/*  {JSON.stringify(annotations, null, 2)}*/}
+                    {/*</pre>*/}
                     </Grid>
                     <Grid xs></Grid>
                 </Grid>
