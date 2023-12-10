@@ -2,7 +2,8 @@ import React, {SetStateAction, useState} from "react";
 import './ImportXML.css'
 import ImportButton from "../components/ImportButton/ImportButton";
 import ViewXML from "./ViewXML";
-import Footer from "../components/Footer/Footer";
+import {Title} from "../stylesheets/Fonts";
+import Grid from "@mui/material/Grid";
 
 
 const ImportXML = () => {
@@ -49,16 +50,17 @@ const ImportXML = () => {
 
     return (
         <>
-            <div className="importButtonContainer">
-
-                <ImportButton onFileSelect={handleFileSelect}/>
-
-            </div>
             <div className="imported-content-container">
-                <h1>
+                <h1 style={Title}>
                     Artikelen
                 </h1>
-
+                <Grid
+                    alignItems="right"
+                    justifyContent="right"
+                    container>
+                    <ImportButton onFileSelect={handleFileSelect}/>
+                </Grid>
+                <Grid>
                 <div className="artikelen">
                     {artikelen.map((artikel, index) => (
 
@@ -67,7 +69,7 @@ const ImportXML = () => {
                         </div>
                     ))}
                 </div>
-                {/*{viewXML}*/}
+                </Grid>
             </div>
         </>
     );

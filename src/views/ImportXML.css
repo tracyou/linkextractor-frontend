@@ -15,12 +15,11 @@ input::file-selector-button{
 }
 
 .artikelen {
-    list-style: none;
+    padding-top: 2rem;
     padding-left: 20%;
     padding-right: 20%;
     align-items: center;
     justify-content: center;
-    padding-bottom: 100px;
 }
 
 .artikel {
@@ -30,10 +29,6 @@ input::file-selector-button{
 }
 .artikel h2{
     margin-left: 2rem;
-}
-.imported-content-container h1{
-    color: #003366;
-    /*padding-left: 22%;*/
 }
 
 
