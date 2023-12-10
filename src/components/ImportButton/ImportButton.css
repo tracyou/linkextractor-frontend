@@ -1,15 +1,12 @@
 .import-button {
     display: flex;
-    height: 100%;
-    width: 5%;
+    height: 3rem;
     justify-content: space-between;
     background-color: lightgray;
     align-items: center;
     padding-right: 2rem;
     padding-left: 2rem;
     border-radius: 5%;
-    margin-right: 3rem;
-    min-width: 70px;
 
 }
 
@@ -18,8 +15,6 @@
     max-height: 2rem;
     max-width: 2rem;
     padding-left: 1rem;
-
-
 }
 
 
