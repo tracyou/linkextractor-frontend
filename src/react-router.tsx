@@ -5,11 +5,16 @@ import ImportXML from "./views/ImportXML";
 import EditArticle from "./components/EditArticle/EditArticle";
 import React from "react";
 import TextAnnotator from "./components/TextAnnotator/TextAnnotator";
+import HomePage from "./components/HomePage/HomePage";
 const router = createBrowserRouter([
     {
-        path: "*",
+        path: "/",
         element: <Layout/>,
         children: [
+            {
+                path: '/',
+                element: <HomePage/>
+            },
             {
                 path: "/import-xml",
                 element: <ImportXML/>
@@ -19,11 +24,11 @@ const router = createBrowserRouter([
                 element:<Navbar/>
             },
             {
-                path: "editarticle",
+                path: "/editarticle",
                 element: <EditArticle/>,
             },
             {
-                path: "annotate",
+                path: "/annotate",
                 element: <TextAnnotator/>,
             },
         ],
