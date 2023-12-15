@@ -1,44 +1,47 @@
-import React from "react";
+import React, {useState} from "react";
 import Grid from '@mui/material/Unstable_Grid2';
 import Box from '@mui/material/Box';
 import {Button, Card, CardContent, InputLabel, MenuItem, Select, Stack, TextField} from "@mui/material";
 import {Blue, DarkBlue, LightBlue} from "../../stylesheets/Colors";
-import {AnnotateTag, TextAnnotate} from "react-text-annotate-blend";
 import {Title} from "../../stylesheets/Fonts";
 import styles from "./EditArticle.module.css";
+import Editor from "../Editor/Editor";
+import {Descendant} from "slate";
+import {Matter} from "../../types";
 
 const EditArticle = () => {
-    const init: AnnotateTag[] = [];
 
-    const text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum\n" +
-        "                                has\n" +
-        "                                been\n" +
-        "                                the\n" +
-        "                                industry&aposs standard dummy text ever since the 1500s, when an unknown printer took a\n" +
-        "                                galley of\n" +
-        "                                type and\n" +
-        "                                scrambled it to make a type specimen book. It has survived not only five centuries, but\n" +
-        "                                also\n" +
-        "                                the\n" +
-        "                                leap\n" +
-        "                                into electronic typesetting, remaining essentially unchanged. It was popularised in the\n" +
-        "                                1960s with\n" +
-        "                                the\n" +
-        "                                release of Letraset sheets containing Lorem Ipsum passages, and more recently with\n" +
-        "                                desktop\n" +
-        "                                publishing"
-    const [value, setValue] = React.useState<AnnotateTag[]>(init);
-    const [tag, setTag] = React.useState("Afleidingsregel");
-
-    const handleChange = (value: AnnotateTag[]) => {
-        setValue(value);
-    };
-    const TAG_COLORS: Record<string, string> = {
+    const MATTER_COLORS: Record<string, string> = {
         'Afleidingsregel': LightBlue,
         'Rechtssubject': DarkBlue,
         'Rechtsbetrekking': Blue,
     };
+    const [matter, setMatter] = React.useState<Matter>({title: "Afleidingsregel", color: MATTER_COLORS['Afleidingsregel']});
+    const [description, setDescription] = React.useState("");
+    const [comment, setComment] = React.useState("");
 
+    const ExampleDocument: Descendant[] = [
+        {
+            type: "h1",
+            children: [{ text: "Heading 1" }],
+        },
+        {
+            type: "h2",
+            children: [{ text: "Heading 2" }],
+        },
+        {
+            type: "paragraph",
+            children: [
+                { text: "Hello World! This is my paragraph inside a sample document." },
+                { text: "Bold text.", bold: true },
+                { text: "Italic text.", italic: true },
+                { text: "Bold and underlined text.", bold: true, underline: true },
+                { text: "variableFoo", code: true },
+            ],
+        },
+    ]
+
+    const [document, setDocument] = useState<Descendant[]>(ExampleDocument);
     return (
         <Box sx={{flexGrow: 1}}>
             <Grid
@@ -66,17 +69,26 @@ const EditArticle = () => {
                                 className={styles.inputMargin}
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
-                                value={tag}
+                                value={matter.title}
                                 fullWidth
-                                onChange={(e) => setTag(e.target.value)}
+                                onChange={(e) => setMatter({title: e.target.value.toString(), color: MATTER_COLORS[e.target.value.toString()]})}
                             >
                                 <MenuItem value={'Afleidingsregel'}>Afleidingsregel</MenuItem>
                                 <MenuItem value={'Rechtssubject'}>Rechtssubject</MenuItem>
-                                <MenuItem value={'Rechtbetrekking'}>Rechtsbetrekking</MenuItem>
+                                <MenuItem value={'Rechtsbetrekking'}>Rechtsbetrekking</MenuItem>
                             </Select>
                             <TextField
                                 style={{marginTop: '1rem'}}
                                 id="outlined-basic"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                label="Definitie"
+                                fullWidth/>
+                            <TextField
+                                style={{marginTop: '1rem'}}
+                                id="outlined-basic"
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
                                 label="Commentaar"
                                 fullWidth/>
                             <Stack
@@ -96,22 +108,7 @@ const EditArticle = () => {
                     </Card>
                 </Grid>
                 <Grid xs={8}>
-                    <TextAnnotate
-                        style={{
-                            lineHeight: 1.5,
-                        }}
-                        content={text}
-                        value={value!}
-                        onChange={handleChange}
-                        getSpan={(span) => ({
-                            ...span,
-                            tag: tag,
-                            color: TAG_COLORS[tag],
-                        })}/>
-                    {/*Testing the value*/}
-                    {/*              <pre style={{fontSize: 12, lineHeight: 1.2}}>*/}
-                    {/*  {JSON.stringify(value, null, 2)}*/}
-                    {/*</pre>*/}
+                    <Editor document={document} onChange={setDocument} matter={matter} description={description} comment={comment}/>
                 </Grid>
             </Grid>
         </Box>
