@@ -1,0 +1,11 @@
+query matters {
+    matters {
+        ...Matter
+    }
+}
+
+query matterById($id: UUID!) {
+    matter(id: $id) {
+        ...Matter
+    }
+}
