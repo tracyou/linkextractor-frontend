@@ -9,7 +9,7 @@ import HomePage from "./components/HomePage/HomePage";
 import ApiDemo from "./components/ApiDemo/ApiDemo";
 const router = createBrowserRouter([
     {
-        path: "*",
+        path: "/",
         element: <Layout/>,
         children: [
             {

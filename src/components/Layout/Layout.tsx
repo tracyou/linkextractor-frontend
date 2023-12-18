@@ -5,6 +5,8 @@ import {Route, Routes} from "react-router-dom";
 import ImportXML from "../../views/ImportXML";
 import './Layout.css'
 import EditArticle from "../EditArticle/EditArticle";
+import HomePage from "../HomePage/HomePage";
+import ApiDemo from "../ApiDemo/ApiDemo";
 
 const Layout = () => {
 
@@ -20,8 +22,7 @@ const Layout = () => {
                         <Route path="/import-xml" element={<ImportXML/>}/>
                         <Route path="/navbar" element={<Navbar/>}/>
                         <Route path="/editarticle" element={<EditArticle/>}/>
-                        <Route path="/annotate" element={<TextAnnotator/>}/>
-                        <Route path={"/test"} element={<ApiDemo/>}/>
+                        <Route path="/test" element={<ApiDemo/>}/>
                     </Routes>
                 </div>
 
