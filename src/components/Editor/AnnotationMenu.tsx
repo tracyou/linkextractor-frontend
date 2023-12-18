@@ -8,6 +8,8 @@ import {useSlateStatic} from "slate-react";
 import useAddAnnotationToState from "../../utils/hooks/useAddAnnotationToState";
 import {insertAnnotation} from "../../utils/EditorAnnotationUtils";
 import {BaseSelection} from "slate";
+import {MattersDocument, MattersQuery} from "../../graphql/api-schema";
+import {useQuery} from "@apollo/client";
 
 interface AnnotationProps {
     selection: BaseSelection,
@@ -18,11 +20,25 @@ interface AnnotationProps {
     setDefinition: Dispatch<SetStateAction<string>>
     comment: string
     setComment: Dispatch<SetStateAction<string>>
-    matterColors: Record<string, string>
+    matterColors: any
 }
-const AnnotationMenu: React.FC<AnnotationProps> = ({selection, setSelection, matter, setMatter, definition, setDefinition, comment, setComment, matterColors}) => {
+
+
+const AnnotationMenu: React.FC<AnnotationProps> = ({
+                                                       selection,
+                                                       setSelection,
+                                                       matter,
+                                                       setMatter,
+                                                       definition,
+                                                       setDefinition,
+                                                       comment,
+                                                       setComment,
+                                                       matterColors
+                                                   }) => {
     const editor = useSlateStatic();
     const addAnnotation = useAddAnnotationToState();
+    const {data, loading} = useQuery<MattersQuery>(MattersDocument)
+
 
     const onInsertAnnotation = useCallback(() => {
         insertAnnotation(editor, addAnnotation, {matter: matter, definition: definition, comment: comment});
@@ -50,7 +66,10 @@ const AnnotationMenu: React.FC<AnnotationProps> = ({selection, setSelection, mat
                 >
                     <h2>Annotatie toevoegen</h2>
                 </Grid>
-                <div style={{display: selection && selection.focus.offset - selection.anchor.offset >= 2 ? "flex" : "none", flexDirection: "column"}}>
+                <div style={{
+                    display: selection && selection.focus.offset - selection.anchor.offset >= 2 ? "flex" : "none",
+                    flexDirection: "column"
+                }}>
                     <Select
                         className={styles.inputMargin}
                         label={"Begrip"}
@@ -58,11 +77,16 @@ const AnnotationMenu: React.FC<AnnotationProps> = ({selection, setSelection, mat
                         id="demo-simple-select"
                         value={matter.title}
                         fullWidth
-                        onChange={(e) => setMatter({title: e.target.value.toString(), color: matterColors[e.target.value.toString()]})}
-                    >
-                        <MenuItem value={'Afleidingsregel'}>Afleidingsregel</MenuItem>
-                        <MenuItem value={'Rechtssubject'}>Rechtssubject</MenuItem>
-                        <MenuItem value={'Rechtsbetrekking'}>Rechtsbetrekking</MenuItem>
+                        onChange={(e) => setMatter({
+                            title: e.target.value.toString(),
+                            color: matterColors[e.target.value.toString()]
+                        })}
+                    >{
+                        data?.matters.map(matter =>
+                        <MenuItem key={matter.id} value={matter.name}>
+                            {matter.name}
+                        </MenuItem>)
+                    }
                     </Select>
                     <FormHelperText>Koppel een begrip aan de geselecteerde tekst</FormHelperText>
                     <TextField
@@ -87,7 +111,8 @@ const AnnotationMenu: React.FC<AnnotationProps> = ({selection, setSelection, mat
                         className={styles.inputMargin}
                         alignItems="center"
                         justifyContent="space-between">
-                        <Button variant="contained" style={{backgroundColor: LightBlue, color: "#000"}} onClick={onClearForm}>
+                        <Button variant="contained" style={{backgroundColor: LightBlue, color: "#000"}}
+                                onClick={onClearForm}>
                             Annuleren
                         </Button>
                         <Button variant="contained" style={{backgroundColor: DarkBlue}} onClick={onInsertAnnotation}>
@@ -95,7 +120,8 @@ const AnnotationMenu: React.FC<AnnotationProps> = ({selection, setSelection, mat
                         </Button>
                     </Stack>
                 </div>
-                <div style={{display: selection && selection.focus.offset - selection.anchor.offset >= 2 ? "none" : "flex"}}>
+                <div
+                    style={{display: selection && selection.focus.offset - selection.anchor.offset >= 2 ? "none" : "flex"}}>
                     Selecteer een woord om een annotatie toe te voegen
                 </div>
             </CardContent>
