@@ -1,7 +1,40 @@
-fragment Pancake on Pancake {
+fragment Law on Law {
     id
+    title
+    text
+    isPublished
+    annotations {
+        ...SimpleAnnotation
+    }
 }
 
-fragment PancakeStack on PancakeStack {
+fragment SimpleLaw on Law {
     id
+    title
+    text
+    isPublished
+}
+
+fragment SimpleAnnotation on Annotation {
+    id
+    text
+    pivot {
+        cursorIndex
+        comment
+    }
+}
+
+fragment Matter on Matter {
+    id
+    name
+    color
+    annotations {
+        ...SimpleAnnotation
+    }
+}
+
+fragment SimpleMatter on Matter {
+    id
+    name
+    color
 }

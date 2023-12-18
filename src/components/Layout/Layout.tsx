@@ -16,11 +16,15 @@ const Layout = () => {
             <switch>
                 <div className="content-area">
                     <Routes>
+                        <Route path="/" element={<HomePage/>}/>
                         <Route path="/import-xml" element={<ImportXML/>}/>
                         <Route path="/navbar" element={<Navbar/>}/>
                         <Route path="/editarticle" element={<EditArticle/>}/>
+                        <Route path="/annotate" element={<TextAnnotator/>}/>
+                        <Route path={"/test"} element={<ApiDemo/>}/>
                     </Routes>
                 </div>
+
                 </switch>
                 <Footer></Footer>
             </div>

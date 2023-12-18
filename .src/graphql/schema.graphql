@@ -1,3 +1,13 @@
+type Annotation {
+  createdAt: DateTime!
+  id: UUID!
+  laws: Law!
+  matter: Matter!
+  pivot: LawAnnotationPivot
+  text: String!
+  updatedAt: DateTime!
+}
+
 input CreatePancakeInput {
   diameter: Int!
 }
@@ -15,6 +25,46 @@ scalar DateTime
 Arbitrary data encoded in JavaScript Object Notation. See https://www.json.org.
 """
 scalar JSON
+
+type Law {
+  annotations: [Annotation!]!
+  createdAt: DateTime!
+  id: UUID!
+  isPublished: Boolean!
+  text: String!
+  title: String!
+  updatedAt: DateTime!
+}
+
+type LawAnnotationPivot {
+  comment: String
+  cursorIndex: Int!
+  id: UUID!
+}
+
+type Matter {
+  annotations: [Annotation!]!
+  color: String!
+  createdAt: DateTime!
+  id: UUID!
+  name: String!
+  updatedAt: DateTime!
+}
+
+"""Matter relation enum"""
+enum MatterRelationEnum {
+  """Requires one"""
+  REQUIRES_ONE
+
+  """Requires one or more"""
+  REQUIRES_ONE_OR_MORE
+
+  """Requires zero or more"""
+  REQUIRES_ZERO_OR_MORE
+
+  """Requires zero or one"""
+  REQUIRES_ZERO_OR_ONE
+}
 
 type Mutation {
   createPancake(input: CreatePancakeInput!): Pancake!
@@ -79,6 +129,10 @@ type PancakeStack {
 }
 
 type Query {
+  annotationsByLaw(lawId: UUID!): [Annotation!]!
+  laws: [Law!]!
+  matter(id: UUID!): Matter!
+  matters: [Matter!]!
   pancakeById(id: ID!): Pancake!
   pancakeStackById(id: ID!): PancakeStack!
   pancakeStacks: [PancakeStack!]!
@@ -107,6 +161,8 @@ enum Trashed {
   """Only return non-trashed results."""
   WITHOUT
 }
+
+scalar UUID
 
 input UpdatePancakeInput {
   diameter: Int!

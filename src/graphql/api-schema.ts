@@ -20,6 +20,17 @@ export interface Scalars {
   Date: { input: string; output: string; }
   DateTime: { input: string; output: string; }
   JSON: { input: string; output: string; }
+  UUID: { input: string; output: string; }
+}
+
+export interface Annotation {
+  readonly createdAt: Scalars['DateTime']['output'];
+  readonly id: Scalars['UUID']['output'];
+  readonly laws: Law;
+  readonly matter: Matter;
+  readonly pivot?: Maybe<LawAnnotationPivot>;
+  readonly text: Scalars['String']['output'];
+  readonly updatedAt: Scalars['DateTime']['output'];
 }
 
 export interface CreatePancakeInput {
@@ -29,6 +40,43 @@ export interface CreatePancakeInput {
 export interface CreatePancakeStackInput {
   readonly name: Scalars['String']['input'];
   readonly pancakes: ReadonlyArray<Scalars['ID']['input']>;
+}
+
+export interface Law {
+  readonly annotations: ReadonlyArray<Annotation>;
+  readonly createdAt: Scalars['DateTime']['output'];
+  readonly id: Scalars['UUID']['output'];
+  readonly isPublished: Scalars['Boolean']['output'];
+  readonly text: Scalars['String']['output'];
+  readonly title: Scalars['String']['output'];
+  readonly updatedAt: Scalars['DateTime']['output'];
+}
+
+export interface LawAnnotationPivot {
+  readonly comment?: Maybe<Scalars['String']['output']>;
+  readonly cursorIndex: Scalars['Int']['output'];
+  readonly id: Scalars['UUID']['output'];
+}
+
+export interface Matter {
+  readonly annotations: ReadonlyArray<Annotation>;
+  readonly color: Scalars['String']['output'];
+  readonly createdAt: Scalars['DateTime']['output'];
+  readonly id: Scalars['UUID']['output'];
+  readonly name: Scalars['String']['output'];
+  readonly updatedAt: Scalars['DateTime']['output'];
+}
+
+/** Matter relation enum */
+export enum MatterRelationEnum {
+  /** Requires one */
+  RequiresOne = 'REQUIRES_ONE',
+  /** Requires one or more */
+  RequiresOneOrMore = 'REQUIRES_ONE_OR_MORE',
+  /** Requires zero or more */
+  RequiresZeroOrMore = 'REQUIRES_ZERO_OR_MORE',
+  /** Requires zero or one */
+  RequiresZeroOrOne = 'REQUIRES_ZERO_OR_ONE'
 }
 
 export interface Mutation {
@@ -115,10 +163,24 @@ export interface PancakeStack {
 }
 
 export interface Query {
+  readonly annotationsByLaw: ReadonlyArray<Annotation>;
+  readonly laws: ReadonlyArray<Law>;
+  readonly matter: Matter;
+  readonly matters: ReadonlyArray<Matter>;
   readonly pancakeById: Pancake;
   readonly pancakeStackById: PancakeStack;
   readonly pancakeStacks: ReadonlyArray<PancakeStack>;
   readonly pancakes: ReadonlyArray<Pancake>;
+}
+
+
+export interface QueryAnnotationsByLawArgs {
+  lawId: Scalars['UUID']['input'];
+}
+
+
+export interface QueryMatterArgs {
+  id: Scalars['UUID']['input'];
 }
 
 
@@ -160,105 +222,150 @@ export interface UpdatePancakeStackInput {
   readonly pancakes: ReadonlyArray<Scalars['ID']['input']>;
 }
 
-export type PancakeFragment = { readonly id: string };
+export type LawFragment = { readonly id: string, readonly title: string, readonly text: string, readonly isPublished: boolean, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
 
-export type PancakeStackFragment = { readonly id: string };
+export type SimpleLawFragment = { readonly id: string, readonly title: string, readonly text: string, readonly isPublished: boolean };
 
-export type PancakesQueryVariables = Exact<{ [key: string]: never; }>;
+export type SimpleAnnotationFragment = { readonly id: string, readonly text: string, readonly pivot?: { readonly cursorIndex: number, readonly comment?: string | null } | null };
+
+export type MatterFragment = { readonly id: string, readonly name: string, readonly color: string, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
+
+export type SimpleMatterFragment = { readonly id: string, readonly name: string, readonly color: string };
+
+export type MattersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PancakesQuery = { readonly pancakes: ReadonlyArray<PancakeFragment> };
+export type MattersQuery = { readonly matters: ReadonlyArray<MatterFragment> };
 
-export type PancakeStacksQueryVariables = Exact<{ [key: string]: never; }>;
+export type MatterByIdQueryVariables = Exact<{
+  id: Scalars['UUID']['input'];
+}>;
 
 
-export type PancakeStacksQuery = { readonly pancakeStacks: ReadonlyArray<PancakeStackFragment> };
+export type MatterByIdQuery = { readonly matter: MatterFragment };
 
-export const PancakeFragmentDoc = gql`
-    fragment Pancake on Pancake {
+export const SimpleAnnotationFragmentDoc = gql`
+    fragment SimpleAnnotation on Annotation {
   id
-}
-    `;
-export const PancakeStackFragmentDoc = gql`
-    fragment PancakeStack on PancakeStack {
-  id
-}
-    `;
-export const PancakesDocument = gql`
-    query Pancakes {
-  pancakes {
-    ...Pancake
+  text
+  pivot {
+    cursorIndex
+    comment
   }
 }
-    ${PancakeFragmentDoc}`;
+    `;
+export const LawFragmentDoc = gql`
+    fragment Law on Law {
+  id
+  title
+  text
+  isPublished
+  annotations {
+    ...SimpleAnnotation
+  }
+}
+    ${SimpleAnnotationFragmentDoc}`;
+export const SimpleLawFragmentDoc = gql`
+    fragment SimpleLaw on Law {
+  id
+  title
+  text
+  isPublished
+}
+    `;
+export const MatterFragmentDoc = gql`
+    fragment Matter on Matter {
+  id
+  name
+  color
+  annotations {
+    ...SimpleAnnotation
+  }
+}
+    ${SimpleAnnotationFragmentDoc}`;
+export const SimpleMatterFragmentDoc = gql`
+    fragment SimpleMatter on Matter {
+  id
+  name
+  color
+}
+    `;
+export const MattersDocument = gql`
+    query matters {
+  matters {
+    ...Matter
+  }
+}
+    ${MatterFragmentDoc}`;
 
 /**
- * __usePancakesQuery__
+ * __useMattersQuery__
  *
- * To run a query within a React component, call `usePancakesQuery` and pass it any options that fit your needs.
- * When your component renders, `usePancakesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useMattersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMattersQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = usePancakesQuery({
+ * const { data, loading, error } = useMattersQuery({
  *   variables: {
  *   },
  * });
  */
-export function usePancakesQuery(baseOptions?: Apollo.QueryHookOptions<PancakesQuery, PancakesQueryVariables>) {
+export function useMattersQuery(baseOptions?: Apollo.QueryHookOptions<MattersQuery, MattersQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<PancakesQuery, PancakesQueryVariables>(PancakesDocument, options);
+        return Apollo.useQuery<MattersQuery, MattersQueryVariables>(MattersDocument, options);
       }
-export function usePancakesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PancakesQuery, PancakesQueryVariables>) {
+export function useMattersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MattersQuery, MattersQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<PancakesQuery, PancakesQueryVariables>(PancakesDocument, options);
+          return Apollo.useLazyQuery<MattersQuery, MattersQueryVariables>(MattersDocument, options);
         }
-export function usePancakesSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PancakesQuery, PancakesQueryVariables>) {
+export function useMattersSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<MattersQuery, MattersQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<PancakesQuery, PancakesQueryVariables>(PancakesDocument, options);
+          return Apollo.useSuspenseQuery<MattersQuery, MattersQueryVariables>(MattersDocument, options);
         }
-export type PancakesQueryHookResult = ReturnType<typeof usePancakesQuery>;
-export type PancakesLazyQueryHookResult = ReturnType<typeof usePancakesLazyQuery>;
-export type PancakesSuspenseQueryHookResult = ReturnType<typeof usePancakesSuspenseQuery>;
-export type PancakesQueryResult = Apollo.QueryResult<PancakesQuery, PancakesQueryVariables>;
-export const PancakeStacksDocument = gql`
-    query PancakeStacks {
-  pancakeStacks {
-    ...PancakeStack
+export type MattersQueryHookResult = ReturnType<typeof useMattersQuery>;
+export type MattersLazyQueryHookResult = ReturnType<typeof useMattersLazyQuery>;
+export type MattersSuspenseQueryHookResult = ReturnType<typeof useMattersSuspenseQuery>;
+export type MattersQueryResult = Apollo.QueryResult<MattersQuery, MattersQueryVariables>;
+export const MatterByIdDocument = gql`
+    query matterById($id: UUID!) {
+  matter(id: $id) {
+    ...Matter
   }
 }
-    ${PancakeStackFragmentDoc}`;
+    ${MatterFragmentDoc}`;
 
 /**
- * __usePancakeStacksQuery__
+ * __useMatterByIdQuery__
  *
- * To run a query within a React component, call `usePancakeStacksQuery` and pass it any options that fit your needs.
- * When your component renders, `usePancakeStacksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useMatterByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMatterByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = usePancakeStacksQuery({
+ * const { data, loading, error } = useMatterByIdQuery({
  *   variables: {
+ *      id: // value for 'id'
  *   },
  * });
  */
-export function usePancakeStacksQuery(baseOptions?: Apollo.QueryHookOptions<PancakeStacksQuery, PancakeStacksQueryVariables>) {
+export function useMatterByIdQuery(baseOptions: Apollo.QueryHookOptions<MatterByIdQuery, MatterByIdQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<PancakeStacksQuery, PancakeStacksQueryVariables>(PancakeStacksDocument, options);
+        return Apollo.useQuery<MatterByIdQuery, MatterByIdQueryVariables>(MatterByIdDocument, options);
       }
-export function usePancakeStacksLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PancakeStacksQuery, PancakeStacksQueryVariables>) {
+export function useMatterByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MatterByIdQuery, MatterByIdQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<PancakeStacksQuery, PancakeStacksQueryVariables>(PancakeStacksDocument, options);
+          return Apollo.useLazyQuery<MatterByIdQuery, MatterByIdQueryVariables>(MatterByIdDocument, options);
         }
-export function usePancakeStacksSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PancakeStacksQuery, PancakeStacksQueryVariables>) {
+export function useMatterByIdSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<MatterByIdQuery, MatterByIdQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<PancakeStacksQuery, PancakeStacksQueryVariables>(PancakeStacksDocument, options);
+          return Apollo.useSuspenseQuery<MatterByIdQuery, MatterByIdQueryVariables>(MatterByIdDocument, options);
         }
-export type PancakeStacksQueryHookResult = ReturnType<typeof usePancakeStacksQuery>;
-export type PancakeStacksLazyQueryHookResult = ReturnType<typeof usePancakeStacksLazyQuery>;
-export type PancakeStacksSuspenseQueryHookResult = ReturnType<typeof usePancakeStacksSuspenseQuery>;
-export type PancakeStacksQueryResult = Apollo.QueryResult<PancakeStacksQuery, PancakeStacksQueryVariables>;
+export type MatterByIdQueryHookResult = ReturnType<typeof useMatterByIdQuery>;
+export type MatterByIdLazyQueryHookResult = ReturnType<typeof useMatterByIdLazyQuery>;
+export type MatterByIdSuspenseQueryHookResult = ReturnType<typeof useMatterByIdSuspenseQuery>;
+export type MatterByIdQueryResult = Apollo.QueryResult<MatterByIdQuery, MatterByIdQueryVariables>;
