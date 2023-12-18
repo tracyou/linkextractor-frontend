@@ -1,139 +1,46 @@
-import React, {useCallback, useEffect, useState} from "react";
-import Grid from '@mui/material/Grid';
+import React from "react";
+import Grid from '@mui/material/Unstable_Grid2';
 import Box from '@mui/material/Box';
+import {Button, Card, CardContent, InputLabel, MenuItem, Select, Stack, TextField} from "@mui/material";
 import {Blue, DarkBlue, LightBlue} from "../../stylesheets/Colors";
+import {AnnotateTag, TextAnnotate} from "react-text-annotate-blend";
 import {Title} from "../../stylesheets/Fonts";
-import {BaseEditor, createEditor, Descendant} from "slate";
-import {Matter} from "../../types";
-import AnnotationMenu from "../Editor/AnnotationMenu";
-import useSelection from "../../utils/hooks/useSelection";
-import {DefaultElement, Editable, ReactEditor, Slate, withReact} from "slate-react";
-import {useRecoilSnapshot} from "recoil";
-import {getAnnotationsOnTextNode} from "../../utils/EditorAnnotationUtils";
-import AnnotatedText from "../Editor/AnnotatedText";
-
-type CustomElement = { type: string; children: CustomText[] }
-type CustomText = { text: string, bold?: boolean, italic?: boolean, code?: boolean, underline?: boolean }
-
-declare module 'slate' {
-    interface CustomTypes {
-        Editor: BaseEditor & ReactEditor
-        Element: CustomElement
-        Text: CustomText
-    }
-}
+import styles from "./EditArticle.module.css";
+import {useQuery} from "@apollo/client";
+import {MattersDocument, MattersQuery} from "../../graphql/api-schema";
 
 const EditArticle = () => {
+    const init: AnnotateTag[] = [];
+    const {data, loading} = useQuery<MattersQuery>(MattersDocument)
 
-    const MATTER_COLORS: Record<string, string> = {
-        'Afleidingsregel': LightBlue,
-        'Rechtssubject': DarkBlue,
-        'Rechtsbetrekking': Blue,
+    const text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum\n" +
+        "                                has\n" +
+        "                                been\n" +
+        "                                the\n" +
+        "                                industry&aposs standard dummy text ever since the 1500s, when an unknown printer took a\n" +
+        "                                galley of\n" +
+        "                                type and\n" +
+        "                                scrambled it to make a type specimen book. It has survived not only five centuries, but\n" +
+        "                                also\n" +
+        "                                the\n" +
+        "                                leap\n" +
+        "                                into electronic typesetting, remaining essentially unchanged. It was popularised in the\n" +
+        "                                1960s with\n" +
+        "                                the\n" +
+        "                                release of Letraset sheets containing Lorem Ipsum passages, and more recently with\n" +
+        "                                desktop\n" +
+        "                                publishing"
+    const [value, setValue] = React.useState<AnnotateTag[]>(init);
+    const [tag, setTag] = React.useState("Afleidingsregel");
+
+    const handleChange = (value: AnnotateTag[]) => {
+        setValue(value);
     };
-
-    const ExampleDocument: Descendant[] = [
-        {
-            type: "h1",
-            children: [{text: "Heading 1"}],
-        },
-        {
-            type: "h2",
-            children: [{text: "Heading 2"}],
-        },
-        {
-            type: "paragraph",
-            children: [
-                {text: "Hello World! This is my paragraph inside a sample document."},
-                {text: "Bold text.", bold: true},
-                {text: "Italic text.", italic: true},
-                {text: "Bold and underlined text.", bold: true, underline: true},
-                {text: "variableFoo", code: true},
-            ],
-        }
-    ]
-    const [matter, setMatter] = React.useState<Matter>({title: "Afleidingsregel", color: MATTER_COLORS['Afleidingsregel']});
-    const [definition, setDefinition] = React.useState("");
-    const [comment, setComment] = React.useState("");
-    const [document, setDocument] = useState<Descendant[]>(ExampleDocument);
-
-    const [editor] = useState(() => withReact(createEditor()));
-    const [selection, setSelection] = useSelection(editor);
-
-    const onChangeHandler = useCallback(
-        (document: any) => {
-            setDocument(document);
-            setSelection(editor.selection);
-        },
-        [editor.selection, setDocument, setSelection]
-    );
-
-    const renderElement = useCallback((props: any) => {
-        const {element, children, attributes} = props;
-        switch (element.type) {
-            case "paragraph":
-                return (
-                    <p {...attributes} >
-                        {children}
-                    </p>
-                );
-            case "h1":
-                return <h1 {...attributes}>{children}</h1>;
-            case "h2":
-                return <h2 {...attributes}>{children}</h2>;
-            case "h3":
-                return <h3 {...attributes}>{children}</h3>;
-            case "h4":
-                return <h4 {...attributes}>{children}</h4>;
-            default:
-                return <DefaultElement {...props}>{children}</DefaultElement>;
-        }
-    }, [])
-
-    const renderLeaf = (props: any) => {
-        const {attributes, children, leaf} = props;
-        let el = <>{children}</>;
-
-        if (leaf.bold) {
-            el = <strong>{el}</strong>;
-        }
-
-        if (leaf.code) {
-            el = <code>{el}</code>;
-        }
-
-        if (leaf.italic) {
-            el = <em>{el}</em>;
-        }
-
-        if (leaf.underline) {
-            el = <u>{el}</u>;
-        }
-
-        //This is also not the right place since if you add a second annotation to the same textnode the amount of hooks called will differ
-        // let annotation = undefined;
-        const annotationIds = getAnnotationsOnTextNode(leaf);
-        // const mostRecentId = Array.from(annotationIds);
-        // if (mostRecentId.length != 0) {
-        //     console.debug("hook fired")
-        //     annotation = useRecoilValue(annotationState(mostRecentId[0]));
-        // }
-
-        if (annotationIds.size > 0) {
-            return (
-                <AnnotatedText
-                    {...attributes}
-                    annotations={annotationIds}
-                    // mostRecent={annotation}
-                    textNode={leaf}
-                >
-                    {el}
-                </AnnotatedText>
-            );
-        }
-
-        return <span {...attributes}>{el}</span>;
-    }
-
+    const TAG_COLORS = data?.matters.map(matter => (
+        <pre key={matter.id}>
+            {matter.name}: {matter.color}
+        </pre>
+    ));
     return (
         <Box sx={{flexGrow: 1}}>
             <Grid
@@ -143,31 +50,75 @@ const EditArticle = () => {
             >
                 <h1 style={Title}>Artikel 80</h1>
             </Grid>
-            <Grid container direction={"row"} spacing={5}>
-                <Slate editor={editor} initialValue={document} onChange={onChangeHandler}>
-                    <Grid item lg={4}>
-                        <AnnotationMenu selection={selection} setSelection={setSelection} matter={matter} setMatter={setMatter} definition={definition} setDefinition={setDefinition} comment={comment} setComment={setComment} matterColors={MATTER_COLORS} />
-                    </Grid>
-                    <Grid item lg={8}>
-                        <Editable renderElement={renderElement} renderLeaf={renderLeaf} onKeyDown={(e) => {e.preventDefault()}}/>]
-                    </Grid>
-                    <DebugObserver/>
-                </Slate>
+            <Grid container spacing={5}>
+                <Grid xs={4}>
+                    <Card
+                        style={{borderColor: LightBlue}}
+                        variant="outlined"
+                    >
+                        <CardContent>
+                            <Grid
+                                alignItems="center"
+                                justifyContent="center"
+                                container
+                            >
+                                <InputLabel id="demo-simple-select-label">Begrip</InputLabel>
+                            </Grid>
+                            <Select
+                                className={styles.inputMargin}
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={tag}
+                                fullWidth
+                                onChange={(e) => setTag(e.target.value)}
+                            >{
+                                data?.matters.map(matter =>
+                                    <MenuItem key={matter.id} value={matter.name}> {matter.name}</MenuItem>
+                                )
+                            }
+                            </Select>
+                            <TextField
+                                style={{marginTop: '1rem'}}
+                                id="outlined-basic"
+                                label="Commentaar"
+                                fullWidth/>
+                            <Stack
+                                direction="row"
+                                spacing={8}
+                                className={styles.inputMargin}
+                                alignItems="center"
+                                justifyContent="center">
+                                <Button variant="contained" color="error">
+                                    Annuleren
+                                </Button>
+                                <Button variant="contained" color="success">
+                                    Toevoegen
+                                </Button>
+                            </Stack>
+                        </CardContent>
+                    </Card>
+                </Grid>
+                <Grid xs={8}>
+                    <TextAnnotate
+                        style={{
+                            lineHeight: 1.5,
+                        }}
+                        content={text}
+                        value={value!}
+                        onChange={handleChange}
+                        getSpan={(span) => ({
+                            ...span,
+                            tag: tag,
+                            color: TAG_COLORS ? TAG_COLORS : [tag],
+                        })}/>
+                    {/*Testing the value*/}
+                    {/*              <pre style={{fontSize: 12, lineHeight: 1.2}}>*/}
+                    {/*  {JSON.stringify(value, null, 2)}*/}
+                    {/*</pre>*/}
+                </Grid>
             </Grid>
         </Box>
     );
 };
-
-function DebugObserver() {
-    const snapshot = useRecoilSnapshot();
-    useEffect(() => {
-        console.debug('The following atoms were modified:');
-        for (const node of snapshot.getNodes_UNSTABLE({isModified: true})) {
-            console.debug(node.key, snapshot.getLoadable(node));
-        }
-    }, [snapshot]);
-
-    return null;
-}
 
 export default EditArticle;
