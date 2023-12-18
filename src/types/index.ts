@@ -6,6 +6,6 @@ export interface Matter {
 export interface Annotation {
     id?: string,
     matter: Matter,
-    description: string,
+    definition: string,
     comment: string
 }

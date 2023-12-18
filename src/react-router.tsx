@@ -4,7 +4,6 @@ import Layout from "./components/Layout/Layout";
 import ImportXML from "./views/ImportXML";
 import EditArticle from "./components/EditArticle/EditArticle";
 import React from "react";
-import TextAnnotator from "./components/TextAnnotator/TextAnnotator";
 const router = createBrowserRouter([
     {
         path: "*",
@@ -21,10 +20,6 @@ const router = createBrowserRouter([
             {
                 path: "editarticle",
                 element: <EditArticle/>,
-            },
-            {
-                path: "annotate",
-                element: <TextAnnotator/>,
             },
         ],
     }
