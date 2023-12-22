@@ -13,27 +13,27 @@ const router = createBrowserRouter([
         element: <Layout/>,
         children: [
             {
-                path: '/',
+                path: '',
                 element: <HomePage/>
             },
             {
-                path: "/import-xml",
+                path: "import-xml",
                 element: <ImportXML/>
             },
             {
-                path:"/navbar",
+                path:"navbar",
                 element:<Navbar/>
             },
             {
-                path: "/editarticle",
+                path: "editarticle",
                 element: <EditArticle/>,
             },
             {
-                path: "/annotate",
+                path: "annotate",
                 element: <TextAnnotator/>,
             },
             {
-                path: "/test",
+                path: "test",
                 element: <ApiDemo/>,
             }
         ],

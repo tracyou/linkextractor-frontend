@@ -1,11 +1,11 @@
-query file {
-    file {
-        ...File
-    }
-}
-
-query FileById($id: UUID!) {
-    file(id: $id) {
-        ...File
-    }
-}
+#query file {
+#    file {
+#        ...File
+#    }
+#}
+#
+#query FileById($id: UUID!) {
+#    file(id: $id) {
+#        ...File
+#    }
+#}

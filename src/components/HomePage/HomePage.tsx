@@ -18,7 +18,7 @@ const HomePage = () => {
                 container
                 style={{marginBottom: '2rem'}}
             >
-                <h1 style={Title}>Wat is de annotatietool</h1>
+                <h1 id="title" style={Title}>Wat is de annotatietool</h1>
             </Grid>
             <Grid container spacing={5}>
                 <Grid xs={8}

@@ -1,10 +1,9 @@
 import {
     annotationState,
     annotationIdState,
-} from "../../recoil/AnnotationState";
-
+} from "../recoil/AnnotationState";
 import { useRecoilCallback } from "recoil";
-import {Annotation} from "../../types";
+import {Annotation} from "../types";
 
 export default function useAddAnnotationToState() {
     return useRecoilCallback(

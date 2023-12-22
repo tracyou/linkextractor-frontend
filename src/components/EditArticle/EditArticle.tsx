@@ -2,14 +2,14 @@ import React, {useCallback, useEffect, useState} from "react";
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import {Title} from "../../stylesheets/Fonts";
-import {BaseEditor, createEditor, Descendant} from "slate";
+import {createEditor, Descendant} from "slate";
 import {Matter} from "../../types";
-import AnnotationMenu from "../Editor/AnnotationMenu";
-import useSelection from "../../utils/hooks/useSelection";
+import AnnotationMenu from "../Editor/Menu/AnnotationMenu";
+import useSelection from "../../hooks/useSelection";
 import {DefaultElement, Editable, ReactEditor, Slate, withReact} from "slate-react";
 import {useRecoilSnapshot} from "recoil";
 import {getAnnotationsOnTextNode} from "../../utils/EditorAnnotationUtils";
-import AnnotatedText from "../Editor/AnnotatedText";
+import AnnotatedText from "../Editor/AnnotatedText/AnnotatedText";
 import {MattersDocument, MattersQuery} from "../../graphql/api-schema";
 import {useQuery} from "@apollo/client";
 
@@ -18,20 +18,20 @@ type CustomText = { text: string, bold?: boolean, italic?: boolean, code?: boole
 
 declare module 'slate' {
     interface CustomTypes {
-        Editor: BaseEditor & ReactEditor
+        Editor: ReactEditor
         Element: CustomElement
         Text: CustomText
     }
 }
 
 const EditArticle = () => {
-    const {data, loading} = useQuery<MattersQuery>(MattersDocument)
+    const {data} = useQuery<MattersQuery>(MattersDocument)
     const MATTER_COLORS = data?.matters.map(matter => (
         <>
             {matter.name}: {matter.color}
         </>
     ));
-    console.log(MATTER_COLORS)
+
     const ExampleDocument: Descendant[] = [
         {
             type: "h1",
@@ -110,21 +110,14 @@ const EditArticle = () => {
             el = <u>{el}</u>;
         }
 
-        //This is also not the right place since if you add a second annotation to the same textnode the amount of hooks called will differ
-        // let annotation = undefined;
         const annotationIds = getAnnotationsOnTextNode(leaf);
-        // const mostRecentId = Array.from(annotationIds);
-        // if (mostRecentId.length != 0) {
-        //     console.debug("hook fired")
-        //     annotation = useRecoilValue(annotationState(mostRecentId[0]));
-        // }
 
         if (annotationIds.size > 0) {
             return (
                 <AnnotatedText
                     {...attributes}
                     annotations={annotationIds}
-                    // mostRecent={annotation}
+                    editor={editor}
                     textNode={leaf}
                 >
                     {el}
