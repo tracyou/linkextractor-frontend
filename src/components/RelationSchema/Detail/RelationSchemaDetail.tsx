@@ -200,6 +200,7 @@ const RelationSchemaDetail = () => {
                 matterId: matterId,
             }
         },
+        fetchPolicy: "network-only"
     })
 
     const {
