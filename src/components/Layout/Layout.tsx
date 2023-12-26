@@ -8,6 +8,8 @@ import EditArticle from "../EditArticle/EditArticle";
 import TextAnnotator from "../TextAnnotator/TextAnnotator";
 import HomePage from "../HomePage/HomePage";
 import ApiDemo from "../ApiDemo/ApiDemo";
+import RelationSchemaIndex from "../RelationSchema/Index/RelationSchemaIndex";
+import RelationSchemaDetail from "../RelationSchema/Detail/RelationSchemaDetail";
 
 const Layout = () => {
 
@@ -25,6 +27,9 @@ const Layout = () => {
                         <Route path="/editarticle" element={<EditArticle/>}/>
                         <Route path="/annotate" element={<TextAnnotator/>}/>
                         <Route path={"/test"} element={<ApiDemo/>}/>
+                        <Route path={"/relation-schemas"} element={<RelationSchemaIndex/>}/>
+                        <Route path={"/relation-schemas/:id"} element={<RelationSchemaDetail/>}/>
+                        <Route path={"/relation-schemas/new"} element={<RelationSchemaDetail/>}/>
                     </Routes>
                 </div>
 
