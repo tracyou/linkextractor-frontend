@@ -29,6 +29,7 @@ import {
 import {Button, Input, MenuItem, Select, SelectChangeEvent} from "@mui/material";
 import {useMutation, useQuery} from "@apollo/client";
 import {useParams} from "react-router-dom";
+import {Black} from "../../../stylesheets/Colors";
 
 const edgeTypes: EdgeTypes = {
     custom: CustomEdge,
@@ -73,14 +74,14 @@ const RelationSchemaDetail = () => {
                     ...edge,
                     animated: false,
                     style: {
-                        stroke: '#000000',
+                        stroke: Black,
                         strokeWidth: 2,
                     },
                     markerEnd: {
                         type: MarkerType.ArrowClosed,
                         width: 13,
                         height: 13,
-                        color: '#000000',
+                        color: Black,
                     },
                 };
             case MatterRelationEnum.RequiresZeroOrOne:
@@ -104,7 +105,7 @@ const RelationSchemaDetail = () => {
                     ...edge,
                     animated: false,
                     style: {
-                        stroke: '#000000',
+                        stroke: Black,
                         strokeWidth: 2,
                         strokeDasharray: '10 4',
                     },
@@ -112,7 +113,7 @@ const RelationSchemaDetail = () => {
                         type: MarkerType.ArrowClosed,
                         width: 13,
                         height: 13,
-                        color: '#000000',
+                        color: Black,
                     },
                 };
             case MatterRelationEnum.RequiresZeroOrMore:
@@ -120,7 +121,7 @@ const RelationSchemaDetail = () => {
                     ...edge,
                     animated: false,
                     style: {
-                        stroke: '#000000',
+                        stroke: Black,
                         strokeWidth: 2,
                         strokeDasharray: '2 2',
                     },
@@ -128,7 +129,7 @@ const RelationSchemaDetail = () => {
                         type: MarkerType.ArrowClosed,
                         width: 13,
                         height: 13,
-                        color: '#000000',
+                        color: Black,
                     },
                 };
             default:
@@ -136,14 +137,14 @@ const RelationSchemaDetail = () => {
                     ...edge,
                     animated: false,
                     style: {
-                        stroke: '#000000',
+                        stroke: Black,
                         strokeWidth: 2,
                     },
                     markerEnd: {
                         type: MarkerType.ArrowClosed,
                         width: 13,
                         height: 13,
-                        color: '#000000',
+                        color: Black,
                     },
                 };
         }
@@ -225,7 +226,7 @@ const RelationSchemaDetail = () => {
                     type: 'input',
                     style: {
                         backgroundColor: matter?.color,
-                        color: '#000000',
+                        color: Black,
                         border: '1px solid #ABABAB',
                     },
                     data: {
@@ -306,7 +307,7 @@ const RelationSchemaDetail = () => {
                         type: MarkerType.ArrowClosed,
                         width: 13,
                         height: 13,
-                        color: '#000000',
+                        color: Black,
                     },
                 },
                 edges
@@ -393,7 +394,7 @@ const RelationSchemaDetail = () => {
                         ...node,
                         style: {
                             backgroundColor: matter.color,
-                            color: '#000000',
+                            color: Black,
                             border: '1px solid #ABABAB',
                         },
                         data: {
