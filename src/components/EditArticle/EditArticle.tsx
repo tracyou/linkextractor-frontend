@@ -26,11 +26,11 @@ declare module 'slate' {
 
 const EditArticle = () => {
     const {data} = useQuery<MattersQuery>(MattersDocument)
-    const MATTER_COLORS = data?.matters.map(matter => (
-        <>
-            {matter.name}: {matter.color}
-        </>
-    ));
+
+    const MATTER_COLORS = data?.matters.reduce((acc: any, matter) => {
+        acc[matter.name] = matter.color;
+        return acc;
+    }, {});
 
     const ExampleDocument: Descendant[] = [
         {

@@ -42,7 +42,6 @@ const AnnotationMenu: React.FC<AnnotationProps> = ({
     const {data} = useQuery<MattersQuery>(MattersDocument)
     const [activeAnnotationIds, setActiveAnnotationIds] = useRecoilState<Set<string>>(activeAnnotationIdsState);
     const activeNode = useRecoilValue<Node | null>(activeTextNode);
-
     const onBack = () => {
         setActiveAnnotationIds(new Set<string>([]));
     }
