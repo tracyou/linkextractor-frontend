@@ -43,7 +43,7 @@ const ImportXML = () => {
 
     const handleOnClick= () =>{
 
-        window.location.href = '/annotate';
+        window.location.href = '/editarticle';
 
     }
 
