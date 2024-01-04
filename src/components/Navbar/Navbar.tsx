@@ -12,7 +12,7 @@ const Navbar = () => (
             <nav>
                 <ul>
                     <li className="active">
-                        <Link to="/">Navbar</Link>
+                        <Link to="/relation-schemas">Relation Schemas</Link>
                     </li>
                 </ul>
             </nav>

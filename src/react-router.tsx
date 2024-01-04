@@ -7,6 +7,8 @@ import React from "react";
 import TextAnnotator from "./components/TextAnnotator/TextAnnotator";
 import HomePage from "./components/HomePage/HomePage";
 import ApiDemo from "./components/ApiDemo/ApiDemo";
+import RelationSchemaIndex from "./components/RelationSchema/Index/RelationSchemaIndex";
+import RelationSchemaDetail from "./components/RelationSchema/Detail/RelationSchemaDetail";
 const router = createBrowserRouter([
     {
         path: "/",
@@ -35,7 +37,19 @@ const router = createBrowserRouter([
             {
                 path: "/test",
                 element: <ApiDemo/>,
-            }
+            },
+            {
+                path: "/relation-schemas",
+                element: <RelationSchemaIndex/>,
+            },
+            {
+                path: "/relation-schemas/:id",
+                element: <RelationSchemaDetail/>,
+            },
+            {
+                path: "/relation-schemas/new",
+                element: <RelationSchemaDetail/>,
+            },
         ],
     }
 ])

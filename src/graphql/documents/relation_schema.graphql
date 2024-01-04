@@ -1,0 +1,17 @@
+query relationSchemas {
+    relationSchemas {
+        ...SimpleRelationSchema
+    }
+}
+
+query relationSchema($id: UUID!) {
+    relationSchema(id: $id) {
+        ...SimpleRelationSchema
+    }
+}
+
+mutation publishRelationSchema($id: UUID!) {
+    publishRelationSchema(id: $id) {
+        ...SimpleRelationSchema
+    }
+}
