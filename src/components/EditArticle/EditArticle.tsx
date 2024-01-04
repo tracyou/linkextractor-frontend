@@ -13,17 +13,6 @@ import AnnotatedText from "../Editor/AnnotatedText/AnnotatedText";
 import {MattersDocument, MattersQuery} from "../../graphql/api-schema";
 import {useQuery} from "@apollo/client";
 
-type CustomElement = { type: string; children: CustomText[] }
-type CustomText = { text: string, bold?: boolean, italic?: boolean, code?: boolean, underline?: boolean }
-
-declare module 'slate' {
-    interface CustomTypes {
-        Editor: ReactEditor
-        Element: CustomElement
-        Text: CustomText
-    }
-}
-
 const EditArticle = () => {
     const {data} = useQuery<MattersQuery>(MattersDocument)
 
@@ -32,26 +21,57 @@ const EditArticle = () => {
         return acc;
     }, {});
 
-    const ExampleDocument: Descendant[] = [
+    //TODO
+    //If field 'json' of articles equals null then loop through all available articles and map them to article form below
+    //On save first save annotations, which returns list of new ids
+    //Write function that
+    const ExampleDocument: any[] = [
         {
             type: "h1",
-            children: [{text: "Heading 1"}],
+            children: [{text: "Law"}],
         },
         {
-            type: "h2",
-            children: [{text: "Heading 2"}],
-        },
-        {
-            type: "paragraph",
+            type: "article",
+            id: "1",
             children: [
-                {text: "Hello World! This is my paragraph inside a sample document."},
-                {text: "Bold text.", bold: true},
-                {text: "Italic text.", italic: true},
-                {text: "Bold and underlined text.", bold: true, underline: true},
-                {text: "variableFoo", code: true},
-            ],
+                {
+                    type: "h2",
+                    children: [{text: "First article"}],
+                },
+                {
+                    type: "paragraph",
+                    children: [
+                        {text: "Hello World! This is my paragraph inside a sample document."},
+                        {text: "Bold text.", bold: true, annotation_id: true},
+                        {text: "Italic text.", italic: true},
+                        {text: "Bold and underlined text.", bold: true, underline: true},
+                        {text: "variableFoo", code: true},
+                    ],
+                },
+            ]
+        },
+        {
+            type: "article",
+            id: "2",
+            children: [
+                {
+                    type: "h2",
+                    children: [{text: "Second article"}],
+                },
+                {
+                    type: "paragraph",
+                    children: [
+                        {text: "Hello World! This is my paragraph inside a sample document."},
+                        {text: "Bold text.", bold: true},
+                        {text: "Italic text.", italic: true},
+                        {text: "Bold and underlined text.", bold: true, underline: true},
+                        {text: "variableFoo", code: true},
+                    ],
+                }
+            ]
         }
     ]
+
     const [matter, setMatter] = React.useState<Matter>({title: "Afleidingsregel", color: "#d47478"});
     const [definition, setDefinition] = React.useState("");
     const [comment, setComment] = React.useState("");
@@ -139,10 +159,14 @@ const EditArticle = () => {
             <Grid container direction={"row"} spacing={5}>
                 <Slate editor={editor} initialValue={document} onChange={onChangeHandler}>
                     <Grid item lg={4}>
-                        <AnnotationMenu selection={selection} setSelection={setSelection} matter={matter} setMatter={setMatter} definition={definition} setDefinition={setDefinition} comment={comment} setComment={setComment} matterColors={MATTER_COLORS} />
+                        <AnnotationMenu selection={selection} setSelection={setSelection} matter={matter}
+                                        setMatter={setMatter} definition={definition} setDefinition={setDefinition}
+                                        comment={comment} setComment={setComment} matterColors={MATTER_COLORS}/>
                     </Grid>
                     <Grid item lg={8}>
-                        <Editable renderElement={renderElement} renderLeaf={renderLeaf} onKeyDown={(e) => {e.preventDefault()}}/>
+                        <Editable renderElement={renderElement} renderLeaf={renderLeaf} onKeyDown={(e) => {
+                            e.preventDefault()
+                        }}/>
                     </Grid>
                     <DebugObserver/>
                 </Slate>

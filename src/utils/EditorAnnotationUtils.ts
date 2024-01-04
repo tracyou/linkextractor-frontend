@@ -1,6 +1,6 @@
 import {v4 as uuidv4} from 'uuid';
-import {Editor, Path} from "slate";
-import {Annotation} from "../types";
+import {Editor, NodeEntry, Path} from "slate";
+import {Annotation, ArticleNode} from "../types";
 import {Node} from 'slate';
 
 const ANNOTATION_PREFIX = "annotation_";
@@ -69,4 +69,21 @@ export const customFindPath = (editor: Editor, targetNode: Node) => {
     };
 
     return findNode(editor, []);
+};
+
+// Recursive function to find the ancestor with a specific type
+export const findAncestorWithType = (
+    editor: Editor,
+    path: Path | null,
+    type: string
+): ArticleNode | null => {
+    if (!path) return null;
+
+    const [node, nodePath] = Editor.node(editor, path) as NodeEntry<ArticleNode>;
+
+    if (node && node.type && node.type === type) {
+        return node;
+    }
+
+    return findAncestorWithType(editor, Path.parent(nodePath), type);
 };
