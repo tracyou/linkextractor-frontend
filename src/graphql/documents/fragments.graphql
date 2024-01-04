@@ -38,3 +38,37 @@ fragment SimpleMatter on Matter {
     name
     color
 }
+
+fragment SimpleMatterRelation on MatterRelation {
+    id
+    relatedMatter {
+        ...SimpleMatter
+    }
+    relation
+    description
+}
+
+fragment SimpleMatterRelationSchema on MatterRelationSchema {
+    id
+    schemaLayout
+    matter {
+        ...SimpleMatter
+    }
+    relations {
+        ...SimpleMatterRelation
+    }
+    relationSchema {
+        id
+    }
+}
+
+fragment SimpleRelationSchema on RelationSchema {
+    id
+    createdAt
+    updatedAt
+    isPublished
+    expiredAt
+    matterRelationSchemas {
+        ...SimpleMatterRelationSchema
+    }
+}

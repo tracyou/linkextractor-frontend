@@ -1,0 +1,38 @@
+.select {
+    outline: none;
+    cursor: pointer;
+    color: black;
+}
+
+.select-disabled {
+    color: #999 !important;
+}
+
+.menu-item-hidden {
+    display: none;
+}
+
+.message-container {
+    height: 30px;
+    padding: 5px;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+.warning-container {
+    background-color: #efd2d2;
+    border: 1px solid #c95252;
+}
+
+.warning-container span {
+    color: #c95252;
+}
+
+.success-container {
+    background-color: #d2efd2;
+    border: 1px solid #297729;
+}
+
+.success-container span {
+    color: #297729;
+}

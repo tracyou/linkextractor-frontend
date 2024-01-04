@@ -1,0 +1,17 @@
+query matterRelationSchemas {
+    matterRelationSchemas {
+        ...SimpleMatterRelationSchema
+    }
+}
+
+query matterRelationSchema($input: MatterRelationSchemaInput!) {
+    matterRelationSchema(input: $input) {
+        ...SimpleMatterRelationSchema
+    }
+}
+
+mutation saveMatterRelationSchema($input: SaveMatterRelationSchemaInput!) {
+    saveMatterRelationSchema(input: $input) {
+        ...SimpleMatterRelationSchema
+    }
+}

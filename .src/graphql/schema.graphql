@@ -4,6 +4,7 @@ type Annotation {
   laws: Law!
   matter: Matter!
   pivot: LawAnnotationPivot
+  relationSchema: RelationSchema!
   text: String!
   updatedAt: DateTime!
 }
@@ -47,7 +48,18 @@ type Matter {
   color: String!
   createdAt: DateTime!
   id: UUID!
+  matterRelations: [MatterRelation!]!
   name: String!
+  updatedAt: DateTime!
+}
+
+type MatterRelation {
+  createdAt: DateTime!
+  description: String
+  id: UUID!
+  matterRelationSchema: MatterRelationSchema!
+  relatedMatter: Matter!
+  relation: MatterRelationEnum!
   updatedAt: DateTime!
 }
 
@@ -66,11 +78,39 @@ enum MatterRelationEnum {
   REQUIRES_ZERO_OR_ONE
 }
 
+input MatterRelationInput {
+  description: String
+  relatedMatterId: UUID!
+  relation: MatterRelationEnum!
+}
+
+type MatterRelationSchema {
+  createdAt: DateTime!
+  id: UUID!
+  matter: Matter!
+  relationSchema: RelationSchema!
+  relations: [MatterRelation!]!
+  schemaLayout: String!
+  updatedAt: DateTime!
+}
+
+input MatterRelationSchemaInput {
+  matterId: UUID!
+  relationSchemaId: UUID!
+}
+
+type MatterRelationType {
+  key: MatterRelationEnum!
+  value: String!
+}
+
 type Mutation {
   createPancake(input: CreatePancakeInput!): Pancake!
   createPancakeStack(input: CreatePancakeStackInput!): PancakeStack!
   deletePancake(id: ID!): Boolean!
   deletePancakeStack(id: ID!): Boolean!
+  publishRelationSchema(id: UUID!): RelationSchema!
+  saveMatterRelationSchema(input: SaveMatterRelationSchemaInput!): MatterRelationSchema!
   updatePancake(input: UpdatePancakeInput!): Pancake!
   updatePancakeStack(input: UpdatePancakeStackInput!): PancakeStack!
 }
@@ -130,13 +170,37 @@ type PancakeStack {
 
 type Query {
   annotationsByLaw(lawId: UUID!): [Annotation!]!
+  law(id: UUID!): Law!
   laws: [Law!]!
   matter(id: UUID!): Matter!
+  matterRelationSchema(input: MatterRelationSchemaInput!): MatterRelationSchema
+  matterRelationSchemas: [MatterRelationSchema!]!
+  matterRelationTypes: [MatterRelationType!]!
   matters: [Matter!]!
   pancakeById(id: ID!): Pancake!
   pancakeStackById(id: ID!): PancakeStack!
   pancakeStacks: [PancakeStack!]!
   pancakes: [Pancake!]!
+  relationSchema(id: UUID!): RelationSchema!
+  relationSchemas: [RelationSchema!]!
+}
+
+type RelationSchema {
+  annotations: [Annotation!]!
+  createdAt: DateTime!
+  expiredAt: DateTime
+  id: UUID!
+  isPublished: Boolean!
+  matterRelationSchemas: [MatterRelationSchema!]!
+  updatedAt: DateTime!
+}
+
+input SaveMatterRelationSchemaInput {
+  matterId: UUID!
+  matterRelationSchemaId: UUID
+  relationSchemaId: UUID
+  relations: [MatterRelationInput!]!
+  schemaLayout: String!
 }
 
 """Directions for ordering a list of records."""
