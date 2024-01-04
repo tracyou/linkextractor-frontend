@@ -214,6 +214,7 @@ export interface PancakeStack {
 
 export interface Query {
   readonly annotationsByLaw: ReadonlyArray<Annotation>;
+  readonly law: Law;
   readonly laws: ReadonlyArray<Law>;
   readonly matter: Matter;
   readonly matterRelationSchema?: Maybe<MatterRelationSchema>;
@@ -231,6 +232,11 @@ export interface Query {
 
 export interface QueryAnnotationsByLawArgs {
   lawId: Scalars['UUID']['input'];
+}
+
+
+export interface QueryLawArgs {
+  id: Scalars['UUID']['input'];
 }
 
 

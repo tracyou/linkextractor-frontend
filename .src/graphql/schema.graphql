@@ -170,6 +170,7 @@ type PancakeStack {
 
 type Query {
   annotationsByLaw(lawId: UUID!): [Annotation!]!
+  law(id: UUID!): Law!
   laws: [Law!]!
   matter(id: UUID!): Matter!
   matterRelationSchema(input: MatterRelationSchemaInput!): MatterRelationSchema
