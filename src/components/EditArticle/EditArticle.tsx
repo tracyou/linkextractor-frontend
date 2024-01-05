@@ -35,11 +35,22 @@ const EditArticle = () => {
     const ExampleDocument: Descendant[] = [
         {
             type: "h1",
-            children: [{text: "Heading 1"}],
+            children: [{text: "Law"}],
         },
         {
             type: "h2",
-            children: [{text: "Heading 2"}],
+            children: [{text: "Article 1"}],
+        },
+        {
+            type: "paragraph",
+            children: [
+                {text: "i want to finish this as soon as possible!!."},
+
+            ],
+        },
+        {
+            type: "h2",
+            children: [{text: "Article 2"}],
         },
         {
             type: "paragraph",
@@ -139,10 +150,14 @@ const EditArticle = () => {
             <Grid container direction={"row"} spacing={5}>
                 <Slate editor={editor} initialValue={document} onChange={onChangeHandler}>
                     <Grid item lg={4}>
-                        <AnnotationMenu selection={selection} setSelection={setSelection} matter={matter} setMatter={setMatter} definition={definition} setDefinition={setDefinition} comment={comment} setComment={setComment} matterColors={MATTER_COLORS} />
+                        <AnnotationMenu selection={selection} setSelection={setSelection} matter={matter}
+                                        setMatter={setMatter} definition={definition} setDefinition={setDefinition}
+                                        comment={comment} setComment={setComment} matterColors={MATTER_COLORS}/>
                     </Grid>
                     <Grid item lg={8}>
-                        <Editable renderElement={renderElement} renderLeaf={renderLeaf} onKeyDown={(e) => {e.preventDefault()}}/>
+                        <Editable renderElement={renderElement} renderLeaf={renderLeaf} onKeyDown={(e) => {
+                            e.preventDefault()
+                        }}/>
                     </Grid>
                     <DebugObserver/>
                 </Slate>

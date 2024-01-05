@@ -12,10 +12,12 @@ fragment SimpleLaw on Law {
     title
     isPublished
 }
+
 fragment SimpleArticle on Article {
     id
     title
     text
+    jsonText
     annotations {
         ...SimpleAnnotation
     }
