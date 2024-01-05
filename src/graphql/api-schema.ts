@@ -23,15 +23,48 @@ export interface Scalars {
   UUID: { input: string; output: string; }
 }
 
+export interface AnnotatedArticleInput {
+  readonly articles: ReadonlyArray<ArticleInput>;
+  readonly isPublished?: InputMaybe<Scalars['Boolean']['input']>;
+  readonly lawId: Scalars['UUID']['input'];
+  readonly title: Scalars['String']['input'];
+}
+
 export interface Annotation {
+  readonly comment?: Maybe<Scalars['String']['output']>;
   readonly createdAt: Scalars['DateTime']['output'];
+  readonly definition?: Maybe<Scalars['String']['output']>;
   readonly id: Scalars['UUID']['output'];
   readonly laws: Law;
   readonly matter: Matter;
-  readonly pivot?: Maybe<LawAnnotationPivot>;
   readonly relationSchema: RelationSchema;
   readonly text: Scalars['String']['output'];
   readonly updatedAt: Scalars['DateTime']['output'];
+}
+
+export interface AnnotationInput {
+  readonly comment?: InputMaybe<Scalars['String']['input']>;
+  readonly definition?: InputMaybe<Scalars['String']['input']>;
+  readonly matterId: Scalars['UUID']['input'];
+  readonly relationSchemaId: Scalars['UUID']['input'];
+  readonly text: Scalars['String']['input'];
+}
+
+export interface Article {
+  readonly annotations: ReadonlyArray<Annotation>;
+  readonly id: Scalars['UUID']['output'];
+  readonly jsonText?: Maybe<Scalars['JSON']['output']>;
+  readonly law: Law;
+  readonly text?: Maybe<Scalars['String']['output']>;
+  readonly title?: Maybe<Scalars['String']['output']>;
+}
+
+export interface ArticleInput {
+  readonly annotations: ReadonlyArray<AnnotationInput>;
+  readonly articleId: Scalars['UUID']['input'];
+  readonly jsonText?: InputMaybe<Scalars['JSON']['input']>;
+  readonly text: Scalars['String']['input'];
+  readonly title: Scalars['String']['input'];
 }
 
 export interface CreatePancakeInput {
@@ -44,11 +77,10 @@ export interface CreatePancakeStackInput {
 }
 
 export interface Law {
-  readonly annotations: ReadonlyArray<Annotation>;
+  readonly articles: ReadonlyArray<Article>;
   readonly createdAt: Scalars['DateTime']['output'];
   readonly id: Scalars['UUID']['output'];
   readonly isPublished: Scalars['Boolean']['output'];
-  readonly text: Scalars['String']['output'];
   readonly title: Scalars['String']['output'];
   readonly updatedAt: Scalars['DateTime']['output'];
 }
@@ -123,6 +155,8 @@ export interface Mutation {
   readonly deletePancake: Scalars['Boolean']['output'];
   readonly deletePancakeStack: Scalars['Boolean']['output'];
   readonly publishRelationSchema: RelationSchema;
+  readonly saveAnnotatedLaw: Law;
+  readonly saveFileXml: XmlFile;
   readonly saveMatterRelationSchema: MatterRelationSchema;
   readonly updatePancake: Pancake;
   readonly updatePancakeStack: PancakeStack;
@@ -151,6 +185,16 @@ export interface MutationDeletePancakeStackArgs {
 
 export interface MutationPublishRelationSchemaArgs {
   id: Scalars['UUID']['input'];
+}
+
+
+export interface MutationSaveAnnotatedLawArgs {
+  input: AnnotatedArticleInput;
+}
+
+
+export interface MutationSaveFileXmlArgs {
+  input: XmlFileInput;
 }
 
 
@@ -213,7 +257,8 @@ export interface PancakeStack {
 }
 
 export interface Query {
-  readonly annotationsByLaw: ReadonlyArray<Annotation>;
+  readonly articles: ReadonlyArray<Article>;
+  readonly fileXmls: ReadonlyArray<XmlFile>;
   readonly law: Law;
   readonly laws: ReadonlyArray<Law>;
   readonly matter: Matter;
@@ -227,11 +272,6 @@ export interface Query {
   readonly pancakes: ReadonlyArray<Pancake>;
   readonly relationSchema: RelationSchema;
   readonly relationSchemas: ReadonlyArray<RelationSchema>;
-}
-
-
-export interface QueryAnnotationsByLawArgs {
-  lawId: Scalars['UUID']['input'];
 }
 
 
@@ -311,11 +351,24 @@ export interface UpdatePancakeStackInput {
   readonly pancakes: ReadonlyArray<Scalars['ID']['input']>;
 }
 
-export type LawFragment = { readonly id: string, readonly title: string, readonly text: string, readonly isPublished: boolean, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
+export interface XmlFile {
+  readonly content: Scalars['String']['output'];
+  readonly id: Scalars['ID']['output'];
+  readonly title: Scalars['String']['output'];
+}
 
-export type SimpleLawFragment = { readonly id: string, readonly title: string, readonly text: string, readonly isPublished: boolean };
+export interface XmlFileInput {
+  readonly content: Scalars['String']['input'];
+  readonly title: Scalars['String']['input'];
+}
 
-export type SimpleAnnotationFragment = { readonly id: string, readonly text: string, readonly pivot?: { readonly cursorIndex: number, readonly comment?: string | null } | null };
+export type LawFragment = { readonly id: string, readonly title: string, readonly isPublished: boolean, readonly articles: ReadonlyArray<SimpleArticleFragment> };
+
+export type SimpleLawFragment = { readonly id: string, readonly title: string, readonly isPublished: boolean };
+
+export type SimpleArticleFragment = { readonly id: string, readonly title?: string | null, readonly text?: string | null, readonly jsonText?: string | null, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
+
+export type SimpleAnnotationFragment = { readonly id: string, readonly text: string };
 
 export type MatterFragment = { readonly id: string, readonly name: string, readonly color: string, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
 
@@ -386,28 +439,33 @@ export const SimpleAnnotationFragmentDoc = gql`
     fragment SimpleAnnotation on Annotation {
   id
   text
-  pivot {
-    cursorIndex
-    comment
-  }
 }
     `;
-export const LawFragmentDoc = gql`
-    fragment Law on Law {
+export const SimpleArticleFragmentDoc = gql`
+    fragment SimpleArticle on Article {
   id
   title
   text
-  isPublished
+  jsonText
   annotations {
     ...SimpleAnnotation
   }
 }
     ${SimpleAnnotationFragmentDoc}`;
+export const LawFragmentDoc = gql`
+    fragment Law on Law {
+  id
+  title
+  isPublished
+  articles {
+    ...SimpleArticle
+  }
+}
+    ${SimpleArticleFragmentDoc}`;
 export const SimpleLawFragmentDoc = gql`
     fragment SimpleLaw on Law {
   id
   title
-  text
   isPublished
 }
     `;

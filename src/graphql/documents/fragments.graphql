@@ -1,27 +1,32 @@
 fragment Law on Law {
     id
     title
-    text
+
     isPublished
-    annotations {
-        ...SimpleAnnotation
+    articles {
+        ...SimpleArticle
     }
 }
 
 fragment SimpleLaw on Law {
     id
     title
-    text
     isPublished
+}
+
+fragment SimpleArticle on Article {
+    id
+    title
+    text
+    jsonText
+    annotations {
+        ...SimpleAnnotation
+    }
 }
 
 fragment SimpleAnnotation on Annotation {
     id
     text
-    pivot {
-        cursorIndex
-        comment
-    }
 }
 
 fragment Matter on Matter {

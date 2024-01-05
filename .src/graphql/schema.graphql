@@ -1,12 +1,45 @@
+input AnnotatedArticleInput {
+  articles: [ArticleInput!]!
+  isPublished: Boolean
+  lawId: UUID!
+  title: String!
+}
+
 type Annotation {
+  comment: String
   createdAt: DateTime!
+  definition: String
   id: UUID!
   laws: Law!
   matter: Matter!
-  pivot: LawAnnotationPivot
   relationSchema: RelationSchema!
   text: String!
   updatedAt: DateTime!
+}
+
+input AnnotationInput {
+  comment: String
+  definition: String
+  matterId: UUID!
+  relationSchemaId: UUID!
+  text: String!
+}
+
+type Article {
+  annotations: [Annotation!]!
+  id: UUID!
+  jsonText: JSON
+  law: Law!
+  text: String
+  title: String
+}
+
+input ArticleInput {
+  annotations: [AnnotationInput!]!
+  articleId: UUID!
+  jsonText: JSON
+  text: String!
+  title: String!
 }
 
 input CreatePancakeInput {
@@ -28,11 +61,10 @@ Arbitrary data encoded in JavaScript Object Notation. See https://www.json.org.
 scalar JSON
 
 type Law {
-  annotations: [Annotation!]!
+  articles: [Article!]!
   createdAt: DateTime!
   id: UUID!
   isPublished: Boolean!
-  text: String!
   title: String!
   updatedAt: DateTime!
 }
@@ -110,6 +142,8 @@ type Mutation {
   deletePancake(id: ID!): Boolean!
   deletePancakeStack(id: ID!): Boolean!
   publishRelationSchema(id: UUID!): RelationSchema!
+  saveAnnotatedLaw(input: AnnotatedArticleInput!): Law!
+  saveFileXml(input: XmlFileInput!): XmlFile!
   saveMatterRelationSchema(input: SaveMatterRelationSchemaInput!): MatterRelationSchema!
   updatePancake(input: UpdatePancakeInput!): Pancake!
   updatePancakeStack(input: UpdatePancakeStackInput!): PancakeStack!
@@ -169,7 +203,8 @@ type PancakeStack {
 }
 
 type Query {
-  annotationsByLaw(lawId: UUID!): [Annotation!]!
+  articles: [Article!]!
+  fileXmls: [XmlFile!]!
   law(id: UUID!): Law!
   laws: [Law!]!
   matter(id: UUID!): Matter!
@@ -237,4 +272,15 @@ input UpdatePancakeStackInput {
   id: ID!
   name: String!
   pancakes: [ID!]!
+}
+
+type XmlFile {
+  content: String!
+  id: ID!
+  title: String!
+}
+
+input XmlFileInput {
+  content: String!
+  title: String!
 }
