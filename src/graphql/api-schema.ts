@@ -362,11 +362,11 @@ export interface XmlFileInput {
   readonly title: Scalars['String']['input'];
 }
 
-export type LawFragment = { readonly id: string, readonly title: string, readonly isPublished: boolean, readonly articles: ReadonlyArray<SimpleArticleFragment> };
+export type LawFragment = { readonly title: string, readonly isPublished: boolean, readonly articles: ReadonlyArray<SimpleArticleFragment> };
 
-export type SimpleLawFragment = { readonly id: string, readonly title: string, readonly isPublished: boolean };
+export type SimpleLawFragment = { readonly title: string, readonly isPublished: boolean };
 
-export type SimpleArticleFragment = { readonly id: string, readonly title?: string | null, readonly text?: string | null, readonly jsonText?: string | null, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
+export type SimpleArticleFragment = { readonly title?: string | null, readonly text?: string | null, readonly jsonText?: string | null, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
 
 export type SimpleAnnotationFragment = { readonly id: string, readonly text: string };
 
@@ -443,7 +443,6 @@ export const SimpleAnnotationFragmentDoc = gql`
     `;
 export const SimpleArticleFragmentDoc = gql`
     fragment SimpleArticle on Article {
-  id
   title
   text
   jsonText
@@ -454,7 +453,6 @@ export const SimpleArticleFragmentDoc = gql`
     ${SimpleAnnotationFragmentDoc}`;
 export const LawFragmentDoc = gql`
     fragment Law on Law {
-  id
   title
   isPublished
   articles {
@@ -464,7 +462,6 @@ export const LawFragmentDoc = gql`
     ${SimpleArticleFragmentDoc}`;
 export const SimpleLawFragmentDoc = gql`
     fragment SimpleLaw on Law {
-  id
   title
   isPublished
 }
@@ -867,3 +864,35 @@ export function usePublishRelationSchemaMutation(baseOptions?: Apollo.MutationHo
 export type PublishRelationSchemaMutationHookResult = ReturnType<typeof usePublishRelationSchemaMutation>;
 export type PublishRelationSchemaMutationResult = Apollo.MutationResult<PublishRelationSchemaMutation>;
 export type PublishRelationSchemaMutationOptions = Apollo.BaseMutationOptions<PublishRelationSchemaMutation, PublishRelationSchemaMutationVariables>;
+
+/**
+ * manualy added the save annotatedlow document*/
+export const SaveAnnotatedLawDocument = gql`
+    mutation SaveAnnotatedLaw($input: AnnotatedArticleInput!) {
+        saveAnnotatedLaw(input: $input) {
+            id
+            title
+            isPublished
+            createdAt
+            updatedAt
+            articles {
+                id
+                title
+                text
+                jsonText
+                annotations {
+                    id
+                    text
+                    definition
+                    comment
+                    matter {
+                        id
+                    }
+                    relationSchema {
+                        id
+                    }
+                }
+            }
+        }
+    }
+`;

@@ -1,5 +1,5 @@
-import {atom, atomFamily} from "recoil";
-import { Node } from 'slate'
+import {atom, atomFamily, selectorFamily} from "recoil";
+import {Node} from 'slate'
 import {Annotation} from "../types";
 
 export const annotationState = atomFamily<Annotation | undefined, string>({
@@ -16,12 +16,15 @@ export const activeAnnotationIdsState = atom<Set<string>>({
     default: new Set([]),
 })
 
-export const activeTextNode = atom<Node|null>({
+export const activeTextNode = atom<Node | null>({
     key: "activeNode",
     default: null
 })
 
-export const editableAnnotation = atom<Annotation|undefined>({
+export const editableAnnotation = atom<Annotation | undefined>({
     key: "editableAnnotation",
     default: undefined
 })
+
+
+

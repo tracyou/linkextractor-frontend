@@ -7,11 +7,17 @@ import {Matter} from "../../types";
 import AnnotationMenu from "../Editor/Menu/AnnotationMenu";
 import useSelection from "../../hooks/useSelection";
 import {DefaultElement, Editable, ReactEditor, Slate, withReact} from "slate-react";
-import {useRecoilSnapshot} from "recoil";
+import {useRecoilCallback, useRecoilSnapshot, useRecoilValue} from "recoil";
 import {getAnnotationsOnTextNode} from "../../utils/EditorAnnotationUtils";
 import AnnotatedText from "../Editor/AnnotatedText/AnnotatedText";
-import {MattersDocument, MattersQuery} from "../../graphql/api-schema";
-import {useQuery} from "@apollo/client";
+import {
+    MattersDocument,
+    MattersQuery,
+    MutationSaveAnnotatedLawArgs,
+    SaveAnnotatedLawDocument
+} from "../../graphql/api-schema";
+import {useMutation, useQuery} from "@apollo/client";
+import {annotationIdState, annotationState} from "../../recoil/AnnotationState";
 
 type CustomElement = { type: string; children: CustomText[] }
 type CustomText = { text: string, bold?: boolean, italic?: boolean, code?: boolean, underline?: boolean }
@@ -25,12 +31,34 @@ declare module 'slate' {
 }
 
 const EditArticle = () => {
+    const [annotations, setAnnotations] = useState<any[]>(['']);
+    const annotationsIds = useRecoilValue(annotationIdState);// get the ids from the satate
+
+    // make an array of annotations
+    const processAnnotations = useRecoilCallback(({snapshot}) => async () => {
+        const updatedAnnotations = await Promise.all(
+            Array.from(annotationsIds).map(async (id) => {
+                const annotation = await snapshot.getPromise(annotationState(id));
+                return annotation;
+            })
+        );
+        setAnnotations(updatedAnnotations);
+    }, [annotationsIds]);
+
+    useEffect(() => {
+        processAnnotations();
+    }, [processAnnotations, annotationsIds]);
+
+
     const {data} = useQuery<MattersQuery>(MattersDocument)
 
     const MATTER_COLORS = data?.matters.reduce((acc: any, matter) => {
         acc[matter.name] = matter.color;
         return acc;
     }, {});
+
+    const [saveLaw] =
+        useMutation<MutationSaveAnnotatedLawArgs>(SaveAnnotatedLawDocument, {});
 
     const ExampleDocument: Descendant[] = [
         {
@@ -63,6 +91,66 @@ const EditArticle = () => {
             ],
         }
     ]
+    const jsonString = JSON.stringify(ExampleDocument, null, 2);
+
+
+    const saveTheLaw = async () => {
+        console.log(annotations);
+
+        // const data = JSON.parse(jsonString);
+
+        const articles = [
+            {"name": "annotation text", "content": "content 1"},
+            {"name": "annotation text", "content": "content 2"},
+            {"name": "annotation text", "content": "content 3"},
+        ];
+
+        const initialAnnotations = annotations.map(annotation => ({
+            text: annotation.comment,
+            definition: annotation.definition,
+            comment: annotation.comment
+        }));
+
+        const law = {"title": "this is the titel"};
+
+
+        const formattedAnnotations = initialAnnotations.map(annotation => ({
+            text: 'this should be saved in the state as well',
+            definition: annotation.definition,
+            comment: annotation.comment,
+            matterId: '9b07767e-e987-4c48-93f9-8d36daf2ee9b',
+            relationSchemaId: '9b07767f-176d-4692-9f4b-bcf6b68eebd6',
+        }));
+
+        const formattedArticles = articles.map(article => ({
+            articleId: '9b07767f-c39f-4be6-8ba3-2393f02dd71f',
+            title: article.name,
+            text: article.content,
+            jsonText: jsonString,
+            annotations: formattedAnnotations,
+        }));
+
+
+        try {
+            await saveLaw({
+                variables: {
+                    input: {
+                        lawId: '9b07767f-3652-46c2-a9a7-1e5fc609e30a',
+                        title: law.title,
+                        isPublished: false,
+                        articles: formattedArticles,
+                    },
+                },
+            });
+        } catch (error) {
+            console.error('Error saving law:', error);
+        }
+    };
+    useEffect(() => {
+        console.log(annotations); // Log annotations inside the main component
+    }, [annotations]);
+
+
     const [matter, setMatter] = React.useState<Matter>({title: "Afleidingsregel", color: "#d47478"});
     const [definition, setDefinition] = React.useState("");
     const [comment, setComment] = React.useState("");
@@ -140,11 +228,13 @@ const EditArticle = () => {
     }
     return (
         <Box sx={{flexGrow: 1}}>
+            <button onClick={saveTheLaw}/>
             <Grid
                 alignItems="center"
                 justifyContent="center"
                 container
             >
+
                 <h1 style={Title}>Artikel 80</h1>
             </Grid>
             <Grid container direction={"row"} spacing={5}>
