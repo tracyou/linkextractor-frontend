@@ -1,5 +1,5 @@
 fragment Law on Law {
-    id
+#    id
     title
     isPublished
     articles {
@@ -8,13 +8,13 @@ fragment Law on Law {
 }
 
 fragment SimpleLaw on Law {
-    id
+#    id
     title
     isPublished
 }
 
 fragment SimpleArticle on Article {
-    id
+#    id
     title
     text
     jsonText
