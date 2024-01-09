@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useState} from "react";
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import {Title} from "../../stylesheets/Fonts";
-import {createEditor, Descendant} from "slate";
+import {createEditor} from "slate";
 import {Matter} from "../../types";
 import AnnotationMenu from "../Editor/Menu/AnnotationMenu";
 import useSelection from "../../hooks/useSelection";
@@ -18,6 +18,7 @@ import {
 } from "../../graphql/api-schema";
 import {useMutation, useQuery} from "@apollo/client";
 import {annotationIdState, annotationState} from "../../recoil/AnnotationState";
+import {Button} from "@mui/material";
 
 type CustomElement = { type: string; children: CustomText[] }
 type CustomText = { text: string, bold?: boolean, italic?: boolean, code?: boolean, underline?: boolean }
@@ -29,6 +30,18 @@ declare module 'slate' {
         Text: CustomText
     }
 }
+
+type Heading = {
+    type: "h1" | "h2";
+    children: CustomText[];
+};
+
+type Paragraph = {
+    type: "paragraph";
+    children: CustomText[];
+};
+
+type Descendant = Heading | Paragraph;
 
 const EditArticle = () => {
     const [annotations, setAnnotations] = useState<any[]>(['']);
@@ -57,8 +70,7 @@ const EditArticle = () => {
         return acc;
     }, {});
 
-    const [saveLaw] =
-        useMutation<MutationSaveAnnotatedLawArgs>(SaveAnnotatedLawDocument, {});
+    const [saveLaw] = useMutation<MutationSaveAnnotatedLawArgs>(SaveAnnotatedLawDocument, {});
 
     const ExampleDocument: Descendant[] = [
         {
@@ -91,27 +103,40 @@ const EditArticle = () => {
             ],
         }
     ]
+    //convert the typescript array to json string
     const jsonString = JSON.stringify(ExampleDocument, null, 2);
 
 
     const saveTheLaw = async () => {
-        console.log(annotations);
 
-        // const data = JSON.parse(jsonString);
+        const articles = [];
+        const jsonObjectsArray = JSON.parse(jsonString) // convert the json string to json object arrY
 
-        const articles = [
-            {"name": "annotation text", "content": "content 1"},
-            {"name": "annotation text", "content": "content 2"},
-            {"name": "annotation text", "content": "content 3"},
-        ];
+        for (let i = 0; i < jsonObjectsArray.length; i++) {
+            const currentElement = jsonObjectsArray[i];
+            const nextElement = jsonObjectsArray[i + 1];
+
+            if (currentElement.type === "h2" && nextElement && nextElement.type === "paragraph") {
+                const title = currentElement.children[0]?.text || "";
+                const content = nextElement.children.map((child: { text: any; }) => child.text).join(" ");
+
+                articles.push({ name: title, content });
+            }
+        }
+
+
+        console.log(articles);
+
 
         const initialAnnotations = annotations.map(annotation => ({
             text: annotation.comment,
             definition: annotation.definition,
-            comment: annotation.comment
+            comment: annotation.comment,
+            json: jsonString
         }));
 
-        const law = {"title": "this is the titel"};
+        const law = {"title": jsonObjectsArray[0].children[0].text};
+        console.log(law)
 
 
         const formattedAnnotations = initialAnnotations.map(annotation => ({
@@ -129,6 +154,7 @@ const EditArticle = () => {
             jsonText: jsonString,
             annotations: formattedAnnotations,
         }));
+        console.log(formattedArticles)
 
 
         try {
@@ -147,7 +173,7 @@ const EditArticle = () => {
         }
     };
     useEffect(() => {
-        console.log(annotations); // Log annotations inside the main component
+        console.log(annotations);
     }, [annotations]);
 
 
@@ -228,7 +254,12 @@ const EditArticle = () => {
     }
     return (
         <Box sx={{flexGrow: 1}}>
-            <button onClick={saveTheLaw}/>
+            <Grid
+                alignItems="center"
+                justifyContent="end"
+                container>
+                <button onClick={saveTheLaw}>Opslaan</button>
+            </Grid>
             <Grid
                 alignItems="center"
                 justifyContent="center"
@@ -267,5 +298,6 @@ function DebugObserver() {
 
     return null;
 }
+
 
 export default EditArticle;

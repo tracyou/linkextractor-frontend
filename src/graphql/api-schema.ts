@@ -380,6 +380,13 @@ export type SimpleMatterRelationSchemaFragment = { readonly id: string, readonly
 
 export type SimpleRelationSchemaFragment = { readonly id: string, readonly createdAt: string, readonly updatedAt: string, readonly isPublished: boolean, readonly expiredAt?: string | null, readonly matterRelationSchemas: ReadonlyArray<SimpleMatterRelationSchemaFragment> };
 
+export type SaveAnnotatedLawMutationVariables = Exact<{
+  input: AnnotatedArticleInput;
+}>;
+
+
+export type SaveAnnotatedLawMutation = { readonly saveAnnotatedLaw: { readonly id: string, readonly title: string, readonly isPublished: boolean, readonly articles: ReadonlyArray<{ readonly id: string, readonly title?: string | null, readonly text?: string | null, readonly jsonText?: string | null, readonly annotations: ReadonlyArray<{ readonly id: string, readonly text: string, readonly definition?: string | null, readonly comment?: string | null, readonly matter: { readonly id: string }, readonly relationSchema: { readonly id: string } }> }> } };
+
 export type MattersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -521,6 +528,59 @@ export const SimpleRelationSchemaFragmentDoc = gql`
   }
 }
     ${SimpleMatterRelationSchemaFragmentDoc}`;
+export const SaveAnnotatedLawDocument = gql`
+    mutation saveAnnotatedLaw($input: AnnotatedArticleInput!) {
+  saveAnnotatedLaw(input: $input) {
+    id
+    title
+    isPublished
+    articles {
+      id
+      title
+      text
+      jsonText
+      annotations {
+        id
+        text
+        definition
+        comment
+        matter {
+          id
+        }
+        relationSchema {
+          id
+        }
+      }
+    }
+  }
+}
+    `;
+export type SaveAnnotatedLawMutationFn = Apollo.MutationFunction<SaveAnnotatedLawMutation, SaveAnnotatedLawMutationVariables>;
+
+/**
+ * __useSaveAnnotatedLawMutation__
+ *
+ * To run a mutation, you first call `useSaveAnnotatedLawMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSaveAnnotatedLawMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [saveAnnotatedLawMutation, { data, loading, error }] = useSaveAnnotatedLawMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSaveAnnotatedLawMutation(baseOptions?: Apollo.MutationHookOptions<SaveAnnotatedLawMutation, SaveAnnotatedLawMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SaveAnnotatedLawMutation, SaveAnnotatedLawMutationVariables>(SaveAnnotatedLawDocument, options);
+      }
+export type SaveAnnotatedLawMutationHookResult = ReturnType<typeof useSaveAnnotatedLawMutation>;
+export type SaveAnnotatedLawMutationResult = Apollo.MutationResult<SaveAnnotatedLawMutation>;
+export type SaveAnnotatedLawMutationOptions = Apollo.BaseMutationOptions<SaveAnnotatedLawMutation, SaveAnnotatedLawMutationVariables>;
 export const MattersDocument = gql`
     query matters {
   matters {
@@ -864,35 +924,3 @@ export function usePublishRelationSchemaMutation(baseOptions?: Apollo.MutationHo
 export type PublishRelationSchemaMutationHookResult = ReturnType<typeof usePublishRelationSchemaMutation>;
 export type PublishRelationSchemaMutationResult = Apollo.MutationResult<PublishRelationSchemaMutation>;
 export type PublishRelationSchemaMutationOptions = Apollo.BaseMutationOptions<PublishRelationSchemaMutation, PublishRelationSchemaMutationVariables>;
-
-/**
- * manualy added the save annotatedlow document*/
-export const SaveAnnotatedLawDocument = gql`
-    mutation SaveAnnotatedLaw($input: AnnotatedArticleInput!) {
-        saveAnnotatedLaw(input: $input) {
-            id
-            title
-            isPublished
-            createdAt
-            updatedAt
-            articles {
-                id
-                title
-                text
-                jsonText
-                annotations {
-                    id
-                    text
-                    definition
-                    comment
-                    matter {
-                        id
-                    }
-                    relationSchema {
-                        id
-                    }
-                }
-            }
-        }
-    }
-`;
