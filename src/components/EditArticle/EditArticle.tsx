@@ -231,7 +231,7 @@ console.log(articles)
             await saveLaw({
                 variables: {
                     input: {
-                        lawId: '9b07767f-3652-46c2-a9a7-1e5fc609e30a',
+                        lawId: lawId,
                         title: law.title,
                         isPublished: false,
                         articles: formattedArticles,
