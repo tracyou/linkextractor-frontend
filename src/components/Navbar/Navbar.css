@@ -4,17 +4,18 @@
 .logoContainer {
     display: flex;
     margin-top: 1rem;
-    margin-left: 2rem;
+    margin-left: 8rem;
 }
 
 /* Navbar styles */
 .nav {
     display: flex;
     justify-content: space-between;
-    background-color: #006699;
+    background-color: rgb(0 123 192);
     align-items: stretch;
     padding-left: 11rem  ;
     border-bottom: 8px solid #B2D7EA;
+    height: 4rem;
 }
 
 /* Navbar list styles */
@@ -25,29 +26,25 @@
     display: flex;
 }
 
-/* Navbar list item styles */
-.nav li {
-    margin-right: 1rem;
-    height: 100%;
-}
-
 /* Navbar link styles */
 .nav a {
     text-decoration: none;
-
-    color: inherit;
-    background-color: #006699;
+    color: rgb(255 255 255);
     display: flex;
     align-items: center;
     margin: 0;
-    padding: 0.5rem;
-
-
+    padding: 1rem;
 }
 
 /* Navbar active link styles */
-.nav li.active a {
+.nav a.active {
     background-color: #B2D7EA;
+    color: rgb(33 36 39);
+}
+/*navbar hover styles*/
+.nav li a:hover {
+    background-color: #B2D7EA;
+    color: rgb(0 123 192);
 }
 
 

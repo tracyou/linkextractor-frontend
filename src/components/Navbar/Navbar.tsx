@@ -1,6 +1,6 @@
 // Navbar.js
 import React from 'react';
-import { Link } from 'react-router-dom';
+import {NavLink} from 'react-router-dom';
 import './Navbar.css';
 
 const Navbar = () => (
@@ -11,8 +11,11 @@ const Navbar = () => (
         <div className="nav">
             <nav>
                 <ul>
+                    <li >
+                        <NavLink to="/" className={({isActive}) => isActive ? "active": ""}>Home</NavLink>
+                    </li>
                     <li className="active">
-                        <Link to="/relation-schemas">Relation Schemas</Link>
+                        <NavLink to="/relation-schemas" className={({isActive}) => isActive ? "active": ""}>Relatie schemas</NavLink>
                     </li>
                 </ul>
             </nav>
