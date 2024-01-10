@@ -1,6 +1,12 @@
-query getAllLaws{
+query getLaws{
     laws {
         ...SimpleLaw
+    }
+}
+
+query getLawById($id: UUID!){
+    law(id: $id){
+        ...Law
     }
 }
 
