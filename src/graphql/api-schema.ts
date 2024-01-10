@@ -362,11 +362,11 @@ export interface XmlFileInput {
   readonly title: Scalars['String']['input'];
 }
 
-export type LawFragment = { readonly title: string, readonly isPublished: boolean, readonly articles: ReadonlyArray<SimpleArticleFragment> };
+export type LawFragment = { readonly id: string, readonly title: string, readonly isPublished: boolean, readonly articles: ReadonlyArray<SimpleArticleFragment> };
 
-export type SimpleLawFragment = { readonly title: string, readonly isPublished: boolean };
+export type SimpleLawFragment = { readonly id: string, readonly title: string, readonly isPublished: boolean };
 
-export type SimpleArticleFragment = { readonly title?: string | null, readonly text?: string | null, readonly jsonText?: string | null, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
+export type SimpleArticleFragment = { readonly id: string, readonly title?: string | null, readonly text?: string | null, readonly jsonText?: string | null, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
 
 export type SimpleAnnotationFragment = { readonly id: string, readonly text: string };
 
@@ -379,6 +379,18 @@ export type SimpleMatterRelationFragment = { readonly id: string, readonly relat
 export type SimpleMatterRelationSchemaFragment = { readonly id: string, readonly schemaLayout: string, readonly matter: SimpleMatterFragment, readonly relations: ReadonlyArray<SimpleMatterRelationFragment>, readonly relationSchema: { readonly id: string } };
 
 export type SimpleRelationSchemaFragment = { readonly id: string, readonly createdAt: string, readonly updatedAt: string, readonly isPublished: boolean, readonly expiredAt?: string | null, readonly matterRelationSchemas: ReadonlyArray<SimpleMatterRelationSchemaFragment> };
+
+export type GetLawsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetLawsQuery = { readonly laws: ReadonlyArray<SimpleLawFragment> };
+
+export type GetLawByIdQueryVariables = Exact<{
+  id: Scalars['UUID']['input'];
+}>;
+
+
+export type GetLawByIdQuery = { readonly law: LawFragment };
 
 export type SaveAnnotatedLawMutationVariables = Exact<{
   input: AnnotatedArticleInput;
@@ -450,6 +462,7 @@ export const SimpleAnnotationFragmentDoc = gql`
     `;
 export const SimpleArticleFragmentDoc = gql`
     fragment SimpleArticle on Article {
+  id
   title
   text
   jsonText
@@ -460,6 +473,7 @@ export const SimpleArticleFragmentDoc = gql`
     ${SimpleAnnotationFragmentDoc}`;
 export const LawFragmentDoc = gql`
     fragment Law on Law {
+  id
   title
   isPublished
   articles {
@@ -469,6 +483,7 @@ export const LawFragmentDoc = gql`
     ${SimpleArticleFragmentDoc}`;
 export const SimpleLawFragmentDoc = gql`
     fragment SimpleLaw on Law {
+  id
   title
   isPublished
 }
@@ -528,6 +543,85 @@ export const SimpleRelationSchemaFragmentDoc = gql`
   }
 }
     ${SimpleMatterRelationSchemaFragmentDoc}`;
+export const GetLawsDocument = gql`
+    query getLaws {
+  laws {
+    ...SimpleLaw
+  }
+}
+    ${SimpleLawFragmentDoc}`;
+
+/**
+ * __useGetLawsQuery__
+ *
+ * To run a query within a React component, call `useGetLawsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetLawsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetLawsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetLawsQuery(baseOptions?: Apollo.QueryHookOptions<GetLawsQuery, GetLawsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetLawsQuery, GetLawsQueryVariables>(GetLawsDocument, options);
+      }
+export function useGetLawsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetLawsQuery, GetLawsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetLawsQuery, GetLawsQueryVariables>(GetLawsDocument, options);
+        }
+export function useGetLawsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetLawsQuery, GetLawsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetLawsQuery, GetLawsQueryVariables>(GetLawsDocument, options);
+        }
+export type GetLawsQueryHookResult = ReturnType<typeof useGetLawsQuery>;
+export type GetLawsLazyQueryHookResult = ReturnType<typeof useGetLawsLazyQuery>;
+export type GetLawsSuspenseQueryHookResult = ReturnType<typeof useGetLawsSuspenseQuery>;
+export type GetLawsQueryResult = Apollo.QueryResult<GetLawsQuery, GetLawsQueryVariables>;
+export const GetLawByIdDocument = gql`
+    query getLawById($id: UUID!) {
+  law(id: $id) {
+    ...Law
+  }
+}
+    ${LawFragmentDoc}`;
+
+/**
+ * __useGetLawByIdQuery__
+ *
+ * To run a query within a React component, call `useGetLawByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetLawByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetLawByIdQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetLawByIdQuery(baseOptions: Apollo.QueryHookOptions<GetLawByIdQuery, GetLawByIdQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetLawByIdQuery, GetLawByIdQueryVariables>(GetLawByIdDocument, options);
+      }
+export function useGetLawByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetLawByIdQuery, GetLawByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetLawByIdQuery, GetLawByIdQueryVariables>(GetLawByIdDocument, options);
+        }
+export function useGetLawByIdSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetLawByIdQuery, GetLawByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetLawByIdQuery, GetLawByIdQueryVariables>(GetLawByIdDocument, options);
+        }
+export type GetLawByIdQueryHookResult = ReturnType<typeof useGetLawByIdQuery>;
+export type GetLawByIdLazyQueryHookResult = ReturnType<typeof useGetLawByIdLazyQuery>;
+export type GetLawByIdSuspenseQueryHookResult = ReturnType<typeof useGetLawByIdSuspenseQuery>;
+export type GetLawByIdQueryResult = Apollo.QueryResult<GetLawByIdQuery, GetLawByIdQueryVariables>;
 export const SaveAnnotatedLawDocument = gql`
     mutation saveAnnotatedLaw($input: AnnotatedArticleInput!) {
   saveAnnotatedLaw(input: $input) {

@@ -11,14 +11,17 @@ import {useRecoilCallback, useRecoilSnapshot, useRecoilValue} from "recoil";
 import {getAnnotationsOnTextNode} from "../../utils/EditorAnnotationUtils";
 import AnnotatedText from "../Editor/AnnotatedText/AnnotatedText";
 import {
+    GetLawByIdDocument,
+    GetLawByIdQuery,
     MattersDocument,
     MattersQuery,
-    MutationSaveAnnotatedLawArgs,
+    MutationSaveAnnotatedLawArgs, RelationSchemaDocument, RelationSchemaQuery,
     SaveAnnotatedLawDocument
 } from "../../graphql/api-schema";
 import {useMutation, useQuery} from "@apollo/client";
 import {annotationIdState, annotationState} from "../../recoil/AnnotationState";
 import {Button} from "@mui/material";
+import {useParams} from "react-router-dom";
 
 type CustomElement = { type: string; children: CustomText[] }
 type CustomText = { text: string, bold?: boolean, italic?: boolean, code?: boolean, underline?: boolean }
@@ -44,6 +47,27 @@ type Paragraph = {
 type Descendant = Heading | Paragraph;
 
 const EditArticle = () => {
+
+    const [lawId, setLawId] = useState<string | undefined>();
+
+    // Get the relation schema id from the url
+    const {id} = useParams();
+
+    useEffect(() => {
+        setLawId(id);
+    }, [id]);
+
+    const {
+        data: lawData,
+        loading: lawLoading,
+        refetch: lawRefetch,
+        error: lawError
+    } = useQuery<GetLawByIdQuery>(GetLawByIdDocument, {
+        variables: {
+            id: lawId
+        }
+    });
+
     const [annotations, setAnnotations] = useState<any[]>(['']);
     const annotationsIds = useRecoilValue(annotationIdState);// get the ids from the satate
 
@@ -71,6 +95,27 @@ const EditArticle = () => {
     }, {});
 
     const [saveLaw] = useMutation<MutationSaveAnnotatedLawArgs>(SaveAnnotatedLawDocument, {});
+
+    const lawTitle = {
+        type: 'h1',
+        children: [{ text: "Law" }],
+    };
+
+    const articles = lawData?.law.articles.flatMap((article) => [
+        {
+            type: "h2",
+            children: [{ text: `Article ${article.id}` }],
+        },
+        {
+            type: "paragraph",
+            children: [
+                { text: article.text || '' }, // Make sure text is defined or provide a default value
+            ],
+        },
+    ]);
+console.log(articles)
+
+    // const lawDocument=[...lawTitle, ...articles]
 
     const ExampleDocument: Descendant[] = [
         {
@@ -103,14 +148,32 @@ const EditArticle = () => {
             ],
         }
     ]
-    //convert the typescript array to json string
-    const jsonString = JSON.stringify(ExampleDocument, null, 2);
 
+    const [matter, setMatter] = React.useState<Matter>({title: "Afleidingsregel", color: "#d47478"});
+    const [definition, setDefinition] = React.useState("");
+    const [comment, setComment] = React.useState("");
+    const [document, setDocument] = useState<Descendant[]>(ExampleDocument);
+
+    const [editor] = useState(() => withReact(createEditor()));
+    const [selection, setSelection] = useSelection(editor);
+
+    const onChangeHandler = useCallback(
+        (document: any) => {
+            setDocument(document);
+            setSelection(editor.selection);
+        },
+        [editor.selection, setDocument, setSelection]
+    );
+
+
+    //convert the typescript array to json string
+    const documentAsJson = JSON.stringify(document, null, 2);
 
     const saveTheLaw = async () => {
 
         const articles = [];
-        const jsonObjectsArray = JSON.parse(jsonString) // convert the json string to json object arrY
+        const jsonObjectsArray = JSON.parse(documentAsJson); // convert the json string to json object array
+        const articleContentAsJson: JSON[] = [];
 
         for (let i = 0; i < jsonObjectsArray.length; i++) {
             const currentElement = jsonObjectsArray[i];
@@ -118,21 +181,28 @@ const EditArticle = () => {
 
             if (currentElement.type === "h2" && nextElement && nextElement.type === "paragraph") {
                 const title = currentElement.children[0]?.text || "";
-                const content = nextElement.children.map((child: { text: any; }) => child.text).join(" ");
+                const content = nextElement.children
+                    .filter((child: { text?: string; }) => child.text !== undefined);
 
-                articles.push({ name: title, content });
+                // Store the JSON objects in jsonObjectArray
+                articleContentAsJson.push(...content);
+
+                // Create a string from the text properties of the children
+                const contentAsString = content.map((child: { text: string; }) => child.text).join(" ");
+
+                articles.push({name: title, content: contentAsString});
             }
         }
 
 
         console.log(articles);
+        console.log(articleContentAsJson);
 
 
         const initialAnnotations = annotations.map(annotation => ({
-            text: annotation.comment,
+            text: null,
             definition: annotation.definition,
             comment: annotation.comment,
-            json: jsonString
         }));
 
         const law = {"title": jsonObjectsArray[0].children[0].text};
@@ -151,7 +221,7 @@ const EditArticle = () => {
             articleId: '9b07767f-c39f-4be6-8ba3-2393f02dd71f',
             title: article.name,
             text: article.content,
-            jsonText: jsonString,
+            jsonText: JSON.stringify(articleContentAsJson),
             annotations: formattedAnnotations,
         }));
         console.log(formattedArticles)
@@ -176,22 +246,6 @@ const EditArticle = () => {
         console.log(annotations);
     }, [annotations]);
 
-
-    const [matter, setMatter] = React.useState<Matter>({title: "Afleidingsregel", color: "#d47478"});
-    const [definition, setDefinition] = React.useState("");
-    const [comment, setComment] = React.useState("");
-    const [document, setDocument] = useState<Descendant[]>(ExampleDocument);
-
-    const [editor] = useState(() => withReact(createEditor()));
-    const [selection, setSelection] = useSelection(editor);
-
-    const onChangeHandler = useCallback(
-        (document: any) => {
-            setDocument(document);
-            setSelection(editor.selection);
-        },
-        [editor.selection, setDocument, setSelection]
-    );
 
     const renderElement = useCallback((props: any) => {
         const {element, children, attributes} = props;

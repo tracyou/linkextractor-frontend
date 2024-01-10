@@ -4,30 +4,28 @@ import ImportButton from "../components/ImportButton/ImportButton";
 import ViewXML from "./ViewXML";
 import {Title} from "../stylesheets/Fonts";
 import Grid from "@mui/material/Grid";
+import {
+    GetLawsDocument,
+    GetLawsQuery,
+    RelationSchemasDocument,
+    RelationSchemasQuery,
+    SimpleLawFragment
+} from "../graphql/api-schema";
+import {useQuery} from "@apollo/client";
 
 
 const ImportXML = () => {
 
     const [fileContent, setFileContent] = useState("")
 
-    const [artikelen, setArtikelen] = useState([
-        {
-            name: 'Artikel 1',
-        },
-        {
-            name: 'Artikel 2',
-        },
-        {
-            name: 'Artikel 3',
-        },
-    ]);
+    const {data, loading} = useQuery<GetLawsQuery>(GetLawsDocument);
 
-    const [file, setFile] = useState<File|null>();
+    const [file, setFile] = useState<File | null>();
     const [viewXML, setViewXML] = useState<SetStateAction<any>>();
 
     const handleFileSelect = (selectedFile: File) => {
         setFile(selectedFile);
-        artikelen.push({name: selectedFile.name.toString()})
+        // laws.push({name: selectedFile.name.toString()})
 
         if (selectedFile) {
             const reader = new FileReader();
@@ -41,9 +39,9 @@ const ImportXML = () => {
         }
     }
 
-    const handleOnClick= () =>{
+    const handleOnClick = (law: SimpleLawFragment) => {
 
-        window.location.href = '/editarticle';
+        window.location.href = '/editarticle/' + law.id;
 
     }
 
@@ -52,7 +50,7 @@ const ImportXML = () => {
         <>
             <div className="imported-content-container">
                 <h1 style={Title}>
-                    Artikelen
+                    Wetten
                 </h1>
                 <Grid
                     alignItems="right"
@@ -61,18 +59,21 @@ const ImportXML = () => {
                     <ImportButton onFileSelect={handleFileSelect}/>
                 </Grid>
                 <Grid>
-                <div className="artikelen">
-                    {artikelen.map((artikel, index) => (
+                    {loading ? 'Wetten laden....' : (
+                        <div className="artikelen">
+                            {data?.laws.map((law) => (
 
-                        <div key={index} className="artikel" onClick={handleOnClick}>
-                            <h2>{artikel.name}</h2>
+                                <div key={law.id} className="artikel" onClick={() => handleOnClick(law)} >
+                                    < h2 > {law?.title}</h2>
+                                    </div>
+                                    ))}
+                                </div>
+                                )}
+
+                        </Grid>
                         </div>
-                    ))}
-                </div>
-                </Grid>
-            </div>
-        </>
-    );
-};
+                        </>
+                        );
+                    };
 
 export default ImportXML;

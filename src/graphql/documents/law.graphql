@@ -1,3 +1,14 @@
+query getLaws{
+    laws {
+        ...SimpleLaw
+    }
+}
+
+query getLawById($id: UUID!){
+    law(id: $id){
+        ...Law
+    }
+}
 mutation saveAnnotatedLaw($input: AnnotatedArticleInput!){
     saveAnnotatedLaw(input: $input){
         id

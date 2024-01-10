@@ -24,7 +24,7 @@ const Layout = () => {
                         <Route path="/" element={<HomePage/>}/>
                         <Route path="/import-xml" element={<ImportXML/>}/>
                         <Route path="/navbar" element={<Navbar/>}/>
-                        <Route path="/editarticle" element={<EditArticle/>}/>
+                        <Route path="/editarticle/:id" element={<EditArticle/>}/>
                         <Route path={"/test"} element={<ApiDemo/>}/>
                         <Route path={"/relation-schemas"} element={<RelationSchemaIndex/>}/>
                         <Route path={"/relation-schemas/:id"} element={<RelationSchemaDetail/>}/>
