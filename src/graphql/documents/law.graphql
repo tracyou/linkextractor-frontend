@@ -18,26 +18,6 @@ mutation importXml($file: Upload!){
 
 mutation saveAnnotatedLaw($input: AnnotatedArticleInput!){
     saveAnnotatedLaw(input: $input){
-        id
-        title
-        isPublished
-        articles {
-            id
-            title
-            text
-            jsonText
-            annotations {
-                id
-                text
-                definition
-                comment
-                matter {
-                    id
-                }
-                relationSchema {
-                    id
-                }
-            }
-        }
+        ...Law
     }
 }
