@@ -3,7 +3,7 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import {Title} from "../../stylesheets/Fonts";
 import {createEditor} from "slate";
-import {Matter} from "../../types";
+import {CustomText, Matter} from "../../types";
 import AnnotationMenu from "../Editor/Menu/AnnotationMenu";
 import useSelection from "../../hooks/useSelection";
 import {DefaultElement, Editable, ReactEditor, Slate, withReact} from "slate-react";
@@ -23,16 +23,7 @@ import {annotationIdState, annotationState} from "../../recoil/AnnotationState";
 import {Button} from "@mui/material";
 import {useParams} from "react-router-dom";
 
-type CustomElement = { type: string; children: CustomText[] }
-type CustomText = { text: string, bold?: boolean, italic?: boolean, code?: boolean, underline?: boolean }
 
-declare module 'slate' {
-    interface CustomTypes {
-        Editor: ReactEditor
-        Element: CustomElement
-        Text: CustomText
-    }
-}
 
 type Heading = {
     type: "h1" | "h2" | "h3" | "h4";
@@ -50,7 +41,7 @@ const EditArticle = () => {
 
     const [lawId, setLawId] = useState<string | undefined>();
 
-    const [lawDocument, setLawDocument] = useState<Descendant[]>([]);
+    const [lawDocument, setLawDocument] = useState<any[]>([]);
 
     // Get the relation schema id from the url
     const {id} = useParams();
@@ -91,14 +82,18 @@ const EditArticle = () => {
         if (lawData) {
             setLawDocument(lawData!.law.articles.flatMap((article) => [
                 {
-                    type: "h4",
-                    children: [{text: article.title}],
-                },
-                {
-                    type: "paragraph",
-                    children: [
-                        {text: article.text || ''}, // Make sure text is defined or provide a default value
-                    ],
+                    id: article.id,
+                    type: "article",
+                    children: [{
+                        type: "h4",
+                        children: [{text: article.title}],
+                    },
+                        {
+                            type: "paragraph",
+                            children: [
+                                {text: article.text || ''}, // Make sure text is defined or provide a default value
+                            ],
+                        }]
                 },
             ]));
         }
@@ -252,38 +247,38 @@ const EditArticle = () => {
     return (
         lawLoading ? <p>Wet wordt geladen...</p> : (
             lawDocument.length === 0 ? <p>Geen resultaat...</p> :
-            <Box sx={{flexGrow: 1}}>
-                <Grid
-                    alignItems="center"
-                    justifyContent="end"
-                    container>
-                    <button onClick={saveTheLaw}>Opslaan</button>
-                </Grid>
-                <Grid
-                    alignItems="center"
-                    justifyContent="center"
-                    container
-                >
+                <Box sx={{flexGrow: 1}}>
+                    <Grid
+                        alignItems="center"
+                        justifyContent="end"
+                        container>
+                        <button onClick={saveTheLaw}>Opslaan</button>
+                    </Grid>
+                    <Grid
+                        alignItems="center"
+                        justifyContent="center"
+                        container
+                    >
 
-                    <h1 style={Title}>{lawData?.law.title}</h1>
-                </Grid>
-                <Grid container direction={"row"} spacing={5}>
-                    <Slate editor={editor} initialValue={lawDocument} onChange={onChangeHandler}>
-                        <Grid item lg={4}>
-                            <AnnotationMenu selection={selection} setSelection={setSelection} matter={matter}
-                                            setMatter={setMatter} definition={definition}
-                                            setDefinition={setDefinition}
-                                            comment={comment} setComment={setComment} matterColors={MATTER_COLORS}/>
-                        </Grid>
-                        <Grid item lg={8}>
-                            <Editable renderElement={renderElement} renderLeaf={renderLeaf} onKeyDown={(e) => {
-                                e.preventDefault()
-                            }}/>
-                        </Grid>
-                        <DebugObserver/>
-                    </Slate>
-                </Grid>
-            </Box>
+                        <h1 style={Title}>{lawData?.law.title}</h1>
+                    </Grid>
+                    <Grid container direction={"row"} spacing={5}>
+                        <Slate editor={editor} initialValue={lawDocument} onChange={onChangeHandler}>
+                            <Grid item lg={4}>
+                                <AnnotationMenu selection={selection} setSelection={setSelection} matter={matter}
+                                                setMatter={setMatter} definition={definition}
+                                                setDefinition={setDefinition}
+                                                comment={comment} setComment={setComment} matterColors={MATTER_COLORS}/>
+                            </Grid>
+                            <Grid item lg={8}>
+                                <Editable renderElement={renderElement} renderLeaf={renderLeaf} onKeyDown={(e) => {
+                                    e.preventDefault()
+                                }}/>
+                            </Grid>
+                            <DebugObserver/>
+                        </Slate>
+                    </Grid>
+                </Box>
         )
     );
 };
