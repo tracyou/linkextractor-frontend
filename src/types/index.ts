@@ -2,14 +2,16 @@ import {ReactEditor} from "slate-react";
 
 export interface Matter {
     title: string,
-    color: string
+    color: string,
+    id: string,
 }
 export interface Annotation {
     id?: string,
     matter: Matter,
     definition: string,
     comment: string,
-    articleId: string
+    articleId: string,
+    text: string
 }
 
 export type ArticleNode = {

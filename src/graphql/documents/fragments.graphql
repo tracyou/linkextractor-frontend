@@ -26,6 +26,8 @@ fragment SimpleArticle on Article {
 fragment SimpleAnnotation on Annotation {
     id
     text
+    comment
+    definition
     matter {
         ...SimpleMatter
     }
