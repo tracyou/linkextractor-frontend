@@ -35,7 +35,7 @@ declare module 'slate' {
 }
 
 type Heading = {
-    type: "h1" | "h2";
+    type: "h1" | "h2" | "h3" | "h4";
     children: CustomText[];
 };
 
@@ -49,6 +49,8 @@ type Descendant = Heading | Paragraph;
 const EditArticle = () => {
 
     const [lawId, setLawId] = useState<string | undefined>();
+
+    const [lawDocument, setLawDocument] = useState<Descendant[]>([]);
 
     // Get the relation schema id from the url
     const {id} = useParams();
@@ -67,6 +69,40 @@ const EditArticle = () => {
             id: lawId
         }
     });
+
+    useEffect(() => {
+        if (lawError) {
+            if (lawError.graphQLErrors.some((error) => {
+                if (!error.extensions.validation) return false;
+
+                // @ts-ignore
+                return error.extensions.validation.id.includes('The selected id is invalid.')
+            })) {
+                window.location.href = '/import-xml';
+            }
+        }
+    }, [lawError]);
+
+    useEffect(() => {
+        if (lawLoading) {
+            return
+        }
+
+        if (lawData) {
+            setLawDocument(lawData!.law.articles.flatMap((article) => [
+                {
+                    type: "h4",
+                    children: [{text: article.title}],
+                },
+                {
+                    type: "paragraph",
+                    children: [
+                        {text: article.text || ''}, // Make sure text is defined or provide a default value
+                    ],
+                },
+            ]));
+        }
+    }, [lawData, lawLoading, lawError]);
 
     const [annotations, setAnnotations] = useState<any[]>(['']);
     const annotationsIds = useRecoilValue(annotationIdState);// get the ids from the satate
@@ -96,81 +132,25 @@ const EditArticle = () => {
 
     const [saveLaw] = useMutation<MutationSaveAnnotatedLawArgs>(SaveAnnotatedLawDocument, {});
 
-    const lawTitle = {
-        type: 'h1',
-        children: [{ text: "Law" }],
-    };
-
-    const articles = lawData?.law.articles.flatMap((article) => [
-        {
-            type: "h2",
-            children: [{ text: `Article ${article.id}` }],
-        },
-        {
-            type: "paragraph",
-            children: [
-                { text: article.text || '' }, // Make sure text is defined or provide a default value
-            ],
-        },
-    ]);
-console.log(articles)
-
-    // const lawDocument=[...lawTitle, ...articles]
-
-    const ExampleDocument: Descendant[] = [
-        {
-            type: "h1",
-            children: [{text: "Law"}],
-        },
-        {
-            type: "h2",
-            children: [{text: "Article 1"}],
-        },
-        {
-            type: "paragraph",
-            children: [
-                {text: "i want to finish this as soon as possible!!."},
-
-            ],
-        },
-        {
-            type: "h2",
-            children: [{text: "Article 2"}],
-        },
-        {
-            type: "paragraph",
-            children: [
-                {text: "Hello World! This is my paragraph inside a sample document."},
-                {text: "Bold text.", bold: true},
-                {text: "Italic text.", italic: true},
-                {text: "Bold and underlined text.", bold: true, underline: true},
-                {text: "variableFoo", code: true},
-            ],
-        }
-    ]
-
     const [matter, setMatter] = React.useState<Matter>({title: "Afleidingsregel", color: "#d47478"});
     const [definition, setDefinition] = React.useState("");
     const [comment, setComment] = React.useState("");
-    const [document, setDocument] = useState<Descendant[]>(ExampleDocument);
 
     const [editor] = useState(() => withReact(createEditor()));
     const [selection, setSelection] = useSelection(editor);
 
     const onChangeHandler = useCallback(
         (document: any) => {
-            setDocument(document);
+            setLawDocument(document);
             setSelection(editor.selection);
         },
-        [editor.selection, setDocument, setSelection]
+        [editor.selection, setLawDocument, setSelection]
     );
 
-
     //convert the typescript array to json string
-    const documentAsJson = JSON.stringify(document, null, 2);
+    const documentAsJson = JSON.stringify(lawDocument, null, 2);
 
     const saveTheLaw = async () => {
-
         const articles = [];
         const jsonObjectsArray = JSON.parse(documentAsJson); // convert the json string to json object array
         const articleContentAsJson: JSON[] = [];
@@ -194,47 +174,14 @@ console.log(articles)
             }
         }
 
-
-        console.log(articles);
-        console.log(articleContentAsJson);
-
-
-        const initialAnnotations = annotations.map(annotation => ({
-            text: null,
-            definition: annotation.definition,
-            comment: annotation.comment,
-        }));
-
-        const law = {"title": jsonObjectsArray[0].children[0].text};
-        console.log(law)
-
-
-        const formattedAnnotations = initialAnnotations.map(annotation => ({
-            text: 'this should be saved in the state as well',
-            definition: annotation.definition,
-            comment: annotation.comment,
-            matterId: '9b07767e-e987-4c48-93f9-8d36daf2ee9b',
-            relationSchemaId: '9b07767f-176d-4692-9f4b-bcf6b68eebd6',
-        }));
-
-        const formattedArticles = articles.map(article => ({
-            articleId: '9b07767f-c39f-4be6-8ba3-2393f02dd71f',
-            title: article.name,
-            text: article.content,
-            jsonText: JSON.stringify(articleContentAsJson),
-            annotations: formattedAnnotations,
-        }));
-        console.log(formattedArticles)
-
-
         try {
             await saveLaw({
                 variables: {
                     input: {
                         lawId: lawId,
-                        title: law.title,
                         isPublished: false,
-                        articles: formattedArticles,
+                        articles: articles, // TODO: Create a mapping to an array of objects that contain all the mandator input parameters:
+                        // - [{ articleId, jsonText, annotations : [{ text, matterId, definition, comment }] }]
                     },
                 },
             });
@@ -242,10 +189,6 @@ console.log(articles)
             console.error('Error saving law:', error);
         }
     };
-    useEffect(() => {
-        console.log(annotations);
-    }, [annotations]);
-
 
     const renderElement = useCallback((props: any) => {
         const {element, children, attributes} = props;
@@ -307,37 +250,41 @@ console.log(articles)
         return <span {...attributes}>{el}</span>;
     }
     return (
-        <Box sx={{flexGrow: 1}}>
-            <Grid
-                alignItems="center"
-                justifyContent="end"
-                container>
-                <button onClick={saveTheLaw}>Opslaan</button>
-            </Grid>
-            <Grid
-                alignItems="center"
-                justifyContent="center"
-                container
-            >
+        lawLoading ? <p>Wet wordt geladen...</p> : (
+            lawDocument.length === 0 ? <p>Geen resultaat...</p> :
+            <Box sx={{flexGrow: 1}}>
+                <Grid
+                    alignItems="center"
+                    justifyContent="end"
+                    container>
+                    <button onClick={saveTheLaw}>Opslaan</button>
+                </Grid>
+                <Grid
+                    alignItems="center"
+                    justifyContent="center"
+                    container
+                >
 
-                <h1 style={Title}>Artikel 80</h1>
-            </Grid>
-            <Grid container direction={"row"} spacing={5}>
-                <Slate editor={editor} initialValue={document} onChange={onChangeHandler}>
-                    <Grid item lg={4}>
-                        <AnnotationMenu selection={selection} setSelection={setSelection} matter={matter}
-                                        setMatter={setMatter} definition={definition} setDefinition={setDefinition}
-                                        comment={comment} setComment={setComment} matterColors={MATTER_COLORS}/>
-                    </Grid>
-                    <Grid item lg={8}>
-                        <Editable renderElement={renderElement} renderLeaf={renderLeaf} onKeyDown={(e) => {
-                            e.preventDefault()
-                        }}/>
-                    </Grid>
-                    <DebugObserver/>
-                </Slate>
-            </Grid>
-        </Box>
+                    <h1 style={Title}>{lawData?.law.title}</h1>
+                </Grid>
+                <Grid container direction={"row"} spacing={5}>
+                    <Slate editor={editor} initialValue={lawDocument} onChange={onChangeHandler}>
+                        <Grid item lg={4}>
+                            <AnnotationMenu selection={selection} setSelection={setSelection} matter={matter}
+                                            setMatter={setMatter} definition={definition}
+                                            setDefinition={setDefinition}
+                                            comment={comment} setComment={setComment} matterColors={MATTER_COLORS}/>
+                        </Grid>
+                        <Grid item lg={8}>
+                            <Editable renderElement={renderElement} renderLeaf={renderLeaf} onKeyDown={(e) => {
+                                e.preventDefault()
+                            }}/>
+                        </Grid>
+                        <DebugObserver/>
+                    </Slate>
+                </Grid>
+            </Box>
+        )
     );
 };
 

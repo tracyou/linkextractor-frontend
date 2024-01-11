@@ -56,7 +56,7 @@ export interface Article {
   readonly jsonText?: Maybe<Scalars['JSON']['output']>;
   readonly law: Law;
   readonly text?: Maybe<Scalars['String']['output']>;
-  readonly title?: Maybe<Scalars['String']['output']>;
+  readonly title: Scalars['String']['output'];
 }
 
 export interface ArticleInput {
@@ -366,7 +366,7 @@ export type LawFragment = { readonly id: string, readonly title: string, readonl
 
 export type SimpleLawFragment = { readonly id: string, readonly title: string, readonly isPublished: boolean };
 
-export type SimpleArticleFragment = { readonly id: string, readonly title?: string | null, readonly text?: string | null, readonly jsonText?: string | null, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
+export type SimpleArticleFragment = { readonly id: string, readonly title: string, readonly text?: string | null, readonly jsonText?: string | null, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
 
 export type SimpleAnnotationFragment = { readonly id: string, readonly text: string };
 
@@ -397,7 +397,7 @@ export type SaveAnnotatedLawMutationVariables = Exact<{
 }>;
 
 
-export type SaveAnnotatedLawMutation = { readonly saveAnnotatedLaw: { readonly id: string, readonly title: string, readonly isPublished: boolean, readonly articles: ReadonlyArray<{ readonly id: string, readonly title?: string | null, readonly text?: string | null, readonly jsonText?: string | null, readonly annotations: ReadonlyArray<{ readonly id: string, readonly text: string, readonly definition?: string | null, readonly comment?: string | null, readonly matter: { readonly id: string }, readonly relationSchema: { readonly id: string } }> }> } };
+export type SaveAnnotatedLawMutation = { readonly saveAnnotatedLaw: { readonly id: string, readonly title: string, readonly isPublished: boolean, readonly articles: ReadonlyArray<{ readonly id: string, readonly title: string, readonly text?: string | null, readonly jsonText?: string | null, readonly annotations: ReadonlyArray<{ readonly id: string, readonly text: string, readonly definition?: string | null, readonly comment?: string | null, readonly matter: { readonly id: string }, readonly relationSchema: { readonly id: string } }> }> } };
 
 export type MattersQueryVariables = Exact<{ [key: string]: never; }>;
 

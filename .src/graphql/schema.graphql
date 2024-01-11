@@ -31,7 +31,7 @@ type Article {
   jsonText: JSON
   law: Law!
   text: String
-  title: String
+  title: String!
 }
 
 input ArticleInput {
