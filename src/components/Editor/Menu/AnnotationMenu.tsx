@@ -56,7 +56,9 @@ const AnnotationMenu: React.FC<AnnotationProps> = ({
 
     const onInsertAnnotation = useCallback(() => {
         const ancestorWithType = findAncestorWithType(editor, editor.selection ? Editor.path(editor, editor.selection.anchor) : null, 'article');
-        insertAnnotation(editor, addAnnotation, {matter: matter, definition: definition, comment: comment, articleId: ancestorWithType!.id});
+        const selectedText =
+
+        insertAnnotation(editor, addAnnotation, {matter: matter, definition: definition, comment: comment, articleId: ancestorWithType!.id, text: Editor.string(editor, editor.selection!)});
         onClearForm();
     }, [editor, addAnnotation, matter, definition, comment]);
 
@@ -92,8 +94,9 @@ const AnnotationMenu: React.FC<AnnotationProps> = ({
                         value={matter.title}
                         fullWidth
                         onChange={(e) => setMatter({
-                            title: e.target.value.toString(),
-                            color: matterColors[e.target.value.toString()]
+                            id: matterColors[e.target.value.toString()].id,
+                            title: matterColors[e.target.value.toString()].title,
+                            color: matterColors[e.target.value.toString()].color
                         })}
                     >{
                         data?.matters.map(matter =>

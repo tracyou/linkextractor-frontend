@@ -2,7 +2,6 @@ input AnnotatedArticleInput {
   articles: [ArticleInput!]!
   isPublished: Boolean
   lawId: UUID!
-  title: String!
 }
 
 type Annotation {
@@ -21,14 +20,14 @@ input AnnotationInput {
   comment: String
   definition: String
   matterId: UUID!
-  relationSchemaId: UUID!
+  tempId: UUID!
   text: String!
 }
 
 type Article {
   annotations: [Annotation!]!
   id: UUID!
-  jsonText: JSON
+  jsonText: String
   law: Law!
   text: String
   title: String!
@@ -38,8 +37,6 @@ input ArticleInput {
   annotations: [AnnotationInput!]!
   articleId: UUID!
   jsonText: JSON
-  text: String!
-  title: String!
 }
 
 input CreatePancakeInput {

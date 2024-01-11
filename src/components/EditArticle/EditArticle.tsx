@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useState} from "react";
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import {Title} from "../../stylesheets/Fonts";
-import {createEditor} from "slate";
+import {createEditor, first} from "slate";
 import {CustomText, Matter} from "../../types";
 import AnnotationMenu from "../Editor/Menu/AnnotationMenu";
 import useSelection from "../../hooks/useSelection";
@@ -12,17 +12,21 @@ import {getAnnotationsOnTextNode} from "../../utils/EditorAnnotationUtils";
 import AnnotatedText from "../Editor/AnnotatedText/AnnotatedText";
 import {
     GetLawByIdDocument,
-    GetLawByIdQuery,
+    GetLawByIdQuery, LawFragment, LawFragmentDoc,
     MattersDocument,
     MattersQuery,
-    MutationSaveAnnotatedLawArgs, RelationSchemaDocument, RelationSchemaQuery,
-    SaveAnnotatedLawDocument
+    MutationSaveAnnotatedLawArgs,
+    RelationSchemaDocument,
+    RelationSchemaQuery,
+    SaveAnnotatedLawDocument,
+    SaveAnnotatedLawMutation,
+    SaveMatterRelationSchemaDocument,
+    SaveMatterRelationSchemaMutation
 } from "../../graphql/api-schema";
 import {useMutation, useQuery} from "@apollo/client";
 import {annotationIdState, annotationState} from "../../recoil/AnnotationState";
-import {Button} from "@mui/material";
 import {useParams} from "react-router-dom";
-
+import useAddAnnotationToState from "../../hooks/useAddAnnotationToState";
 
 
 type Heading = {
@@ -40,8 +44,9 @@ type Descendant = Heading | Paragraph;
 const EditArticle = () => {
 
     const [lawId, setLawId] = useState<string | undefined>();
-
+    const addAnnotation = useAddAnnotationToState();
     const [lawDocument, setLawDocument] = useState<any[]>([]);
+    const [lawData, setLawData] = useState<LawFragment|undefined>();
 
     // Get the relation schema id from the url
     const {id} = useParams();
@@ -51,7 +56,7 @@ const EditArticle = () => {
     }, [id]);
 
     const {
-        data: lawData,
+        data: queryResult,
         loading: lawLoading,
         refetch: lawRefetch,
         error: lawError
@@ -60,6 +65,10 @@ const EditArticle = () => {
             id: lawId
         }
     });
+
+    const [saveLawMutation, {loading, error}] = useMutation<SaveAnnotatedLawMutation>(
+        SaveAnnotatedLawDocument
+    );
 
     useEffect(() => {
         if (lawError) {
@@ -79,25 +88,49 @@ const EditArticle = () => {
             return
         }
 
-        if (lawData) {
-            setLawDocument(lawData!.law.articles.flatMap((article) => [
-                {
-                    id: article.id,
-                    type: "article",
-                    children: [{
-                        type: "h4",
-                        children: [{text: article.title}],
-                    },
-                        {
-                            type: "paragraph",
-                            children: [
-                                {text: article.text || ''}, // Make sure text is defined or provide a default value
-                            ],
-                        }]
-                },
-            ]));
+        if (queryResult?.law) {
+            setLawData(queryResult.law);
         }
-    }, [lawData, lawLoading, lawError]);
+    }, [lawLoading]);
+
+    useEffect(() => {
+        if (lawData) {
+            const test = lawData.articles.flatMap((article) => {
+                    article.annotations.forEach((annotation) => addAnnotation(annotation.id, annotation));
+                    if (article.jsonText == null) {
+                        return [
+                            {
+                                id: article.id,
+                                type: "article",
+                                children: [
+                                    {
+                                        type: "h4",
+                                        children: [{text: article.title}],
+                                    },
+                                    {
+                                        type: "paragraph",
+                                        children: [
+                                            {text: article.text || ''}, // Make sure text is defined or provide a default value
+                                        ],
+                                    }]
+                            },
+                        ]
+                    } else {
+                        const test = JSON.parse(article.jsonText);
+                        console.log(test[0]);
+                        return [
+                            {
+                                id: article.id,
+                                type: "article",
+                                children: JSON.parse(article.jsonText)
+                            }
+                        ]
+                    }
+                }
+            );
+            setLawDocument(test);
+        }
+    }, [lawData]);
 
     const [annotations, setAnnotations] = useState<any[]>(['']);
     const annotationsIds = useRecoilValue(annotationIdState);// get the ids from the satate
@@ -117,17 +150,15 @@ const EditArticle = () => {
         processAnnotations();
     }, [processAnnotations, annotationsIds]);
 
-
     const {data} = useQuery<MattersQuery>(MattersDocument)
 
     const MATTER_COLORS = data?.matters.reduce((acc: any, matter) => {
-        acc[matter.name] = matter.color;
+        acc[matter.name] = {title: matter.name, color: matter.color, id: matter.id}
         return acc;
     }, {});
 
     const [saveLaw] = useMutation<MutationSaveAnnotatedLawArgs>(SaveAnnotatedLawDocument, {});
-
-    const [matter, setMatter] = React.useState<Matter>({title: "Afleidingsregel", color: "#d47478"});
+    const [matter, setMatter] = React.useState<Matter>({id: '9b112641-7383-4b0b-8550-87cbfc5c16f1', title: 'Rechtsubject', color: '#d7e9f9'});
     const [definition, setDefinition] = React.useState("");
     const [comment, setComment] = React.useState("");
 
@@ -150,39 +181,44 @@ const EditArticle = () => {
         const jsonObjectsArray = JSON.parse(documentAsJson); // convert the json string to json object array
         const articleContentAsJson: JSON[] = [];
 
-        for (let i = 0; i < jsonObjectsArray.length; i++) {
-            const currentElement = jsonObjectsArray[i];
-            const nextElement = jsonObjectsArray[i + 1];
+        // for (let i = 0; i < jsonObjectsArray.length; i++) {
+        //     const currentElement = jsonObjectsArray[i];
+        //     const nextElement = jsonObjectsArray[i + 1];
+        //
+        //     if (currentElement.type === "h2" && nextElement && nextElement.type === "paragraph") {
+        //         const title = currentElement.children[0]?.text || "";
+        //         const content = nextElement.children
+        //             .filter((child: { text?: string; }) => child.text !== undefined);
+        //
+        //         // Store the JSON objects in jsonObjectArray
+        //         articleContentAsJson.push(...content);
+        //
+        //         // Create a string from the text properties of the children
+        //         const contentAsString = content.map((child: { text: string; }) => child.text).join(" ");
+        //
+        //         articles.push({name: title, content: contentAsString});
+        //     }
+        // }
 
-            if (currentElement.type === "h2" && nextElement && nextElement.type === "paragraph") {
-                const title = currentElement.children[0]?.text || "";
-                const content = nextElement.children
-                    .filter((child: { text?: string; }) => child.text !== undefined);
+        const articlesWithAnnotations = lawDocument.map(({id, children}) => {
+            const articleAnnotations = annotations.filter((annotation) => annotation.articleId === id);
+            const mappedAnnotations = articleAnnotations.map(({id, definition, comment, text, matter}) => ({tempId: id, text: text, definition: definition, comment: comment, matterId: matter.id}))
+            return {articleId: id, jsonText: JSON.stringify(children), annotations: mappedAnnotations};
+        });
 
-                // Store the JSON objects in jsonObjectArray
-                articleContentAsJson.push(...content);
-
-                // Create a string from the text properties of the children
-                const contentAsString = content.map((child: { text: string; }) => child.text).join(" ");
-
-                articles.push({name: title, content: contentAsString});
-            }
-        }
-
-        try {
-            await saveLaw({
-                variables: {
-                    input: {
-                        lawId: lawId,
-                        isPublished: false,
-                        articles: articles, // TODO: Create a mapping to an array of objects that contain all the mandator input parameters:
-                        // - [{ articleId, jsonText, annotations : [{ text, matterId, definition, comment }] }]
-                    },
+        saveLawMutation({
+            variables: {
+                input: {
+                    lawId: lawId,
+                    isPublished: false,
+                    articles: articlesWithAnnotations
                 },
-            });
-        } catch (error) {
-            console.error('Error saving law:', error);
-        }
+            },
+        }).then((res) => {
+            if (res.data) {
+                setLawData(res.data.saveAnnotatedLaw)
+            }
+        });
     };
 
     const renderElement = useCallback((props: any) => {
@@ -260,7 +296,7 @@ const EditArticle = () => {
                         container
                     >
 
-                        <h1 style={Title}>{lawData?.law.title}</h1>
+                        <h1 style={Title}>{lawData?.title}</h1>
                     </Grid>
                     <Grid container direction={"row"} spacing={5}>
                         <Slate editor={editor} initialValue={lawDocument} onChange={onChangeHandler}>

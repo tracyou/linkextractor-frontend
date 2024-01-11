@@ -1,8 +1,9 @@
 import {atom, atomFamily, selectorFamily} from "recoil";
 import {Node} from 'slate'
 import {Annotation} from "../types";
+import {SimpleAnnotationFragment} from "../graphql/api-schema";
 
-export const annotationState = atomFamily<Annotation | undefined, string>({
+export const annotationState = atomFamily<SimpleAnnotationFragment | undefined, string>({
     key: "annotations"
 });
 
@@ -21,7 +22,7 @@ export const activeTextNode = atom<Node | null>({
     default: null
 })
 
-export const editableAnnotation = atom<Annotation | undefined>({
+export const editableAnnotation = atom<SimpleAnnotationFragment | undefined>({
     key: "editableAnnotation",
     default: undefined
 })

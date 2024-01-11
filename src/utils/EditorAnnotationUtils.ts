@@ -87,3 +87,4 @@ export const findAncestorWithType = (
 
     return findAncestorWithType(editor, Path.parent(nodePath), type);
 };
+

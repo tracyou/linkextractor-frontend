@@ -27,7 +27,6 @@ export interface AnnotatedArticleInput {
   readonly articles: ReadonlyArray<ArticleInput>;
   readonly isPublished?: InputMaybe<Scalars['Boolean']['input']>;
   readonly lawId: Scalars['UUID']['input'];
-  readonly title: Scalars['String']['input'];
 }
 
 export interface Annotation {
@@ -46,14 +45,14 @@ export interface AnnotationInput {
   readonly comment?: InputMaybe<Scalars['String']['input']>;
   readonly definition?: InputMaybe<Scalars['String']['input']>;
   readonly matterId: Scalars['UUID']['input'];
-  readonly relationSchemaId: Scalars['UUID']['input'];
+  readonly tempId: Scalars['UUID']['input'];
   readonly text: Scalars['String']['input'];
 }
 
 export interface Article {
   readonly annotations: ReadonlyArray<Annotation>;
   readonly id: Scalars['UUID']['output'];
-  readonly jsonText?: Maybe<Scalars['JSON']['output']>;
+  readonly jsonText?: Maybe<Scalars['String']['output']>;
   readonly law: Law;
   readonly text?: Maybe<Scalars['String']['output']>;
   readonly title: Scalars['String']['output'];
@@ -63,8 +62,6 @@ export interface ArticleInput {
   readonly annotations: ReadonlyArray<AnnotationInput>;
   readonly articleId: Scalars['UUID']['input'];
   readonly jsonText?: InputMaybe<Scalars['JSON']['input']>;
-  readonly text: Scalars['String']['input'];
-  readonly title: Scalars['String']['input'];
 }
 
 export interface CreatePancakeInput {
@@ -368,7 +365,7 @@ export type SimpleLawFragment = { readonly id: string, readonly title: string, r
 
 export type SimpleArticleFragment = { readonly id: string, readonly title: string, readonly text?: string | null, readonly jsonText?: string | null, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
 
-export type SimpleAnnotationFragment = { readonly id: string, readonly text: string };
+export type SimpleAnnotationFragment = { readonly id: string, readonly text: string, readonly comment?: string | null, readonly definition?: string | null, readonly matter: SimpleMatterFragment };
 
 export type MatterFragment = { readonly id: string, readonly name: string, readonly color: string, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
 
@@ -397,7 +394,7 @@ export type SaveAnnotatedLawMutationVariables = Exact<{
 }>;
 
 
-export type SaveAnnotatedLawMutation = { readonly saveAnnotatedLaw: { readonly id: string, readonly title: string, readonly isPublished: boolean, readonly articles: ReadonlyArray<{ readonly id: string, readonly title: string, readonly text?: string | null, readonly jsonText?: string | null, readonly annotations: ReadonlyArray<{ readonly id: string, readonly text: string, readonly definition?: string | null, readonly comment?: string | null, readonly matter: { readonly id: string }, readonly relationSchema: { readonly id: string } }> }> } };
+export type SaveAnnotatedLawMutation = { readonly saveAnnotatedLaw: LawFragment };
 
 export type MattersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -454,12 +451,24 @@ export type PublishRelationSchemaMutationVariables = Exact<{
 
 export type PublishRelationSchemaMutation = { readonly publishRelationSchema: SimpleRelationSchemaFragment };
 
+export const SimpleMatterFragmentDoc = gql`
+    fragment SimpleMatter on Matter {
+  id
+  name
+  color
+}
+    `;
 export const SimpleAnnotationFragmentDoc = gql`
     fragment SimpleAnnotation on Annotation {
   id
   text
+  comment
+  definition
+  matter {
+    ...SimpleMatter
+  }
 }
-    `;
+    ${SimpleMatterFragmentDoc}`;
 export const SimpleArticleFragmentDoc = gql`
     fragment SimpleArticle on Article {
   id
@@ -498,13 +507,6 @@ export const MatterFragmentDoc = gql`
   }
 }
     ${SimpleAnnotationFragmentDoc}`;
-export const SimpleMatterFragmentDoc = gql`
-    fragment SimpleMatter on Matter {
-  id
-  name
-  color
-}
-    `;
 export const SimpleMatterRelationFragmentDoc = gql`
     fragment SimpleMatterRelation on MatterRelation {
   id
@@ -625,30 +627,10 @@ export type GetLawByIdQueryResult = Apollo.QueryResult<GetLawByIdQuery, GetLawBy
 export const SaveAnnotatedLawDocument = gql`
     mutation saveAnnotatedLaw($input: AnnotatedArticleInput!) {
   saveAnnotatedLaw(input: $input) {
-    id
-    title
-    isPublished
-    articles {
-      id
-      title
-      text
-      jsonText
-      annotations {
-        id
-        text
-        definition
-        comment
-        matter {
-          id
-        }
-        relationSchema {
-          id
-        }
-      }
-    }
+    ...Law
   }
 }
-    `;
+    ${LawFragmentDoc}`;
 export type SaveAnnotatedLawMutationFn = Apollo.MutationFunction<SaveAnnotatedLawMutation, SaveAnnotatedLawMutationVariables>;
 
 /**

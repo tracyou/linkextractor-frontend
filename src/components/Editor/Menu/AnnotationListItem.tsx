@@ -18,7 +18,12 @@ import {getMarkForAnnotationID, customFindPath} from "../../../utils/EditorAnnot
 import {ReactEditor} from "slate-react";
 import {Annotation, Matter} from "../../../types";
 import {useQuery} from "@apollo/client";
-import {MattersDocument, MattersQuery} from "../../../graphql/api-schema";
+import {
+    MattersDocument,
+    MattersQuery,
+    SimpleAnnotationFragment,
+    SimpleMatterFragment
+} from "../../../graphql/api-schema";
 import {DarkBlue, LightBlue} from "../../../stylesheets/Colors";
 
 export default function AnnotationListItem(props: {
@@ -29,10 +34,10 @@ export default function AnnotationListItem(props: {
     const [annotation, setAnnotation] = useRecoilState(annotationState(props.id));
     const removeAnnotation = useRemoveAnnotationFromState();
     const setActiveAnnotationIds = useSetRecoilState(activeAnnotationIdsState);
-    const [editable, setEditableAnnotation] = useRecoilState<Annotation | undefined>(editableAnnotation);
+    const [editable, setEditableAnnotation] = useRecoilState<SimpleAnnotationFragment | undefined>(editableAnnotation);
     const textNode = useRecoilValue(activeTextNode);
     const {data} = useQuery<MattersQuery>(MattersDocument)
-    const [matter, setMatter] = React.useState<Matter>({title: annotation!.matter.title, color: annotation!.matter.color});
+    const [matter, setMatter] = React.useState<SimpleMatterFragment>({id: annotation!.matter.id, name: annotation!.matter.name, color: annotation!.matter.color});
     const [definition, setDefinition] = React.useState(annotation!.definition);
     const [comment, setComment] = React.useState(annotation!.comment);
 
@@ -65,10 +70,8 @@ export default function AnnotationListItem(props: {
             if (!prev) {
                 throw new Error("Unexpected undefined value for 'prev'");
             }
-            const anno: Annotation = {...prev};
-            anno.matter = matter;
-            anno.definition = definition;
-            anno.comment = comment;
+            let anno: SimpleAnnotationFragment = {...prev};
+            anno = {...anno, matter: matter, definition: definition, comment: comment};
             return anno;
         });
         onBack();
@@ -78,7 +81,7 @@ export default function AnnotationListItem(props: {
         <Card variant={"outlined"} style={{marginBottom: "5%",}}>
             <CardContent style={{display: annotation?.id == editable?.id ? 'none' : 'flex', flexDirection: 'column'}}>
                 <div style={{display: "flex", flexDirection: "column"}}>
-                    <h4 style={{marginBottom: 0}}>{annotation?.matter.title}</h4>
+                    <h4 style={{marginBottom: 0}}>{annotation?.matter.name}</h4>
                     <span>{annotation?.definition}</span>
                     <span>{annotation?.comment}</span>
                 </div>
@@ -93,10 +96,11 @@ export default function AnnotationListItem(props: {
                         className={styles.inputMargin}
                         label={"Begrip"}
                         id="demo-simple-select"
-                        value={matter.title}
+                        value={matter.name}
                         onChange={(e) => setMatter({
-                            title: e.target.value.toString(),
-                            color: props.matterColors[e.target.value.toString()]
+                            id: props.matterColors[e.target.value.toString()].id,
+                            name: props.matterColors[e.target.value.toString()].name,
+                            color: props.matterColors[e.target.value.toString()].color
                         })}
                         fullWidth
                     >{
