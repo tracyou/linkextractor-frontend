@@ -6,8 +6,8 @@ import React, {Dispatch, SetStateAction, useCallback} from "react";
 import {Matter} from "../../../types";
 import {useSlateStatic} from "slate-react";
 import useAddAnnotationToState from "../../../hooks/useAddAnnotationToState";
-import {customFindPath, insertAnnotation} from "../../../utils/EditorAnnotationUtils";
-import {BaseSelection, Node, Transforms} from "slate";
+import {customFindPath, findAncestorWithType, insertAnnotation} from "../../../utils/EditorAnnotationUtils";
+import {BaseSelection, Editor, Node, Transforms} from "slate";
 import {MattersDocument, MattersQuery} from "../../../graphql/api-schema";
 import {useQuery} from "@apollo/client";
 import {useRecoilState, useRecoilValue} from "recoil";
@@ -55,7 +55,8 @@ const AnnotationMenu: React.FC<AnnotationProps> = ({
     }
 
     const onInsertAnnotation = useCallback(() => {
-        insertAnnotation(editor, addAnnotation, {matter: matter, definition: definition, comment: comment});
+        const ancestorWithType = findAncestorWithType(editor, editor.selection ? Editor.path(editor, editor.selection.anchor) : null, 'article');
+        insertAnnotation(editor, addAnnotation, {matter: matter, definition: definition, comment: comment, articleId: ancestorWithType!.id});
         onClearForm();
     }, [editor, addAnnotation, matter, definition, comment]);
 
