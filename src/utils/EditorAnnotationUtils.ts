@@ -2,6 +2,7 @@ import {v4 as uuidv4} from 'uuid';
 import {Editor, NodeEntry, Path} from "slate";
 import {Annotation, ArticleNode} from "../types";
 import {Node} from 'slate';
+import {SimpleAnnotationFragment} from "../graphql/api-schema";
 
 const ANNOTATION_PREFIX = "annotation_";
 
