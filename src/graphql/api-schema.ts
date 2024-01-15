@@ -43,6 +43,10 @@ export interface CreatePancakeStackInput {
   readonly pancakes: ReadonlyArray<Scalars['ID']['input']>;
 }
 
+export interface DeleteLawInput {
+  readonly id: Scalars['UUID']['input'];
+}
+
 export interface Law {
   readonly annotations: ReadonlyArray<Annotation>;
   readonly createdAt: Scalars['DateTime']['output'];
@@ -120,6 +124,7 @@ export interface MatterRelationType {
 export interface Mutation {
   readonly createPancake: Pancake;
   readonly createPancakeStack: PancakeStack;
+  readonly deleteLaw: Scalars['Boolean']['output'];
   readonly deletePancake: Scalars['Boolean']['output'];
   readonly deletePancakeStack: Scalars['Boolean']['output'];
   readonly publishRelationSchema: RelationSchema;
@@ -136,6 +141,11 @@ export interface MutationCreatePancakeArgs {
 
 export interface MutationCreatePancakeStackArgs {
   input: CreatePancakeStackInput;
+}
+
+
+export interface MutationDeleteLawArgs {
+  input: DeleteLawInput;
 }
 
 
@@ -327,6 +337,13 @@ export type SimpleMatterRelationSchemaFragment = { readonly id: string, readonly
 
 export type SimpleRelationSchemaFragment = { readonly id: string, readonly createdAt: string, readonly updatedAt: string, readonly isPublished: boolean, readonly expiredAt?: string | null, readonly matterRelationSchemas: ReadonlyArray<SimpleMatterRelationSchemaFragment> };
 
+export type DeleteLawMutationVariables = Exact<{
+  input: DeleteLawInput;
+}>;
+
+
+export type DeleteLawMutation = { readonly deleteLaw: boolean };
+
 export type MattersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -466,6 +483,37 @@ export const SimpleRelationSchemaFragmentDoc = gql`
   }
 }
     ${SimpleMatterRelationSchemaFragmentDoc}`;
+export const DeleteLawDocument = gql`
+    mutation deleteLaw($input: DeleteLawInput!) {
+  deleteLaw(input: $input)
+}
+    `;
+export type DeleteLawMutationFn = Apollo.MutationFunction<DeleteLawMutation, DeleteLawMutationVariables>;
+
+/**
+ * __useDeleteLawMutation__
+ *
+ * To run a mutation, you first call `useDeleteLawMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteLawMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteLawMutation, { data, loading, error }] = useDeleteLawMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteLawMutation(baseOptions?: Apollo.MutationHookOptions<DeleteLawMutation, DeleteLawMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteLawMutation, DeleteLawMutationVariables>(DeleteLawDocument, options);
+      }
+export type DeleteLawMutationHookResult = ReturnType<typeof useDeleteLawMutation>;
+export type DeleteLawMutationResult = Apollo.MutationResult<DeleteLawMutation>;
+export type DeleteLawMutationOptions = Apollo.BaseMutationOptions<DeleteLawMutation, DeleteLawMutationVariables>;
 export const MattersDocument = gql`
     query matters {
   matters {

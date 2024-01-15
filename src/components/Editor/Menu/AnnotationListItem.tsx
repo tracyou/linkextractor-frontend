@@ -17,8 +17,15 @@ import {Editor, Transforms, Path} from "slate";
 import {getMarkForAnnotationID, customFindPath} from "../../../utils/EditorAnnotationUtils";
 import {ReactEditor} from "slate-react";
 import {Annotation, Matter} from "../../../types";
-import {useQuery} from "@apollo/client";
-import {MattersDocument, MattersQuery} from "../../../graphql/api-schema";
+import {useMutation, useQuery} from "@apollo/client";
+import {
+    DeleteLawDocument,
+    DeleteLawMutation,
+    MattersDocument,
+    MattersQuery,
+    SaveMatterRelationSchemaDocument,
+    SaveMatterRelationSchemaMutation
+} from "../../../graphql/api-schema";
 import {DarkBlue, LightBlue} from "../../../stylesheets/Colors";
 
 export default function AnnotationListItem(props: {
@@ -47,6 +54,9 @@ export default function AnnotationListItem(props: {
             Transforms.select(props.editor, path);
             removeMarkAtPath(props.editor, path, getMarkForAnnotationID(props.id));
         }
+
+
+
         Editor.removeMark(props.editor, getMarkForAnnotationID(props.id));
         setActiveAnnotationIds((prev) => new Set([...prev].filter(id => id !== props.id)));
         removeAnnotation(props.id);
@@ -73,6 +83,9 @@ export default function AnnotationListItem(props: {
         });
         onBack();
     }
+
+    const [deleteLaw, {loading, error}] = useMutation<DeleteLawMutation>(
+    DeleteLawDocument);
 
     return (
         <Card variant={"outlined"} style={{marginBottom: "5%",}}>

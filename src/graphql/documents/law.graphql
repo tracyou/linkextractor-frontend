@@ -1,0 +1,3 @@
+mutation deleteLaw($input: DeleteLawInput!) {
+    deleteLaw(input: $input)
+}
