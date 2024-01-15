@@ -43,6 +43,10 @@ export interface CreatePancakeStackInput {
   readonly pancakes: ReadonlyArray<Scalars['ID']['input']>;
 }
 
+export interface DeleteLawInput {
+  readonly id: Scalars['UUID']['input'];
+}
+
 export interface Law {
   readonly annotations: ReadonlyArray<Annotation>;
   readonly createdAt: Scalars['DateTime']['output'];
@@ -120,6 +124,7 @@ export interface MatterRelationType {
 export interface Mutation {
   readonly createPancake: Pancake;
   readonly createPancakeStack: PancakeStack;
+  readonly deleteLaw: Scalars['Boolean']['output'];
   readonly deletePancake: Scalars['Boolean']['output'];
   readonly deletePancakeStack: Scalars['Boolean']['output'];
   readonly publishRelationSchema: RelationSchema;
@@ -136,6 +141,11 @@ export interface MutationCreatePancakeArgs {
 
 export interface MutationCreatePancakeStackArgs {
   input: CreatePancakeStackInput;
+}
+
+
+export interface MutationDeleteLawArgs {
+  input: DeleteLawInput;
 }
 
 
@@ -330,7 +340,7 @@ export type SimpleRelationSchemaFragment = { readonly id: string, readonly creat
 export type MattersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MattersQuery = { readonly matters: ReadonlyArray<MatterFragment> };
+export type MattersQuery = { readonly matters: ReadonlyArray<SimpleMatterFragment> };
 
 export type MatterByIdQueryVariables = Exact<{
   id: Scalars['UUID']['input'];
@@ -469,10 +479,10 @@ export const SimpleRelationSchemaFragmentDoc = gql`
 export const MattersDocument = gql`
     query matters {
   matters {
-    ...Matter
+    ...SimpleMatter
   }
 }
-    ${MatterFragmentDoc}`;
+    ${SimpleMatterFragmentDoc}`;
 
 /**
  * __useMattersQuery__
