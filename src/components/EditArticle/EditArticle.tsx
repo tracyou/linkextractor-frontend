@@ -3,40 +3,32 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import {Title} from "../../stylesheets/Fonts";
 import {createEditor} from "slate";
-import {Matter} from "../../types";
 import AnnotationMenu from "../Editor/Menu/AnnotationMenu";
 import useSelection from "../../hooks/useSelection";
-import {DefaultElement, Editable, Slate, withReact} from "slate-react";
-import {useRecoilCallback, useRecoilSnapshot, useRecoilValue} from "recoil";
-import {getAnnotationsOnTextNode} from "../../utils/EditorAnnotationUtils";
-import AnnotatedText from "../Editor/AnnotatedText/AnnotatedText";
+import {Editable, Slate, withReact} from "slate-react";
+import {useRecoilSnapshot, useRecoilValue} from "recoil";
 import {
     GetLawByIdDocument,
     GetLawByIdQuery,
-    LawFragment,
-    MattersDocument,
-    MattersQuery,
+    LawFragment, MattersDocument, MattersQuery,
     SaveAnnotatedLawDocument,
-    SaveAnnotatedLawMutation
+    SaveAnnotatedLawMutation,
+    SimpleAnnotationFragment, SimpleMatterFragment
 } from "../../graphql/api-schema";
 import {useMutation, useQuery} from "@apollo/client";
-import {annotationIdState, annotationState} from "../../recoil/AnnotationState";
+import {allArticlesState} from "../../recoil/AnnotationState";
 import {useParams} from "react-router-dom";
 import useAddAnnotationToState from "../../hooks/useAddAnnotationToState";
 import useClearAnnotationState from "../../hooks/useClearAnnotationsState";
+import useEditorConfig from "../../hooks/useEditorConfig";
+import useAddArticleToState from "../../hooks/useAddArticleToState";
+import useClearArticleState from "../../hooks/useClearArticleState";
 
 const EditArticle = () => {
 
     const [lawId, setLawId] = useState<string | undefined>();
     const [lawData, setLawData] = useState<LawFragment | undefined>();
-    const clearAnnotations = useClearAnnotationState();
-    const addAnnotation = useAddAnnotationToState();
     const [lawDocument, setLawDocument] = useState<any[]>([]);
-    const [saveLawMutation] = useMutation<SaveAnnotatedLawMutation>(
-        SaveAnnotatedLawDocument
-    );
-
-    // Get the relation schema id from the url
     const {id} = useParams();
 
     useEffect(() => {
@@ -76,10 +68,53 @@ const EditArticle = () => {
         }
     }, [lawLoading]);
 
+    const {data: matterQueryResult, loading: mattersLoading}
+        = useQuery<MattersQuery>(MattersDocument)
+    const [matter, setMatter]
+        = React.useState<SimpleMatterFragment>();
+    const [mattersByName, setMattersByName]
+        = React.useState<Record<string, SimpleMatterFragment>>();
+
+    useEffect(() => {
+        if (mattersLoading) {
+            return
+        }
+
+        if (matterQueryResult?.matters) {
+            const matters: Record<string, SimpleMatterFragment>
+                = matterQueryResult?.matters.reduce((acc: any, matter) => {
+                acc[matter.name] = {name: matter.name, color: matter.color, id: matter.id}
+                return acc;
+            }, {});
+
+            setMattersByName(matters);
+            setMatter(matters[Object.keys(matters)[0]]);
+        }
+    }, [mattersLoading]);
+
+    const [editor] = useState(() => withReact(createEditor()));
+    const addAnnotation = useAddAnnotationToState();
+    const clearAnnotations = useClearAnnotationState();
+    const addArticle = useAddArticleToState();
+    const clearArticles = useClearArticleState();
+    const [selection, setSelection] = useSelection(editor);
+
+    const onChangeHandler = useCallback(
+        (document: any) => {
+            setLawDocument(document);
+            setSelection(editor.selection);
+        },
+        [editor.selection, lawData, setSelection]
+    );
+
     useEffect(() => {
         if (lawData) {
             const mappedDocument = lawData.articles.flatMap((article) => {
-                    clearAnnotations().then(() => article.annotations.forEach((annotation) => addAnnotation(annotation.id, annotation)));
+                    //Store each annotation in global context
+                    clearAnnotations().then(() => article.annotations.forEach((annotation) => addAnnotation(annotation.id, annotation, editor)));
+                    //Store each article in global context
+                    clearArticles().then(() => addArticle(article.id, article));
+                    //If there is no JSON yet, parse imported text to proper JSON format
                     if (article.jsonText == null) {
                         return [
                             {
@@ -114,51 +149,43 @@ const EditArticle = () => {
         }
     }, [lawData]);
 
-    const [annotations, setAnnotations] = useState<any[]>(['']);
-    const annotationsIds = useRecoilValue(annotationIdState);
-
-    // make an array of annotations
-    const processAnnotations = useRecoilCallback(({snapshot}) => async () => {
-        const updatedAnnotations = await Promise.all(
-            Array.from(annotationsIds).map(async (id) => {
-                return await snapshot.getPromise(annotationState(id));
-            })
-        );
-        setAnnotations(updatedAnnotations);
-    }, [annotationsIds]);
-
-    useEffect(() => {
-        processAnnotations();
-    }, [processAnnotations, annotationsIds]);
-
-    const {data} = useQuery<MattersQuery>(MattersDocument)
-
-    const MATTER_COLORS = data?.matters.reduce((acc: any, matter) => {
-        acc[matter.name] = {title: matter.name, color: matter.color, id: matter.id}
-        return acc;
-    }, {});
-
-    const [matter, setMatter] = React.useState<Matter>({id: '9b112641-7383-4b0b-8550-87cbfc5c16f1', title: 'Rechtsubject', color: '#d7e9f9'});
-    const [definition, setDefinition] = React.useState("");
-    const [comment, setComment] = React.useState("");
-    const [editor] = useState(() => withReact(createEditor()));
-    const [selection, setSelection] = useSelection(editor);
-
-    const onChangeHandler = useCallback(
-        (document: any) => {
-            setLawDocument(document);
-            setSelection(editor.selection);
-        },
-        [editor.selection, lawData, setSelection]
+    const [saveLawMutation] = useMutation<SaveAnnotatedLawMutation>(
+        SaveAnnotatedLawDocument
     );
+
+    const allArticles = useRecoilValue(allArticlesState);
 
     const saveTheLaw = async () => {
 
         const articlesWithAnnotations = lawDocument.map(({id, children}) => {
-            const articleAnnotations = annotations.filter((annotation) => annotation.articleId === id);
-            const mappedAnnotations = articleAnnotations.map(({id, definition, comment, text, matter}) => ({tempId: id, text: text, definition: definition, comment: comment, matterId: matter.id}))
-            return {articleId: id, jsonText: JSON.stringify(children), annotations: mappedAnnotations};
-        });
+            //For each article in lawDocument get annotations array from state by id
+            const article = allArticles.find((article) => article!.id == id);
+
+            const transformedAnnotations = article!.annotations.map((annotation: SimpleAnnotationFragment) => {
+                const {
+                    id,
+                    text,
+                    definition,
+                    comment,
+                    matter
+                } = annotation;
+
+                return {
+                    tempId: id,
+                    text: text,
+                    definition: definition,
+                    comment: comment,
+                    matterId: matter.id
+                }
+            })
+
+            return {
+                articleId: id,
+                jsonText: JSON.stringify(children), // Make sure to use children from the document, not from the state
+                annotations: transformedAnnotations,
+            };
+
+        })
 
         saveLawMutation({
             variables: {
@@ -175,68 +202,11 @@ const EditArticle = () => {
         });
     };
 
-    const renderElement = useCallback((props: any) => {
-        const {element, children, attributes} = props;
-        switch (element.type) {
-            case "paragraph":
-                return (
-                    <p {...attributes} >
-                        {children}
-                    </p>
-                );
-            case "h1":
-                return <h1 {...attributes}>{children}</h1>;
-            case "h2":
-                return <h2 {...attributes}>{children}</h2>;
-            case "h3":
-                return <h3 {...attributes}>{children}</h3>;
-            case "h4":
-                return <h4 {...attributes}>{children}</h4>;
-            default:
-                return <DefaultElement {...props}>{children}</DefaultElement>;
-        }
-    }, [])
-    const renderLeaf = (props: any) => {
-        const {attributes, children, leaf} = props;
-        let el = <>{children}</>;
-
-        if (leaf.bold) {
-            el = <strong>{el}</strong>;
-        }
-
-        if (leaf.code) {
-            el = <code>{el}</code>;
-        }
-
-        if (leaf.italic) {
-            el = <em>{el}</em>;
-        }
-
-        if (leaf.underline) {
-            el = <u>{el}</u>;
-        }
-
-        const annotationIds = getAnnotationsOnTextNode(leaf);
-
-        if (annotationIds.size > 0) {
-            return (
-                <AnnotatedText
-                    {...attributes}
-                    annotations={annotationIds}
-                    editor={editor}
-                    textNode={leaf}
-                >
-                    {el}
-                </AnnotatedText>
-            );
-        }
-
-        return <span {...attributes}>{el}</span>;
-    }
+    const {renderLeaf, renderElement} = useEditorConfig(editor);
 
     return (
-        lawLoading ? <p>Wet wordt geladen...</p> : (
-            lawDocument.length === 0 ? <p>Geen resultaat...</p> :
+        mattersLoading || lawLoading ? <p>Wet wordt geladen...</p> : (
+            !matter || !mattersByName || lawDocument.length === 0 ? <p>Geen resultaat...</p> :
                 <Box sx={{flexGrow: 1}}>
                     <Grid
                         alignItems="center"
@@ -255,10 +225,11 @@ const EditArticle = () => {
                     <Grid container direction={"row"} spacing={5}>
                         <Slate editor={editor} initialValue={lawDocument} onChange={onChangeHandler}>
                             <Grid item lg={4}>
-                                <AnnotationMenu selection={selection} setSelection={setSelection} matter={matter}
-                                                setMatter={setMatter} definition={definition}
-                                                setDefinition={setDefinition}
-                                                comment={comment} setComment={setComment} matterColors={MATTER_COLORS}/>
+                                <AnnotationMenu
+                                    selection={selection}
+                                    setSelection={setSelection}
+                                    matter={matter} setMatter={setMatter}
+                                    mattersByName={mattersByName}/>
                             </Grid>
                             <Grid item lg={8}>
                                 <Editable renderElement={renderElement} renderLeaf={renderLeaf} onKeyDown={(e) => {
@@ -273,6 +244,7 @@ const EditArticle = () => {
     );
 };
 
+//For debugging purposes, prints state whenever any atom changes
 function DebugObserver() {
     const snapshot = useRecoilSnapshot();
     useEffect(() => {
