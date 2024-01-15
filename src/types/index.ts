@@ -1,7 +1,7 @@
 import {ReactEditor} from "slate-react";
 
 export interface Matter {
-    title: string,
+    name: string,
     color: string,
     id: string,
 }
@@ -10,7 +10,6 @@ export interface Annotation {
     matter: Matter,
     definition: string,
     comment: string,
-    articleId: string,
     text: string
 }
 
