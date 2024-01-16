@@ -20,7 +20,6 @@ const ImportButton: React.FC<ImportButtonProps> = ({ onFileSelect }) => {
         const selectedFile = files![0];
         setFile(selectedFile);
         onFileSelect(selectedFile);
-        console.log(selectedFile)
     };
 
     return (

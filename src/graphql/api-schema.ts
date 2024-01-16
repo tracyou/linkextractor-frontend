@@ -21,17 +21,25 @@ export interface Scalars {
   DateTime: { input: string; output: string; }
   JSON: { input: string; output: string; }
   UUID: { input: string; output: string; }
+  Upload: { input: File; output: File; }
 }
 
 export interface Annotation {
+  readonly article: Article;
   readonly createdAt: Scalars['DateTime']['output'];
   readonly id: Scalars['UUID']['output'];
-  readonly laws: Law;
   readonly matter: Matter;
-  readonly pivot?: Maybe<LawAnnotationPivot>;
   readonly relationSchema: RelationSchema;
   readonly text: Scalars['String']['output'];
   readonly updatedAt: Scalars['DateTime']['output'];
+}
+
+export interface Article {
+  readonly annotations: ReadonlyArray<Annotation>;
+  readonly id: Scalars['UUID']['output'];
+  readonly law: Law;
+  readonly text: Scalars['String']['output'];
+  readonly title: Scalars['String']['output'];
 }
 
 export interface CreatePancakeInput {
@@ -48,10 +56,10 @@ export interface DeleteLawInput {
 }
 
 export interface Law {
-  readonly annotations: ReadonlyArray<Annotation>;
+  readonly articles: ReadonlyArray<Article>;
   readonly createdAt: Scalars['DateTime']['output'];
   readonly id: Scalars['UUID']['output'];
-  readonly isPublished: Scalars['Boolean']['output'];
+  readonly isPublished?: Maybe<Scalars['Boolean']['output']>;
   readonly text: Scalars['String']['output'];
   readonly title: Scalars['String']['output'];
   readonly updatedAt: Scalars['DateTime']['output'];
@@ -127,6 +135,7 @@ export interface Mutation {
   readonly deleteLaw: Scalars['Boolean']['output'];
   readonly deletePancake: Scalars['Boolean']['output'];
   readonly deletePancakeStack: Scalars['Boolean']['output'];
+  readonly importXml: Law;
   readonly publishRelationSchema: RelationSchema;
   readonly saveMatterRelationSchema: MatterRelationSchema;
   readonly updatePancake: Pancake;
@@ -156,6 +165,11 @@ export interface MutationDeletePancakeArgs {
 
 export interface MutationDeletePancakeStackArgs {
   id: Scalars['ID']['input'];
+}
+
+
+export interface MutationImportXmlArgs {
+  file: Scalars['Upload']['input'];
 }
 
 
@@ -223,7 +237,8 @@ export interface PancakeStack {
 }
 
 export interface Query {
-  readonly annotationsByLaw: ReadonlyArray<Annotation>;
+  readonly annotationsByArticle: ReadonlyArray<Annotation>;
+  readonly articlesByLaw: ReadonlyArray<Article>;
   readonly law: Law;
   readonly laws: ReadonlyArray<Law>;
   readonly matter: Matter;
@@ -240,7 +255,12 @@ export interface Query {
 }
 
 
-export interface QueryAnnotationsByLawArgs {
+export interface QueryAnnotationsByArticleArgs {
+  articleId: Scalars['UUID']['input'];
+}
+
+
+export interface QueryArticlesByLawArgs {
   lawId: Scalars['UUID']['input'];
 }
 
@@ -321,11 +341,13 @@ export interface UpdatePancakeStackInput {
   readonly pancakes: ReadonlyArray<Scalars['ID']['input']>;
 }
 
-export type LawFragment = { readonly id: string, readonly title: string, readonly text: string, readonly isPublished: boolean, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
+export type LawFragment = { readonly id: string, readonly title: string, readonly isPublished?: boolean | null, readonly articles: ReadonlyArray<SimpleArticleFragment> };
 
-export type SimpleLawFragment = { readonly id: string, readonly title: string, readonly text: string, readonly isPublished: boolean };
+export type SimpleLawFragment = { readonly id: string, readonly title: string, readonly isPublished?: boolean | null };
 
-export type SimpleAnnotationFragment = { readonly id: string, readonly text: string, readonly pivot?: { readonly cursorIndex: number, readonly comment?: string | null } | null };
+export type SimpleArticleFragment = { readonly id: string, readonly title: string, readonly text: string, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
+
+export type SimpleAnnotationFragment = { readonly id: string, readonly text: string, readonly matter: SimpleMatterFragment };
 
 export type MatterFragment = { readonly id: string, readonly name: string, readonly color: string, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
 
@@ -336,6 +358,18 @@ export type SimpleMatterRelationFragment = { readonly id: string, readonly relat
 export type SimpleMatterRelationSchemaFragment = { readonly id: string, readonly schemaLayout: string, readonly matter: SimpleMatterFragment, readonly relations: ReadonlyArray<SimpleMatterRelationFragment>, readonly relationSchema: { readonly id: string } };
 
 export type SimpleRelationSchemaFragment = { readonly id: string, readonly createdAt: string, readonly updatedAt: string, readonly isPublished: boolean, readonly expiredAt?: string | null, readonly matterRelationSchemas: ReadonlyArray<SimpleMatterRelationSchemaFragment> };
+
+export type GetAllLawsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetAllLawsQuery = { readonly laws: ReadonlyArray<SimpleLawFragment> };
+
+export type ImportXmlMutationVariables = Exact<{
+  file: Scalars['Upload']['input'];
+}>;
+
+
+export type ImportXmlMutation = { readonly importXml: SimpleLawFragment };
 
 export type MattersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -392,32 +426,46 @@ export type PublishRelationSchemaMutationVariables = Exact<{
 
 export type PublishRelationSchemaMutation = { readonly publishRelationSchema: SimpleRelationSchemaFragment };
 
+export const SimpleMatterFragmentDoc = gql`
+    fragment SimpleMatter on Matter {
+  id
+  name
+  color
+}
+    `;
 export const SimpleAnnotationFragmentDoc = gql`
     fragment SimpleAnnotation on Annotation {
   id
   text
-  pivot {
-    cursorIndex
-    comment
+  matter {
+    ...SimpleMatter
   }
 }
-    `;
-export const LawFragmentDoc = gql`
-    fragment Law on Law {
+    ${SimpleMatterFragmentDoc}`;
+export const SimpleArticleFragmentDoc = gql`
+    fragment SimpleArticle on Article {
   id
   title
   text
-  isPublished
   annotations {
     ...SimpleAnnotation
   }
 }
     ${SimpleAnnotationFragmentDoc}`;
+export const LawFragmentDoc = gql`
+    fragment Law on Law {
+  id
+  title
+  isPublished
+  articles {
+    ...SimpleArticle
+  }
+}
+    ${SimpleArticleFragmentDoc}`;
 export const SimpleLawFragmentDoc = gql`
     fragment SimpleLaw on Law {
   id
   title
-  text
   isPublished
 }
     `;
@@ -431,13 +479,6 @@ export const MatterFragmentDoc = gql`
   }
 }
     ${SimpleAnnotationFragmentDoc}`;
-export const SimpleMatterFragmentDoc = gql`
-    fragment SimpleMatter on Matter {
-  id
-  name
-  color
-}
-    `;
 export const SimpleMatterRelationFragmentDoc = gql`
     fragment SimpleMatterRelation on MatterRelation {
   id
@@ -476,6 +517,78 @@ export const SimpleRelationSchemaFragmentDoc = gql`
   }
 }
     ${SimpleMatterRelationSchemaFragmentDoc}`;
+export const GetAllLawsDocument = gql`
+    query getAllLaws {
+  laws {
+    ...SimpleLaw
+  }
+}
+    ${SimpleLawFragmentDoc}`;
+
+/**
+ * __useGetAllLawsQuery__
+ *
+ * To run a query within a React component, call `useGetAllLawsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllLawsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllLawsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetAllLawsQuery(baseOptions?: Apollo.QueryHookOptions<GetAllLawsQuery, GetAllLawsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAllLawsQuery, GetAllLawsQueryVariables>(GetAllLawsDocument, options);
+      }
+export function useGetAllLawsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllLawsQuery, GetAllLawsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAllLawsQuery, GetAllLawsQueryVariables>(GetAllLawsDocument, options);
+        }
+export function useGetAllLawsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetAllLawsQuery, GetAllLawsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetAllLawsQuery, GetAllLawsQueryVariables>(GetAllLawsDocument, options);
+        }
+export type GetAllLawsQueryHookResult = ReturnType<typeof useGetAllLawsQuery>;
+export type GetAllLawsLazyQueryHookResult = ReturnType<typeof useGetAllLawsLazyQuery>;
+export type GetAllLawsSuspenseQueryHookResult = ReturnType<typeof useGetAllLawsSuspenseQuery>;
+export type GetAllLawsQueryResult = Apollo.QueryResult<GetAllLawsQuery, GetAllLawsQueryVariables>;
+export const ImportXmlDocument = gql`
+    mutation importXml($file: Upload!) {
+  importXml(file: $file) {
+    ...SimpleLaw
+  }
+}
+    ${SimpleLawFragmentDoc}`;
+export type ImportXmlMutationFn = Apollo.MutationFunction<ImportXmlMutation, ImportXmlMutationVariables>;
+
+/**
+ * __useImportXmlMutation__
+ *
+ * To run a mutation, you first call `useImportXmlMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useImportXmlMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [importXmlMutation, { data, loading, error }] = useImportXmlMutation({
+ *   variables: {
+ *      file: // value for 'file'
+ *   },
+ * });
+ */
+export function useImportXmlMutation(baseOptions?: Apollo.MutationHookOptions<ImportXmlMutation, ImportXmlMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ImportXmlMutation, ImportXmlMutationVariables>(ImportXmlDocument, options);
+      }
+export type ImportXmlMutationHookResult = ReturnType<typeof useImportXmlMutation>;
+export type ImportXmlMutationResult = Apollo.MutationResult<ImportXmlMutation>;
+export type ImportXmlMutationOptions = Apollo.BaseMutationOptions<ImportXmlMutation, ImportXmlMutationVariables>;
 export const MattersDocument = gql`
     query matters {
   matters {

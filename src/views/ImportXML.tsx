@@ -1,49 +1,54 @@
-import React, {SetStateAction, useState} from "react";
+import React, {SetStateAction, useEffect, useState} from "react";
 import './ImportXML.css'
 import ImportButton from "../components/ImportButton/ImportButton";
 import ViewXML from "./ViewXML";
 import {Title} from "../stylesheets/Fonts";
 import Grid from "@mui/material/Grid";
+import {useMutation, useQuery} from "@apollo/client";
+import {
+    GetAllLawsDocument,
+    GetAllLawsQuery, ImportXmlDocument,
+    ImportXmlMutation, SimpleLawFragment,
+    useGetAllLawsQuery,
+    useImportXmlMutation
+} from "../graphql/api-schema";
 
 
 const ImportXML = () => {
 
-    const [fileContent, setFileContent] = useState("")
+    const {data, loading, error, refetch} = useGetAllLawsQuery();
+    const [importXmlMutation, {
+        data: importData,
+        error: importEror
+    }] = useMutation<ImportXmlMutation>(ImportXmlDocument);
 
-    const [artikelen, setArtikelen] = useState([
-        {
-            name: 'Artikel 1',
-        },
-        {
-            name: 'Artikel 2',
-        },
-        {
-            name: 'Artikel 3',
-        },
-    ]);
+    const [file, setFile] = useState<File>();
 
-    const [file, setFile] = useState<File|null>();
-    const [viewXML, setViewXML] = useState<SetStateAction<any>>();
 
-    const handleFileSelect = (selectedFile: File) => {
-        setFile(selectedFile);
-        artikelen.push({name: selectedFile.name.toString()})
+    useEffect(() => {
+        refetch()
+    }, [file]);
 
-        if (selectedFile) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const content = e.target?.result as string;
-                setFileContent(content)//save the file content inthe variable to be used later
-                setViewXML(<ViewXML name={selectedFile.name} data={content}/>);
+    const handleFileSelect = async (selectedFile: File) => {
 
-            };
-            reader.readAsText(selectedFile);//read the file content
+        try {
+            console.log(selectedFile)
+            const response = await importXmlMutation({
+                variables: {
+                    file: selectedFile
+                },
+            });
+            console.log('File uploaded successfully', response);
+        } catch (error) {
+            console.error('Error uploading file', error);
         }
+        setFile(selectedFile)
+
     }
 
-    const handleOnClick= () =>{
+    const handleOnClick = (law: SimpleLawFragment) => {
 
-        window.location.href = '/editarticle';
+        window.location.href = '/editarticle/' + law.id;
 
     }
 
@@ -61,14 +66,19 @@ const ImportXML = () => {
                     <ImportButton onFileSelect={handleFileSelect}/>
                 </Grid>
                 <Grid>
-                <div className="artikelen">
-                    {artikelen.map((artikel, index) => (
+                    <div className="artikelen">
+                        {loading ? 'Wetten laden....' : (
+                            <div className="artikelen">
+                                {data?.laws.map((law) => (
 
-                        <div key={index} className="artikel" onClick={handleOnClick}>
-                            <h2>{artikel.name}</h2>
-                        </div>
-                    ))}
-                </div>
+                                    <div key={law.id} className="artikel" onClick={() => handleOnClick(law)}>
+                                        < h2> {law?.title}</h2>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                    </div>
                 </Grid>
             </div>
         </>

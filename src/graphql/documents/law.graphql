@@ -1,0 +1,11 @@
+query getAllLaws{
+    laws {
+        ...SimpleLaw
+    }
+}
+
+mutation importXml($file: Upload!){
+    importXml(file: $file){
+        ...SimpleLaw
+    }
+}
