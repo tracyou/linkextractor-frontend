@@ -23,10 +23,10 @@ import {
     DeleteLawMutation,
     MattersDocument,
     MattersQuery,
-    SaveMatterRelationSchemaDocument,
-    SaveMatterRelationSchemaMutation
+
 } from "../../../graphql/api-schema";
 import {DarkBlue, LightBlue} from "../../../stylesheets/Colors";
+import {UUID} from "node:crypto";
 
 export default function AnnotationListItem(props: {
     id: string,
@@ -55,11 +55,23 @@ export default function AnnotationListItem(props: {
             removeMarkAtPath(props.editor, path, getMarkForAnnotationID(props.id));
         }
 
+        console.log(typeof props.id)
+
+        deleteLaw({
+            variables: {
+                input: {
+                    id: props.id,
+                },
+            },
+        }).then((result) => {
+            if (result) {
+                Editor.removeMark(props.editor, getMarkForAnnotationID(props.id));
+                setActiveAnnotationIds((prev) => new Set([...prev].filter(id => id !== props.id)));
+                removeAnnotation(props.id);
+            }
+        });
 
 
-        Editor.removeMark(props.editor, getMarkForAnnotationID(props.id));
-        setActiveAnnotationIds((prev) => new Set([...prev].filter(id => id !== props.id)));
-        removeAnnotation(props.id);
     }
 
     const onBack = () => {
