@@ -30,7 +30,7 @@ const ImportXML = () => {
                 console.log(selectedFile)
                 const response = await importXmlMutation({
                     variables: {
-                        file: selectedFile
+                        file: selectedFile //[selectedFile.name,selectedFile.type,selectedFile.webkitRelativePath]
                     }
                 });
 
