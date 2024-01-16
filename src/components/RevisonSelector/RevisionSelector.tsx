@@ -1,33 +1,49 @@
 import EditArticle from "../EditArticle/EditArticle";
 import React from "react";
-import {createTheme, Step, StepButton, Stepper} from "@mui/material";
+import {Tab, Tabs,} from "@mui/material";
 import Box from "@mui/material/Box";
 import {useParams} from "react-router-dom";
+import {Title} from "../../stylesheets/Fonts";
 
 const RevisionSelector = () => {
     // Get id from the router
     const {id} = useParams();
 
     // Stepper logic
-    const steps = ['Versie: 1, Datum: 16-1-2024, Tijd: 11:10', 'Versie: 2, Datum: 16-1-2024, Tijd: 11:11', 'Versie: 3, Datum: 16-1-2024, Tijd: 11:15'];
-    const [activeStep, setActiveStep] = React.useState(0);
-    const handleStep = (step: number) => () => {
-        setActiveStep(step);
+    const steps = ['Datum: 16-1-2024, Tijd: 11:10', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11', 'Datum: 16-1-2024, Tijd: 11:11'];
+    const [value, setValue] = React.useState(0);
+
+    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+        setValue(newValue);
     };
 
     return (
-        <Box paddingTop={'1.5rem'}>
+        <Box>
             {steps.length > 1 &&
-              <Stepper nonLinear activeStep={activeStep}>
-                  {steps.map((label, index) => (
-                      <Step key={label}>
-                          <StepButton color="inherit" onClick={handleStep(index)}>
-                              {label}
-                          </StepButton>
-                      </Step>
-                  ))}
-              </Stepper>}
-            <EditArticle/></Box>
+              <>
+                <h1 style={Title}>Versiebeheer</h1>
+                <Tabs
+                  value={value}
+                  onChange={handleChange}
+                  variant="scrollable"
+                  scrollButtons
+                  allowScrollButtonsMobile
+                  aria-label="scrollable force tabs example"
+                  sx={{
+                      '& .MuiTabs-scrollButtons.Mui-disabled': {
+                          opacity: 0.3
+                      }
+                  }}
+                >
+                    {steps.map((label) => (
+                        <Tab key={label} label={label}/>
+                    ))}
+                </Tabs>
+              </>
+            }
+            {/*Passing revision id to the editarticle*/}
+            <EditArticle/>
+        </Box>
     );
 };
 export default RevisionSelector;
