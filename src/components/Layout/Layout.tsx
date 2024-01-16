@@ -4,10 +4,10 @@ import Footer from "../Footer/Footer";
 import {Route, Routes} from "react-router-dom";
 import ImportXML from "../../views/ImportXML";
 import './Layout.css'
-import EditArticle from "../EditArticle/EditArticle";
 import ApiDemo from "../ApiDemo/ApiDemo";
 import RelationSchemaIndex from "../RelationSchema/Index/RelationSchemaIndex";
 import RelationSchemaDetail from "../RelationSchema/Detail/RelationSchemaDetail";
+import RevisionSelector from "../RevisonSelector/RevisionSelector";
 
 const Layout = () => {
 
@@ -21,7 +21,7 @@ const Layout = () => {
                     <Routes>
                         <Route path="/" element={<ImportXML/>}/>
                         <Route path="/navbar" element={<Navbar/>}/>
-                        <Route path="/editarticle/:id" element={<EditArticle/>}/>
+                        <Route path="/revisionselector/:id" element={<RevisionSelector/>}/>
                         <Route path={"/test"} element={<ApiDemo/>}/>
                         <Route path={"/relation-schemas"} element={<RelationSchemaIndex/>}/>
                         <Route path={"/relation-schemas/:id"} element={<RelationSchemaDetail/>}/>
