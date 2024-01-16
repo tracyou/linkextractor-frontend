@@ -1,12 +1,19 @@
 type Annotation {
+  article: Article!
   createdAt: DateTime!
   id: UUID!
-  laws: Law!
   matter: Matter!
-  pivot: LawAnnotationPivot
   relationSchema: RelationSchema!
   text: String!
   updatedAt: DateTime!
+}
+
+type Article {
+  annotations: [Annotation!]!
+  id: UUID!
+  law: Law!
+  text: String!
+  title: String!
 }
 
 input CreatePancakeInput {
@@ -22,17 +29,20 @@ scalar Date
 
 scalar DateTime
 
+input DeleteLawInput {
+  id: UUID!
+}
+
 """
 Arbitrary data encoded in JavaScript Object Notation. See https://www.json.org.
 """
 scalar JSON
 
 type Law {
-  annotations: [Annotation!]!
+  articles: [Article!]!
   createdAt: DateTime!
   id: UUID!
   isPublished: Boolean!
-  text: String!
   title: String!
   updatedAt: DateTime!
 }
@@ -107,8 +117,10 @@ type MatterRelationType {
 type Mutation {
   createPancake(input: CreatePancakeInput!): Pancake!
   createPancakeStack(input: CreatePancakeStackInput!): PancakeStack!
+  deleteLaw(input: DeleteLawInput!): Boolean!
   deletePancake(id: ID!): Boolean!
   deletePancakeStack(id: ID!): Boolean!
+  importXml(file: Upload!): Law!
   publishRelationSchema(id: UUID!): RelationSchema!
   saveMatterRelationSchema(input: SaveMatterRelationSchemaInput!): MatterRelationSchema!
   updatePancake(input: UpdatePancakeInput!): Pancake!
@@ -169,7 +181,8 @@ type PancakeStack {
 }
 
 type Query {
-  annotationsByLaw(lawId: UUID!): [Annotation!]!
+  annotationsByArticle(articleId: UUID!): [Annotation!]!
+  articlesByLaw(lawId: UUID!): [Article!]!
   law(id: UUID!): Law!
   laws: [Law!]!
   matter(id: UUID!): Matter!
@@ -238,3 +251,5 @@ input UpdatePancakeStackInput {
   name: String!
   pancakes: [ID!]!
 }
+
+scalar Upload
