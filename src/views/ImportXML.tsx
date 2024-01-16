@@ -21,6 +21,7 @@ const ImportXML = () => {
         data: importData,
         error: importEror
     }] = useMutation<ImportXmlMutation>(ImportXmlDocument);
+
     const [file, setFile] = useState<File>();
 
 
@@ -29,7 +30,6 @@ const ImportXML = () => {
     }, [file]);
 
     const handleFileSelect = async (selectedFile: File) => {
-        console.log(selectedFile)
 
         try {
             console.log(selectedFile)
@@ -38,9 +38,7 @@ const ImportXML = () => {
                     file: selectedFile
                 },
             });
-
             console.log('File uploaded successfully', response);
-            console.log('hi')
         } catch (error) {
             console.error('Error uploading file', error);
         }
@@ -53,7 +51,6 @@ const ImportXML = () => {
         window.location.href = '/editarticle/' + law.id;
 
     }
-
 
 
     return (
