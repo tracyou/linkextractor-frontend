@@ -59,7 +59,8 @@ export interface Law {
   readonly articles: ReadonlyArray<Article>;
   readonly createdAt: Scalars['DateTime']['output'];
   readonly id: Scalars['UUID']['output'];
-  readonly isPublished: Scalars['Boolean']['output'];
+  readonly isPublished?: Maybe<Scalars['Boolean']['output']>;
+  readonly text: Scalars['String']['output'];
   readonly title: Scalars['String']['output'];
   readonly updatedAt: Scalars['DateTime']['output'];
 }
@@ -340,9 +341,9 @@ export interface UpdatePancakeStackInput {
   readonly pancakes: ReadonlyArray<Scalars['ID']['input']>;
 }
 
-export type LawFragment = { readonly id: string, readonly title: string, readonly isPublished: boolean, readonly articles: ReadonlyArray<SimpleArticleFragment> };
+export type LawFragment = { readonly id: string, readonly title: string, readonly isPublished?: boolean | null, readonly articles: ReadonlyArray<SimpleArticleFragment> };
 
-export type SimpleLawFragment = { readonly id: string, readonly title: string, readonly isPublished: boolean };
+export type SimpleLawFragment = { readonly id: string, readonly title: string, readonly isPublished?: boolean | null };
 
 export type SimpleArticleFragment = { readonly id: string, readonly title: string, readonly text: string, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
 

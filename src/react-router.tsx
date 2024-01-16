@@ -27,7 +27,7 @@ const router = createBrowserRouter([
                 element:<Navbar/>
             },
             {
-                path: "editarticle",
+                path: "editarticle/:id",
                 element: <EditArticle/>,
             },
             {

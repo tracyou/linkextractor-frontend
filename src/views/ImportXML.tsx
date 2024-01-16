@@ -8,7 +8,7 @@ import {useMutation, useQuery} from "@apollo/client";
 import {
     GetAllLawsDocument,
     GetAllLawsQuery, ImportXmlDocument,
-    ImportXmlMutation,
+    ImportXmlMutation, SimpleLawFragment,
     useGetAllLawsQuery,
     useImportXmlMutation
 } from "../graphql/api-schema";
@@ -16,36 +16,44 @@ import {
 
 const ImportXML = () => {
 
-    const {data, loading, error} = useGetAllLawsQuery();
+    const {data, loading, error, refetch} = useGetAllLawsQuery();
     const [importXmlMutation, {
         data: importData,
         error: importEror
     }] = useMutation<ImportXmlMutation>(ImportXmlDocument);
+    const [file, setFile] = useState<File>();
 
 
+    useEffect(() => {
+        refetch()
+    }, [file]);
 
     const handleFileSelect = async (selectedFile: File) => {
         console.log(selectedFile)
-            try {
-                console.log(selectedFile)
-                const response = await importXmlMutation({
-                    variables: {
-                        file: selectedFile //[selectedFile.name,selectedFile.type,selectedFile.webkitRelativePath]
-                    }
-                });
 
-                console.log('File uploaded successfully', response);
-            } catch (error) {
-                console.error('Error uploading file', error);
-            }
+        try {
+            console.log(selectedFile)
+            const response = await importXmlMutation({
+                variables: {
+                    file: selectedFile
+                },
+            });
+
+            console.log('File uploaded successfully', response);
+            console.log('hi')
+        } catch (error) {
+            console.error('Error uploading file', error);
+        }
+        setFile(selectedFile)
+
+    }
+
+    const handleOnClick = (law: SimpleLawFragment) => {
+
+        window.location.href = '/editarticle/' + law.id;
 
     }
 
-    const handleOnClick = () => {
-
-        window.location.href = '/editarticle';
-
-    }
 
 
     return (
@@ -62,12 +70,17 @@ const ImportXML = () => {
                 </Grid>
                 <Grid>
                     <div className="artikelen">
-                        {data?.laws.map((law, id) => (
+                        {loading ? 'Wetten laden....' : (
+                            <div className="artikelen">
+                                {data?.laws.map((law) => (
 
-                            <div key={id} className="artikel" onClick={handleOnClick}>
-                                <h2>{law.title}</h2>
+                                    <div key={law.id} className="artikel" onClick={() => handleOnClick(law)}>
+                                        < h2> {law?.title}</h2>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        )}
+
                     </div>
                 </Grid>
             </div>

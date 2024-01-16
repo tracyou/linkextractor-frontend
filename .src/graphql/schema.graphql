@@ -42,7 +42,8 @@ type Law {
   articles: [Article!]!
   createdAt: DateTime!
   id: UUID!
-  isPublished: Boolean!
+  isPublished: Boolean
+  text: String!
   title: String!
   updatedAt: DateTime!
 }
