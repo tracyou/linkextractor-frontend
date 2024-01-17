@@ -6,7 +6,7 @@ import Grid from "@mui/material/Grid";
 import {
     SimpleLawFragment, useGetLawsQuery
 } from "../graphql/api-schema";
-import {useMutation, useQuery} from "@apollo/client";
+import {useMutation} from "@apollo/client";
 import {
     ImportXmlDocument,
     ImportXmlMutation,
@@ -41,7 +41,9 @@ const ImportXML = () => {
     }
 
     const handleOnClick = (law: SimpleLawFragment) => {
-        window.location.href = '/editarticle/' + law.id;
+
+        window.location.href = '/revisionselector/' + law.id;
+
     }
 
 
