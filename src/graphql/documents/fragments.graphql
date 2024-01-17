@@ -42,6 +42,11 @@ fragment SimpleAnnotation on Annotation {
     }
 }
 
+fragment SimpleRevision on ArticleRevision {
+    id
+    createdAt
+}
+
 fragment Matter on Matter {
     id
     name
