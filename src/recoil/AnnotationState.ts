@@ -1,6 +1,6 @@
 import {atom, atomFamily, selector} from "recoil";
 import {Node} from 'slate'
-import {SimpleAnnotationFragment, SimpleArticleFragment} from "../graphql/api-schema";
+import {SimpleAnnotationFragment, ArticleFragment} from "../graphql/api-schema";
 
 export const annotationState = atomFamily<SimpleAnnotationFragment | undefined, string>({
     key: "annotations"
@@ -11,7 +11,7 @@ export const annotationIdState = atom<Set<string>>({
     default: new Set([]),
 });
 
-export const articleState = atomFamily<SimpleArticleFragment | undefined, string>({
+export const articleState = atomFamily<ArticleFragment | undefined, string>({
     key: "articles",
 });
 

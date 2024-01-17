@@ -4,9 +4,7 @@ import ImportButton from "../components/ImportButton/ImportButton";
 import {Title} from "../stylesheets/Fonts";
 import Grid from "@mui/material/Grid";
 import {
-    GetLawsDocument,
-    GetLawsQuery,
-    SimpleLawFragment
+    SimpleLawFragment, useGetLawsQuery
 } from "../graphql/api-schema";
 import {useMutation, useQuery} from "@apollo/client";
 import {
@@ -16,22 +14,20 @@ import {
 
 
 const ImportXML = () => {
-
-    const {data, loading} = useQuery<GetLawsQuery>(GetLawsDocument);
+    const {data, loading, error, refetch} = useGetLawsQuery();
     const [importXmlMutation, {
         data: importData,
         error: importEror
     }] = useMutation<ImportXmlMutation>(ImportXmlDocument);
 
-    const [file, setFile] = useState<File | null>();
-    
+    const [file, setFile] = useState<File>();
+
     useEffect(() => {
         refetch()
     }, [file]);
 
     const handleFileSelect = async (selectedFile: File) => {
         try {
-            console.log(selectedFile)
             const response = await importXmlMutation({
                 variables: {
                     file: selectedFile
@@ -45,9 +41,7 @@ const ImportXML = () => {
     }
 
     const handleOnClick = (law: SimpleLawFragment) => {
-
         window.location.href = '/editarticle/' + law.id;
-
     }
 
 

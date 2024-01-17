@@ -5,7 +5,7 @@ import {
 import {useRecoilCallback} from "recoil";
 import {Editor} from "slate";
 import {findAncestorWithType} from "../utils/EditorAnnotationUtils";
-import {SimpleArticleFragment} from "../graphql/api-schema";
+import {ArticleFragment} from "../graphql/api-schema";
 
 export default function useRemoveAnnotationFromState() {
     return useRecoilCallback(({set, snapshot}) => async (idToRemove: string, editor: Editor) => {
@@ -14,7 +14,6 @@ export default function useRemoveAnnotationFromState() {
         set(annotationIdState, updatedIds);
         set(annotationState(idToRemove), undefined);
 
-        console.log(editor.selection);
         //Remove from respective article
         const ancestorWithType = findAncestorWithType(
             editor,
@@ -23,9 +22,12 @@ export default function useRemoveAnnotationFromState() {
         if (ancestorWithType) {
             set(articleState(ancestorWithType.id), (article) => {
                 // Create a new article object with the updated annotations
-                const updatedArticle: SimpleArticleFragment = {
+                const updatedArticle: ArticleFragment = {
                     ...article!,
-                    annotations: article!.annotations.filter((annotation) => annotation.id != idToRemove)
+                    latestRevision: article!.latestRevision && {
+                        ...article!.latestRevision,
+                        annotations: article!.latestRevision?.annotations.filter((annotation) => annotation.id != idToRemove)
+                    },
                 };
                 return updatedArticle;
             });

@@ -16,7 +16,7 @@ mutation importXml($file: Upload!){
     }
 }
 
-mutation saveAnnotatedLaw($input: AnnotatedArticleInput!){
+mutation saveAnnotatedLaw($input: AnnotatedLawInput!){
     saveAnnotatedLaw(input: $input){
         ...Law
     }

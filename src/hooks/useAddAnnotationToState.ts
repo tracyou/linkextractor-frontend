@@ -3,7 +3,7 @@ import {
     annotationIdState, articleState,
 } from "../recoil/AnnotationState";
 import { useRecoilCallback } from "recoil";
-import {SimpleAnnotationFragment, SimpleArticleFragment} from "../graphql/api-schema";
+import {SimpleAnnotationFragment, ArticleFragment} from "../graphql/api-schema";
 import {findAncestorWithType} from "../utils/EditorAnnotationUtils";
 import {Editor} from "slate";
 
@@ -24,10 +24,24 @@ export default function useAddAnnotationToState() {
             if (ancestorWithType) {
                 set(articleState(ancestorWithType.id), (article) => {
                     if (article) {
+                        let articleRevision = article.latestRevision;
+                        if (!articleRevision) {
+                            articleRevision = {
+                                id: '',
+                                jsonText: '',
+                                updatedAt: '',
+                                createdAt: '',
+                                annotations: [],
+                            };
+                        }
+
                         // Convert Set to array before updating annotations
-                        const updatedArticle: SimpleArticleFragment = {
+                        const updatedArticle: ArticleFragment = {
                             ...article,
-                            annotations: [...article.annotations, annotationData],
+                            latestRevision: {
+                                ...articleRevision,
+                                annotations: [...articleRevision.annotations, annotationData],
+                            },
                         };
                         return updatedArticle;
                     }
