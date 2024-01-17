@@ -10,10 +10,13 @@ import {useRecoilSnapshot, useRecoilValue} from "recoil";
 import {
     GetLawByIdDocument,
     GetLawByIdQuery,
-    LawFragment, MattersDocument, MattersQuery,
+    LawFragment,
+    MattersDocument,
+    MattersQuery,
     SaveAnnotatedLawDocument,
     SaveAnnotatedLawMutation,
-    SimpleAnnotationFragment, SimpleMatterFragment
+    SimpleAnnotationFragment,
+    SimpleMatterFragment
 } from "../../graphql/api-schema";
 import {useMutation, useQuery} from "@apollo/client";
 import {allArticlesState} from "../../recoil/AnnotationState";
