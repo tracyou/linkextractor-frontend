@@ -11,7 +11,6 @@ const RevisionSelector = () => {
     // Get id from the router
     const {id} = useParams();
     const [lawId, setLawId] = useState<string | undefined>();
-    const [revisionData, setRevisionData] = useState<number | undefined>();
     useEffect(() => {
         setLawId(id);
     }, [id]);
@@ -26,20 +25,8 @@ const RevisionSelector = () => {
         }
     });
 
-    useEffect(() => {
-        if (revisionLoading) {
-            return
-        }
 
-        if (queryResult) {
-            setRevisionData(queryResult);
-            console.log(queryResult)
-        }
-    }, [revisionLoading]);
-
-    // Setting the data in the
-
-    const [value, setValue] = React.useState(0);
+    const [value, setValue] = React.useState<number | undefined>(queryResult?.lawRevisions.law.revision);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -63,16 +50,16 @@ const RevisionSelector = () => {
                     }}
                 >
                     {
-                        Object.entries(revisionData).map(([,value]) => {
-                            return (<Tab key={} label={value}/>)
-                    }
-                    )
+                        queryResult?.lawRevisions.revisions.map((value) =>
+                            <Tab key={value.revision} label={value.createdAt} value={value.revision}/>
+                        )
                     }
                 </Tabs>
             </>
-            {/*Passing revision id to the editarticle*/}
-            <EditArticle/>
+            {value &&
+              <EditArticle revision={value}/>
+            }
         </Box>
-    );
+    )
 };
 export default RevisionSelector;

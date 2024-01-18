@@ -28,7 +28,14 @@ import useAddArticleToState from "../../hooks/useAddArticleToState";
 import useClearArticleState from "../../hooks/useClearArticleState";
 import {Alert, Button, Snackbar} from "@mui/material";
 
-const EditArticle = () => {
+interface EditArticleProps {
+    revision: number
+}
+
+const EditArticle: React.FC<EditArticleProps> = ({
+                                                     revision
+                                                 }
+) => {
 
     const [lawId, setLawId] = useState<string | undefined>();
     const [lawData, setLawData] = useState<LawFragment | undefined>();
@@ -42,10 +49,12 @@ const EditArticle = () => {
     const {
         data: queryResult,
         loading: lawLoading,
-        error: lawError
+        error: lawError,
+        refetch: lawRefetch
     } = useQuery<GetLawByIdQuery>(GetLawByIdDocument, {
         variables: {
-            id: lawId
+            id: lawId,
+            revision: revision
         }
     });
 
@@ -61,6 +70,14 @@ const EditArticle = () => {
             }
         }
     }, [lawError]);
+    useEffect(() => {
+        lawRefetch({
+            variables: {
+                id: lawId,
+                revision: revision
+            }
+        });
+    }, [revision]);
 
     useEffect(() => {
         if (lawLoading) {
