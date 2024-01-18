@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, {Dispatch, SetStateAction, useCallback, useEffect, useState} from "react";
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import {Title} from "../../stylesheets/Fonts";
@@ -30,10 +30,12 @@ import {Alert, Button, Snackbar} from "@mui/material";
 
 interface EditArticleProps {
     revision: number
+    stateChanger: Dispatch<SetStateAction<boolean>>
 }
 
 const EditArticle: React.FC<EditArticleProps> = ({
-                                                     revision
+                                                     revision,
+                                                     stateChanger
                                                  }
 ) => {
 
@@ -226,13 +228,13 @@ const EditArticle: React.FC<EditArticleProps> = ({
             if (res.data) {
                 setLawData(res.data.saveAnnotatedLaw)
                 setIsSuccess(true);
-            //     Update parent component
+                //     Update parent component
+                stateChanger(true)
             }
         });
     };
 
     const {renderLeaf, renderElement} = useEditorConfig(editor);
-
     return (
         mattersLoading || lawLoading ? <p>Wet wordt geladen...</p> : (
             !matter || !mattersByName || lawDocument.length === 0 ? <p>Geen resultaat...</p> :
@@ -263,7 +265,8 @@ const EditArticle: React.FC<EditArticleProps> = ({
                             alignItems="center"
                             justifyContent="end"
                             container>
-                            <Button variant={"contained"} style={{marginTop: "2%"}} onClick={saveTheLaw}>Wet opslaan</Button>
+                            <Button variant={"contained"} style={{marginTop: "2%"}} onClick={saveTheLaw}>Wet
+                                opslaan</Button>
                         </Grid>
                         <Grid container direction={"row"} spacing={5}>
                             <Slate editor={editor} initialValue={lawDocument} onChange={onChangeHandler}>
