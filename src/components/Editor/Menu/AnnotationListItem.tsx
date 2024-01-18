@@ -96,7 +96,7 @@ const AnnotationListItem: React.FC<AnnotationListItemProps> = ({id, editor, matt
         selectAnnotatedWord();
         updateAnnotation(
             id, {
-                text: "",
+                text: annotation.text,
                 id: id,
                 matter: matter,
                 definition: definition,
