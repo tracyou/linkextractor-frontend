@@ -3,7 +3,8 @@ import './ImportXML.css'
 import ImportButton from "../components/ImportButton/ImportButton";
 import {Title} from "../stylesheets/Fonts";
 import Grid from "@mui/material/Grid";
-import { useGetLawsQuery
+import {
+    useGetLawsQuery
 } from "../graphql/api-schema";
 import {useMutation} from "@apollo/client";
 import {ApolloCache, DefaultContext, MutationFunctionOptions, OperationVariables, useMutation} from "@apollo/client";
@@ -29,7 +30,7 @@ const ImportXML = () => {
 
     const [file, setFile] = useState<File>();
 
-    const [deleteLaw, {data:dataDelete,loading:loadingDelete, error: errorDelete}] = useMutation<DeleteLawMutation>(
+    const [deleteLaw, {data: dataDelete, loading: loadingDelete, error: errorDelete}] = useMutation<DeleteLawMutation>(
         DeleteLawDocument);
 
     useEffect(() => {
@@ -54,15 +55,17 @@ const ImportXML = () => {
         window.location.href = '/revisionselector/' + law.id;
     }
 
-   async function handleOnDelete(id: string) {
+    async function handleOnDelete(event: React.MouseEvent, id: string) {
+
+        event.stopPropagation();
         try {
-            const response = await deleteLaw({
+            await deleteLaw({
                 variables: {
                     input: id
                 },
             });
         } catch (error) {
-            console.log('er is iets fouts gegaan',error)
+            console.log('er is iets fouts gegaan', error)
         }
     }
 
@@ -89,7 +92,7 @@ const ImportXML = () => {
                                         <Button variant={"contained"}
                                                 color={"primary"}
                                                 size={"small"}
-                                                onClick={() => handleOnDelete(law?.id)}
+                                                onClick={(event) => handleOnDelete(event, law?.id)}
                                         >Delete
                                         </Button>
                                     </div>
