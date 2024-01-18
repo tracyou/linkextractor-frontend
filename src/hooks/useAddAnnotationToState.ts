@@ -24,7 +24,7 @@ export default function useAddAnnotationToState() {
             if (ancestorWithType) {
                 set(articleState(ancestorWithType.id), (article) => {
                     if (article) {
-                        let articleRevision = article.latestRevision;
+                        let articleRevision = article.revision;
                         if (!articleRevision) {
                             articleRevision = {
                                 id: '',
@@ -38,7 +38,7 @@ export default function useAddAnnotationToState() {
                         // Convert Set to array before updating annotations
                         const updatedArticle: ArticleFragment = {
                             ...article,
-                            latestRevision: {
+                            revision: {
                                 ...articleRevision,
                                 annotations: [...articleRevision.annotations, annotationData],
                             },

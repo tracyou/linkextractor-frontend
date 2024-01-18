@@ -24,9 +24,9 @@ export default function useRemoveAnnotationFromState() {
                 // Create a new article object with the updated annotations
                 const updatedArticle: ArticleFragment = {
                     ...article!,
-                    latestRevision: article!.latestRevision && {
-                        ...article!.latestRevision,
-                        annotations: article!.latestRevision?.annotations.filter((annotation) => annotation.id != idToRemove)
+                    revision: article!.revision && {
+                        ...article!.revision,
+                        annotations: article!.revision?.annotations.filter((annotation) => annotation.id != idToRemove)
                     },
                 };
                 return updatedArticle;

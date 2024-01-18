@@ -17,10 +17,7 @@ fragment Article on Article {
     id
     title
     text
-    latestRevision {
-        ...ArticleRevision
-    }
-    revisions {
+    revision {
         ...ArticleRevision
     }
 }

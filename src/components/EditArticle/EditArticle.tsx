@@ -112,11 +112,11 @@ const EditArticle = () => {
         if (lawData) {
             const mappedDocument = lawData.articles.flatMap((article) => {
                     //Store each annotation in global context
-                    clearAnnotations().then(() => article.latestRevision?.annotations.forEach((annotation) => addAnnotation(annotation.id, annotation, editor)));
+                    clearAnnotations().then(() => article.revision?.annotations.forEach((annotation) => addAnnotation(annotation.id, annotation, editor)));
                     //Store each article in global context
                     clearArticles().then(() => addArticle(article.id, article));
                     //If there is no JSON yet, parse imported text to proper JSON format
-                    if (!article.latestRevision) {
+                    if (!article.revision) {
                         return [
                             {
                                 id: article.id,
@@ -139,7 +139,7 @@ const EditArticle = () => {
                             {
                                 id: article.id,
                                 type: "article",
-                                children: JSON.parse(article.latestRevision.jsonText)
+                                children: JSON.parse(article.revision.jsonText)
                             }
                         ]
                     }
@@ -164,7 +164,7 @@ const EditArticle = () => {
             //For each article in lawDocument get annotations array from state by id
             const article = allArticles.find((article) => article!.id == id);
 
-            const transformedAnnotations = article!.latestRevision?.annotations.map((annotation: SimpleAnnotationFragment) => {
+            const transformedAnnotations = article!.revision?.annotations.map((annotation: SimpleAnnotationFragment) => {
                 const {
                     id,
                     text,

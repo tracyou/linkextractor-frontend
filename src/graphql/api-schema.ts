@@ -52,9 +52,8 @@ export interface AnnotationInput {
 
 export interface Article {
   readonly id: Scalars['UUID']['output'];
-  readonly latestRevision?: Maybe<ArticleRevision>;
   readonly law: Law;
-  readonly revisions: ReadonlyArray<ArticleRevision>;
+  readonly revision?: Maybe<ArticleRevision>;
   readonly text?: Maybe<Scalars['String']['output']>;
   readonly title: Scalars['String']['output'];
 }
@@ -93,6 +92,11 @@ export interface LawAnnotationPivot {
   readonly comment?: Maybe<Scalars['String']['output']>;
   readonly cursorIndex: Scalars['Int']['output'];
   readonly id: Scalars['UUID']['output'];
+}
+
+export interface LawRevision {
+  readonly createdAt: Scalars['DateTime']['output'];
+  readonly revision: Scalars['Int']['output'];
 }
 
 export interface Matter {
@@ -216,6 +220,7 @@ export enum OrderByRelationWithColumnAggregateFunction {
 
 export interface Query {
   readonly law: Law;
+  readonly lawRevisions: ReadonlyArray<LawRevision>;
   readonly laws: ReadonlyArray<Law>;
   readonly matter: Matter;
   readonly matterRelationSchema?: Maybe<MatterRelationSchema>;
@@ -228,6 +233,12 @@ export interface Query {
 
 
 export interface QueryLawArgs {
+  id: Scalars['UUID']['input'];
+  revision: Scalars['Int']['input'];
+}
+
+
+export interface QueryLawRevisionsArgs {
   id: Scalars['UUID']['input'];
 }
 
@@ -286,7 +297,7 @@ export type LawFragment = { readonly id: string, readonly title: string, readonl
 
 export type SimpleLawFragment = { readonly id: string, readonly title: string, readonly isPublished: boolean };
 
-export type ArticleFragment = { readonly id: string, readonly title: string, readonly text?: string | null, readonly latestRevision?: ArticleRevisionFragment | null, readonly revisions: ReadonlyArray<ArticleRevisionFragment> };
+export type ArticleFragment = { readonly id: string, readonly title: string, readonly text?: string | null, readonly revision?: ArticleRevisionFragment | null };
 
 export type ArticleRevisionFragment = { readonly id: string, readonly jsonText: string, readonly createdAt: string, readonly updatedAt: string, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
 
@@ -417,10 +428,7 @@ export const ArticleFragmentDoc = gql`
   id
   title
   text
-  latestRevision {
-    ...ArticleRevision
-  }
-  revisions {
+  revision {
     ...ArticleRevision
   }
 }
@@ -531,7 +539,7 @@ export type GetLawsSuspenseQueryHookResult = ReturnType<typeof useGetLawsSuspens
 export type GetLawsQueryResult = Apollo.QueryResult<GetLawsQuery, GetLawsQueryVariables>;
 export const GetLawByIdDocument = gql`
     query getLawById($id: UUID!) {
-  law(id: $id) {
+  law(id: $id, revision: 0) {
     ...Law
   }
 }
