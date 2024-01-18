@@ -13,9 +13,8 @@ import React from "react";
 import styles from "../../EditArticle/EditArticle.module.css";
 import {Button, Card, CardContent, FormHelperText, MenuItem, Select, TextField} from "@mui/material";
 import useRemoveAnnotationFromState from "../../../hooks/useRemoveAnnotationFromState";
-import {Editor, Transforms, Path} from "slate";
+import {Editor, Transforms} from "slate";
 import {getMarkForAnnotationID, customFindPath} from "../../../utils/EditorAnnotationUtils";
-import {ReactEditor} from "slate-react";
 import {useQuery} from "@apollo/client";
 import {
     MattersDocument,
@@ -33,12 +32,6 @@ interface AnnotationListItemProps {
 }
 const AnnotationListItem: React.FC<AnnotationListItemProps> = ({id, editor, matterColors}) => {
 
-    //Remove mark (wrapper containing id and providing style to annotation)
-    const removeMarkAtPath = (editor: Editor, path: Path, markKey: string) => {
-        Transforms.unsetNodes(editor, markKey, {at: path});
-        ReactEditor.focus(editor);
-    };
-
     const textNode = useRecoilValue(activeTextNode);
 
     //Find path of active (clicked) textnode and select it in the editor
@@ -46,7 +39,6 @@ const AnnotationListItem: React.FC<AnnotationListItemProps> = ({id, editor, matt
         const path = customFindPath(editor, textNode!);
         if (path) {
             Transforms.select(editor, path);
-            removeMarkAtPath(editor, path, getMarkForAnnotationID(id));
         }
     }
 
@@ -96,7 +88,7 @@ const AnnotationListItem: React.FC<AnnotationListItemProps> = ({id, editor, matt
         selectAnnotatedWord();
         updateAnnotation(
             id, {
-                text: "",
+                text: annotation.text,
                 id: id,
                 matter: matter,
                 definition: definition,
