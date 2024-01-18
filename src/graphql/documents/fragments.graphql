@@ -32,6 +32,11 @@ fragment ArticleRevision on ArticleRevision {
     updatedAt
 }
 
+fragment LawRevision on LawRevision {
+    revision
+    createdAt
+}
+
 fragment SimpleAnnotation on Annotation {
     id
     text
