@@ -199,13 +199,14 @@ const EditArticle = () => {
                 },
             },
         }).then((res) => {
-            if (res.errors) {
-                const errors = res.errors.map((e) => e.message);
-                setErrorMessages(errors);
-            }
             if (res.data) {
                 setLawData(res.data.saveAnnotatedLaw)
                 setIsSuccess(true);
+            }
+        }).catch((e) => {
+            if (e.graphQLErrors) {
+                const errors = e.graphQLErrors.map((e: any) => e.message);
+                setErrorMessages(errors);
             }
         });
     };
