@@ -25,8 +25,18 @@ const RevisionSelector = () => {
         }
     });
 
+    useEffect(() => {
+        if (revisionLoading){
+            return
+        }
+        if (queryResult)
+        {
+           setValue(queryResult.lawRevisions.law.revision)
+        }
+        }, [revisionLoading, queryResult]);
 
-    const [value, setValue] = React.useState<number | undefined>(queryResult?.lawRevisions.law.revision);
+
+    const [value, setValue] = React.useState<number>(0);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -56,9 +66,7 @@ const RevisionSelector = () => {
                     }
                 </Tabs>
             </>
-            {value &&
               <EditArticle revision={value}/>
-            }
         </Box>
     )
 };
