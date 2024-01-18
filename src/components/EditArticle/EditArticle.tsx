@@ -87,7 +87,7 @@ const EditArticle: React.FC<EditArticleProps> = ({
         if (queryResult?.law) {
             setLawData(queryResult.law);
         }
-    }, [lawLoading]);
+    }, [lawLoading, queryResult]);
 
     const {data: matterQueryResult, loading: mattersLoading}
         = useQuery<MattersQuery>(MattersDocument)
@@ -222,6 +222,7 @@ const EditArticle: React.FC<EditArticleProps> = ({
             if (res.data) {
                 setLawData(res.data.saveAnnotatedLaw)
                 setIsSuccess(true);
+            //     Update parent component
             }
         }).catch((e) => {
             if (e.graphQLErrors) {
