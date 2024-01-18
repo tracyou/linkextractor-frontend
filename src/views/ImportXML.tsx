@@ -3,8 +3,7 @@ import './ImportXML.css'
 import ImportButton from "../components/ImportButton/ImportButton";
 import {Title} from "../stylesheets/Fonts";
 import Grid from "@mui/material/Grid";
-import {
-    SimpleLawFragment, useGetLawsQuery
+import { useGetLawsQuery
 } from "../graphql/api-schema";
 import {useMutation} from "@apollo/client";
 import {ApolloCache, DefaultContext, MutationFunctionOptions, OperationVariables, useMutation} from "@apollo/client";
@@ -12,9 +11,8 @@ import {
     ImportXmlDocument,
     ImportXmlMutation,
     DeleteLawDocument, DeleteLawInput,
+    DeleteLawDocument,
     DeleteLawMutation,
-    ImportXmlDocument,
-    ImportXmlMutation,
     SimpleLawFragment,
     useGetAllLawsQuery
 } from "../graphql/api-schema";
@@ -31,12 +29,12 @@ const ImportXML = () => {
 
     const [file, setFile] = useState<File>();
 
-    const [deleteLaw, {loading: loadingDelete, error: errorDelete}] = useMutation<DeleteLawMutation>(
+    const [deleteLaw, {data:dataDelete,loading:loadingDelete, error: errorDelete}] = useMutation<DeleteLawMutation>(
         DeleteLawDocument);
 
     useEffect(() => {
         refetch()
-    }, [file]);
+    }, [file, dataDelete]);
 
     const handleFileSelect = async (selectedFile: File) => {
         try {
@@ -53,23 +51,19 @@ const ImportXML = () => {
     }
 
     const handleOnClick = (law: SimpleLawFragment) => {
-
         window.location.href = '/revisionselector/' + law.id;
-
     }
 
-    function onDeleteLaw(e: React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>, id: UUID) {
-        e.stopPropagation();
-
-        const input: DeleteLawInput = {
-            id: id,
-        };
-
-        deleteLaw( {
-            variables: {
-                input: input
-            },
-        })
+   async function handleOnDelete(id: string) {
+        try {
+            const response = await deleteLaw({
+                variables: {
+                    input: id
+                },
+            });
+        } catch (error) {
+            console.log('er is iets fouts gegaan',error)
+        }
     }
 
     return (
@@ -95,10 +89,7 @@ const ImportXML = () => {
                                         <Button variant={"contained"}
                                                 color={"primary"}
                                                 size={"small"}
-                                                onClick={(e) => {
-                                                    const id: any = law.id;
-                                                    onDeleteLaw(e, id);
-                                                }}
+                                                onClick={() => handleOnDelete(law?.id)}
                                         >Delete
                                         </Button>
                                     </div>
