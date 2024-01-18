@@ -303,6 +303,8 @@ export type ArticleRevisionFragment = { readonly id: string, readonly jsonText: 
 
 export type SimpleAnnotationFragment = { readonly id: string, readonly text: string, readonly comment?: string | null, readonly definition?: string | null, readonly matter: SimpleMatterFragment };
 
+export type SimpleRevisionFragment = { readonly id: string, readonly createdAt: string };
+
 export type MatterFragment = { readonly id: string, readonly name: string, readonly color: string, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
 
 export type SimpleMatterFragment = { readonly id: string, readonly name: string, readonly color: string };
@@ -448,6 +450,12 @@ export const SimpleLawFragmentDoc = gql`
   id
   title
   isPublished
+}
+    `;
+export const SimpleRevisionFragmentDoc = gql`
+    fragment SimpleRevision on ArticleRevision {
+  id
+  createdAt
 }
     `;
 export const MatterFragmentDoc = gql`
