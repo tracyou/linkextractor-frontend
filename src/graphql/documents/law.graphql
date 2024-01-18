@@ -9,7 +9,14 @@ query getLawById($id: UUID!){
         ...Law
     }
 }
-mutation saveAnnotatedLaw($input: AnnotatedArticleInput!){
+
+mutation importXml($file: Upload!){
+    importXml(file: $file){
+        ...SimpleLaw
+    }
+}
+
+mutation saveAnnotatedLaw($input: AnnotatedLawInput!){
     saveAnnotatedLaw(input: $input){
         ...Law
     }

@@ -21,20 +21,21 @@ export interface Scalars {
   DateTime: { input: string; output: string; }
   JSON: { input: string; output: string; }
   UUID: { input: string; output: string; }
+  Upload: { input: File; output: File; }
 }
 
-export interface AnnotatedArticleInput {
+export interface AnnotatedLawInput {
   readonly articles: ReadonlyArray<ArticleInput>;
   readonly isPublished?: InputMaybe<Scalars['Boolean']['input']>;
   readonly lawId: Scalars['UUID']['input'];
 }
 
 export interface Annotation {
+  readonly articleRevision: ArticleRevision;
   readonly comment?: Maybe<Scalars['String']['output']>;
   readonly createdAt: Scalars['DateTime']['output'];
   readonly definition?: Maybe<Scalars['String']['output']>;
   readonly id: Scalars['UUID']['output'];
-  readonly laws: Law;
   readonly matter: Matter;
   readonly relationSchema: RelationSchema;
   readonly text: Scalars['String']['output'];
@@ -50,10 +51,10 @@ export interface AnnotationInput {
 }
 
 export interface Article {
-  readonly annotations: ReadonlyArray<Annotation>;
   readonly id: Scalars['UUID']['output'];
-  readonly jsonText?: Maybe<Scalars['String']['output']>;
+  readonly latestRevision?: Maybe<ArticleRevision>;
   readonly law: Law;
+  readonly revisions: ReadonlyArray<ArticleRevision>;
   readonly text?: Maybe<Scalars['String']['output']>;
   readonly title: Scalars['String']['output'];
 }
@@ -61,16 +62,21 @@ export interface Article {
 export interface ArticleInput {
   readonly annotations: ReadonlyArray<AnnotationInput>;
   readonly articleId: Scalars['UUID']['input'];
-  readonly jsonText?: InputMaybe<Scalars['JSON']['input']>;
+  readonly jsonText?: InputMaybe<Scalars['String']['input']>;
 }
 
-export interface CreatePancakeInput {
-  readonly diameter: Scalars['Int']['input'];
+export interface ArticleRevision {
+  readonly annotations: ReadonlyArray<Annotation>;
+  readonly article: Article;
+  readonly createdAt: Scalars['DateTime']['output'];
+  readonly id: Scalars['UUID']['output'];
+  readonly jsonText: Scalars['String']['output'];
+  readonly revision: Scalars['Int']['output'];
+  readonly updatedAt: Scalars['DateTime']['output'];
 }
 
-export interface CreatePancakeStackInput {
-  readonly name: Scalars['String']['input'];
-  readonly pancakes: ReadonlyArray<Scalars['ID']['input']>;
+export interface DeleteLawInput {
+  readonly id: Scalars['UUID']['input'];
 }
 
 export interface Law {
@@ -78,6 +84,7 @@ export interface Law {
   readonly createdAt: Scalars['DateTime']['output'];
   readonly id: Scalars['UUID']['output'];
   readonly isPublished: Scalars['Boolean']['output'];
+  readonly revision: Scalars['Int']['output'];
   readonly title: Scalars['String']['output'];
   readonly updatedAt: Scalars['DateTime']['output'];
 }
@@ -147,36 +154,21 @@ export interface MatterRelationType {
 }
 
 export interface Mutation {
-  readonly createPancake: Pancake;
-  readonly createPancakeStack: PancakeStack;
-  readonly deletePancake: Scalars['Boolean']['output'];
-  readonly deletePancakeStack: Scalars['Boolean']['output'];
+  readonly deleteLaw: Scalars['Boolean']['output'];
+  readonly importXml: Law;
   readonly publishRelationSchema: RelationSchema;
   readonly saveAnnotatedLaw: Law;
-  readonly saveFileXml: XmlFile;
   readonly saveMatterRelationSchema: MatterRelationSchema;
-  readonly updatePancake: Pancake;
-  readonly updatePancakeStack: PancakeStack;
 }
 
 
-export interface MutationCreatePancakeArgs {
-  input: CreatePancakeInput;
+export interface MutationDeleteLawArgs {
+  input: DeleteLawInput;
 }
 
 
-export interface MutationCreatePancakeStackArgs {
-  input: CreatePancakeStackInput;
-}
-
-
-export interface MutationDeletePancakeArgs {
-  id: Scalars['ID']['input'];
-}
-
-
-export interface MutationDeletePancakeStackArgs {
-  id: Scalars['ID']['input'];
+export interface MutationImportXmlArgs {
+  file: Scalars['Upload']['input'];
 }
 
 
@@ -186,27 +178,12 @@ export interface MutationPublishRelationSchemaArgs {
 
 
 export interface MutationSaveAnnotatedLawArgs {
-  input: AnnotatedArticleInput;
-}
-
-
-export interface MutationSaveFileXmlArgs {
-  input: XmlFileInput;
+  input: AnnotatedLawInput;
 }
 
 
 export interface MutationSaveMatterRelationSchemaArgs {
   input: SaveMatterRelationSchemaInput;
-}
-
-
-export interface MutationUpdatePancakeArgs {
-  input: UpdatePancakeInput;
-}
-
-
-export interface MutationUpdatePancakeStackArgs {
-  input: UpdatePancakeStackInput;
 }
 
 /** Allows ordering a list of records. */
@@ -237,25 +214,7 @@ export enum OrderByRelationWithColumnAggregateFunction {
   Sum = 'SUM'
 }
 
-export interface Pancake {
-  readonly createdAt: Scalars['DateTime']['output'];
-  readonly diameter: Scalars['Int']['output'];
-  readonly id: Scalars['ID']['output'];
-  readonly stack?: Maybe<PancakeStack>;
-  readonly updatedAt: Scalars['DateTime']['output'];
-}
-
-export interface PancakeStack {
-  readonly createdAt: Scalars['DateTime']['output'];
-  readonly id: Scalars['ID']['output'];
-  readonly name: Scalars['String']['output'];
-  readonly pancakes: ReadonlyArray<Pancake>;
-  readonly updatedAt: Scalars['DateTime']['output'];
-}
-
 export interface Query {
-  readonly articles: ReadonlyArray<Article>;
-  readonly fileXmls: ReadonlyArray<XmlFile>;
   readonly law: Law;
   readonly laws: ReadonlyArray<Law>;
   readonly matter: Matter;
@@ -263,10 +222,6 @@ export interface Query {
   readonly matterRelationSchemas: ReadonlyArray<MatterRelationSchema>;
   readonly matterRelationTypes: ReadonlyArray<MatterRelationType>;
   readonly matters: ReadonlyArray<Matter>;
-  readonly pancakeById: Pancake;
-  readonly pancakeStackById: PancakeStack;
-  readonly pancakeStacks: ReadonlyArray<PancakeStack>;
-  readonly pancakes: ReadonlyArray<Pancake>;
   readonly relationSchema: RelationSchema;
   readonly relationSchemas: ReadonlyArray<RelationSchema>;
 }
@@ -284,16 +239,6 @@ export interface QueryMatterArgs {
 
 export interface QueryMatterRelationSchemaArgs {
   input: MatterRelationSchemaInput;
-}
-
-
-export interface QueryPancakeByIdArgs {
-  id: Scalars['ID']['input'];
-}
-
-
-export interface QueryPancakeStackByIdArgs {
-  id: Scalars['ID']['input'];
 }
 
 
@@ -337,33 +282,13 @@ export enum Trashed {
   Without = 'WITHOUT'
 }
 
-export interface UpdatePancakeInput {
-  readonly diameter: Scalars['Int']['input'];
-  readonly id: Scalars['ID']['input'];
-}
-
-export interface UpdatePancakeStackInput {
-  readonly id: Scalars['ID']['input'];
-  readonly name: Scalars['String']['input'];
-  readonly pancakes: ReadonlyArray<Scalars['ID']['input']>;
-}
-
-export interface XmlFile {
-  readonly content: Scalars['String']['output'];
-  readonly id: Scalars['ID']['output'];
-  readonly title: Scalars['String']['output'];
-}
-
-export interface XmlFileInput {
-  readonly content: Scalars['String']['input'];
-  readonly title: Scalars['String']['input'];
-}
-
-export type LawFragment = { readonly id: string, readonly title: string, readonly isPublished: boolean, readonly articles: ReadonlyArray<SimpleArticleFragment> };
+export type LawFragment = { readonly id: string, readonly title: string, readonly isPublished: boolean, readonly articles: ReadonlyArray<ArticleFragment> };
 
 export type SimpleLawFragment = { readonly id: string, readonly title: string, readonly isPublished: boolean };
 
-export type SimpleArticleFragment = { readonly id: string, readonly title: string, readonly text?: string | null, readonly jsonText?: string | null, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
+export type ArticleFragment = { readonly id: string, readonly title: string, readonly text?: string | null, readonly latestRevision?: ArticleRevisionFragment | null, readonly revisions: ReadonlyArray<ArticleRevisionFragment> };
+
+export type ArticleRevisionFragment = { readonly id: string, readonly jsonText: string, readonly createdAt: string, readonly updatedAt: string, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
 
 export type SimpleAnnotationFragment = { readonly id: string, readonly text: string, readonly comment?: string | null, readonly definition?: string | null, readonly matter: SimpleMatterFragment };
 
@@ -389,8 +314,15 @@ export type GetLawByIdQueryVariables = Exact<{
 
 export type GetLawByIdQuery = { readonly law: LawFragment };
 
+export type ImportXmlMutationVariables = Exact<{
+  file: Scalars['Upload']['input'];
+}>;
+
+
+export type ImportXmlMutation = { readonly importXml: SimpleLawFragment };
+
 export type SaveAnnotatedLawMutationVariables = Exact<{
-  input: AnnotatedArticleInput;
+  input: AnnotatedLawInput;
 }>;
 
 
@@ -399,7 +331,7 @@ export type SaveAnnotatedLawMutation = { readonly saveAnnotatedLaw: LawFragment 
 export type MattersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MattersQuery = { readonly matters: ReadonlyArray<MatterFragment> };
+export type MattersQuery = { readonly matters: ReadonlyArray<SimpleMatterFragment> };
 
 export type MatterByIdQueryVariables = Exact<{
   id: Scalars['UUID']['input'];
@@ -469,27 +401,40 @@ export const SimpleAnnotationFragmentDoc = gql`
   }
 }
     ${SimpleMatterFragmentDoc}`;
-export const SimpleArticleFragmentDoc = gql`
-    fragment SimpleArticle on Article {
+export const ArticleRevisionFragmentDoc = gql`
+    fragment ArticleRevision on ArticleRevision {
   id
-  title
-  text
   jsonText
   annotations {
     ...SimpleAnnotation
   }
+  createdAt
+  updatedAt
 }
     ${SimpleAnnotationFragmentDoc}`;
+export const ArticleFragmentDoc = gql`
+    fragment Article on Article {
+  id
+  title
+  text
+  latestRevision {
+    ...ArticleRevision
+  }
+  revisions {
+    ...ArticleRevision
+  }
+}
+    ${ArticleRevisionFragmentDoc}`;
 export const LawFragmentDoc = gql`
     fragment Law on Law {
   id
   title
   isPublished
   articles {
-    ...SimpleArticle
+    ...Article
   }
 }
-    ${SimpleArticleFragmentDoc}`;
+    ${ArticleFragmentDoc}`;
 export const SimpleLawFragmentDoc = gql`
     fragment SimpleLaw on Law {
   id
@@ -624,8 +569,41 @@ export type GetLawByIdQueryHookResult = ReturnType<typeof useGetLawByIdQuery>;
 export type GetLawByIdLazyQueryHookResult = ReturnType<typeof useGetLawByIdLazyQuery>;
 export type GetLawByIdSuspenseQueryHookResult = ReturnType<typeof useGetLawByIdSuspenseQuery>;
 export type GetLawByIdQueryResult = Apollo.QueryResult<GetLawByIdQuery, GetLawByIdQueryVariables>;
+export const ImportXmlDocument = gql`
+    mutation importXml($file: Upload!) {
+  importXml(file: $file) {
+    ...SimpleLaw
+  }
+}
+    ${SimpleLawFragmentDoc}`;
+export type ImportXmlMutationFn = Apollo.MutationFunction<ImportXmlMutation, ImportXmlMutationVariables>;
+
+/**
+ * __useImportXmlMutation__
+ *
+ * To run a mutation, you first call `useImportXmlMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useImportXmlMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [importXmlMutation, { data, loading, error }] = useImportXmlMutation({
+ *   variables: {
+ *      file: // value for 'file'
+ *   },
+ * });
+ */
+export function useImportXmlMutation(baseOptions?: Apollo.MutationHookOptions<ImportXmlMutation, ImportXmlMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ImportXmlMutation, ImportXmlMutationVariables>(ImportXmlDocument, options);
+      }
+export type ImportXmlMutationHookResult = ReturnType<typeof useImportXmlMutation>;
+export type ImportXmlMutationResult = Apollo.MutationResult<ImportXmlMutation>;
+export type ImportXmlMutationOptions = Apollo.BaseMutationOptions<ImportXmlMutation, ImportXmlMutationVariables>;
 export const SaveAnnotatedLawDocument = gql`
-    mutation saveAnnotatedLaw($input: AnnotatedArticleInput!) {
+    mutation saveAnnotatedLaw($input: AnnotatedLawInput!) {
   saveAnnotatedLaw(input: $input) {
     ...Law
   }
@@ -660,10 +638,10 @@ export type SaveAnnotatedLawMutationOptions = Apollo.BaseMutationOptions<SaveAnn
 export const MattersDocument = gql`
     query matters {
   matters {
-    ...Matter
+    ...SimpleMatter
   }
 }
-    ${MatterFragmentDoc}`;
+    ${SimpleMatterFragmentDoc}`;
 
 /**
  * __useMattersQuery__

@@ -111,11 +111,11 @@ const EditArticle = () => {
         if (lawData) {
             const mappedDocument = lawData.articles.flatMap((article) => {
                     //Store each annotation in global context
-                    clearAnnotations().then(() => article.annotations.forEach((annotation) => addAnnotation(annotation.id, annotation, editor)));
+                    clearAnnotations().then(() => article.latestRevision?.annotations.forEach((annotation) => addAnnotation(annotation.id, annotation, editor)));
                     //Store each article in global context
                     clearArticles().then(() => addArticle(article.id, article));
                     //If there is no JSON yet, parse imported text to proper JSON format
-                    if (article.jsonText == null) {
+                    if (!article.latestRevision) {
                         return [
                             {
                                 id: article.id,
@@ -138,7 +138,7 @@ const EditArticle = () => {
                             {
                                 id: article.id,
                                 type: "article",
-                                children: JSON.parse(article.jsonText)
+                                children: JSON.parse(article.latestRevision.jsonText)
                             }
                         ]
                     }
@@ -161,7 +161,7 @@ const EditArticle = () => {
             //For each article in lawDocument get annotations array from state by id
             const article = allArticles.find((article) => article!.id == id);
 
-            const transformedAnnotations = article!.annotations.map((annotation: SimpleAnnotationFragment) => {
+            const transformedAnnotations = article!.latestRevision?.annotations.map((annotation: SimpleAnnotationFragment) => {
                 const {
                     id,
                     text,
@@ -182,7 +182,7 @@ const EditArticle = () => {
             return {
                 articleId: id,
                 jsonText: JSON.stringify(children), // Make sure to use children from the document, not from the state
-                annotations: transformedAnnotations,
+                annotations: transformedAnnotations || [],
             };
 
         })
@@ -236,7 +236,7 @@ const EditArticle = () => {
                                     e.preventDefault()
                                 }}/>
                             </Grid>
-                            <DebugObserver/>
+                            {/*<DebugObserver/>*/}
                         </Slate>
                     </Grid>
                 </Box>

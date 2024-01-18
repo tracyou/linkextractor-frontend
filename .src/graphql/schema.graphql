@@ -1,15 +1,15 @@
-input AnnotatedArticleInput {
+input AnnotatedLawInput {
   articles: [ArticleInput!]!
   isPublished: Boolean
   lawId: UUID!
 }
 
 type Annotation {
+  articleRevision: ArticleRevision!
   comment: String
   createdAt: DateTime!
   definition: String
   id: UUID!
-  laws: Law!
   matter: Matter!
   relationSchema: RelationSchema!
   text: String!
@@ -25,10 +25,10 @@ input AnnotationInput {
 }
 
 type Article {
-  annotations: [Annotation!]!
   id: UUID!
-  jsonText: String
+  latestRevision: ArticleRevision
   law: Law!
+  revisions: [ArticleRevision!]!
   text: String
   title: String!
 }
@@ -36,21 +36,26 @@ type Article {
 input ArticleInput {
   annotations: [AnnotationInput!]!
   articleId: UUID!
-  jsonText: JSON
+  jsonText: String
 }
 
-input CreatePancakeInput {
-  diameter: Int!
-}
-
-input CreatePancakeStackInput {
-  name: String!
-  pancakes: [ID!]!
+type ArticleRevision {
+  annotations: [Annotation!]!
+  article: Article!
+  createdAt: DateTime!
+  id: UUID!
+  jsonText: String!
+  revision: Int!
+  updatedAt: DateTime!
 }
 
 scalar Date
 
 scalar DateTime
+
+input DeleteLawInput {
+  id: UUID!
+}
 
 """
 Arbitrary data encoded in JavaScript Object Notation. See https://www.json.org.
@@ -62,6 +67,7 @@ type Law {
   createdAt: DateTime!
   id: UUID!
   isPublished: Boolean!
+  revision: Int!
   title: String!
   updatedAt: DateTime!
 }
@@ -134,16 +140,11 @@ type MatterRelationType {
 }
 
 type Mutation {
-  createPancake(input: CreatePancakeInput!): Pancake!
-  createPancakeStack(input: CreatePancakeStackInput!): PancakeStack!
-  deletePancake(id: ID!): Boolean!
-  deletePancakeStack(id: ID!): Boolean!
+  deleteLaw(input: DeleteLawInput!): Boolean!
+  importXml(file: Upload!): Law!
   publishRelationSchema(id: UUID!): RelationSchema!
-  saveAnnotatedLaw(input: AnnotatedArticleInput!): Law!
-  saveFileXml(input: XmlFileInput!): XmlFile!
+  saveAnnotatedLaw(input: AnnotatedLawInput!): Law!
   saveMatterRelationSchema(input: SaveMatterRelationSchemaInput!): MatterRelationSchema!
-  updatePancake(input: UpdatePancakeInput!): Pancake!
-  updatePancakeStack(input: UpdatePancakeStackInput!): PancakeStack!
 }
 
 """Allows ordering a list of records."""
@@ -183,25 +184,7 @@ enum OrderByRelationWithColumnAggregateFunction {
   SUM
 }
 
-type Pancake {
-  createdAt: DateTime!
-  diameter: Int!
-  id: ID!
-  stack: PancakeStack
-  updatedAt: DateTime!
-}
-
-type PancakeStack {
-  createdAt: DateTime!
-  id: ID!
-  name: String!
-  pancakes: [Pancake!]!
-  updatedAt: DateTime!
-}
-
 type Query {
-  articles: [Article!]!
-  fileXmls: [XmlFile!]!
   law(id: UUID!): Law!
   laws: [Law!]!
   matter(id: UUID!): Matter!
@@ -209,10 +192,6 @@ type Query {
   matterRelationSchemas: [MatterRelationSchema!]!
   matterRelationTypes: [MatterRelationType!]!
   matters: [Matter!]!
-  pancakeById(id: ID!): Pancake!
-  pancakeStackById(id: ID!): PancakeStack!
-  pancakeStacks: [PancakeStack!]!
-  pancakes: [Pancake!]!
   relationSchema(id: UUID!): RelationSchema!
   relationSchemas: [RelationSchema!]!
 }
@@ -260,24 +239,4 @@ enum Trashed {
 
 scalar UUID
 
-input UpdatePancakeInput {
-  diameter: Int!
-  id: ID!
-}
-
-input UpdatePancakeStackInput {
-  id: ID!
-  name: String!
-  pancakes: [ID!]!
-}
-
-type XmlFile {
-  content: String!
-  id: ID!
-  title: String!
-}
-
-input XmlFileInput {
-  content: String!
-  title: String!
-}
+scalar Upload

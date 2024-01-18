@@ -75,9 +75,9 @@ const AnnotationListItem: React.FC<AnnotationListItemProps> = ({id, editor, matt
 
     const annotation = useRecoilValue(annotationState(id))!;
     const [definition, setDefinition]
-        = React.useState(annotation.definition);
+        = React.useState(annotation?.definition);
     const [comment, setComment]
-        = React.useState(annotation.comment);
+        = React.useState(annotation?.comment);
     const [matter, setMatter]
         = React.useState<SimpleMatterFragment>({
         id: annotation.matter.id,

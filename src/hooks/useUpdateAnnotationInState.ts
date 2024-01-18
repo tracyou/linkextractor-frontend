@@ -2,7 +2,7 @@ import {RecoilState, useRecoilCallback} from 'recoil';
 import { annotationState, articleState } from '../recoil/AnnotationState';
 import { Editor } from 'slate';
 import { findAncestorWithType } from '../utils/EditorAnnotationUtils';
-import {SimpleAnnotationFragment, SimpleArticleFragment} from "../graphql/api-schema";
+import {SimpleAnnotationFragment, ArticleFragment} from "../graphql/api-schema";
 
 export default function useUpdateAnnotation() {
     return useRecoilCallback(
@@ -10,7 +10,6 @@ export default function useUpdateAnnotation() {
             // Update the annotation
             set(annotationState(annotationId), updatedAnnotationData);
 
-            console.log(editor.selection)
             // Update the respective article
             const ancestorWithType = findAncestorWithType(
                 editor,
@@ -18,22 +17,35 @@ export default function useUpdateAnnotation() {
                 'article'
             );
 
-            console.log(ancestorWithType)
-
             if (ancestorWithType) {
                 set(
-                    (articleState(ancestorWithType.id) as unknown) as RecoilState<SimpleArticleFragment>,
+                    (articleState(ancestorWithType.id) as unknown) as RecoilState<ArticleFragment>,
                     (article) => {
                         if (article) {
                             // Find and update the annotation in the article
-                            const updatedAnnotations = article.annotations.map((annotation) =>
+                            const updatedAnnotations = article.latestRevision?.annotations.map((annotation) =>
                                 annotation.id === annotationId ? updatedAnnotationData : annotation
                             );
 
                             // Create a new article object with the updated annotations
-                            const updatedArticle: SimpleArticleFragment = {
+                            let articleRevision = article.latestRevision;
+                            if (!articleRevision) {
+                                articleRevision = {
+                                    id: '',
+                                    jsonText: '',
+                                    updatedAt: '',
+                                    createdAt: '',
+                                    annotations: [],
+                                };
+                            }
+
+                            const updatedArticle: ArticleFragment = {
                                 ...article,
-                                annotations: updatedAnnotations,
+
+                                latestRevision: {
+                                    ...articleRevision,
+                                    annotations: updatedAnnotations || [],
+                                },
                             };
 
                             return updatedArticle;
