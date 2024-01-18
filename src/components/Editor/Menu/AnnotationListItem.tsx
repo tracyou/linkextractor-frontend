@@ -116,11 +116,9 @@ const AnnotationListItem: React.FC<AnnotationListItemProps> = ({id, editor, matt
                     <span>{annotation?.definition}</span>
                     <span>{annotation?.comment}</span>
                 </div>
-                <div style={{display: "flex", flexDirection: "row", gap: "2%", marginTop: "5%"}}>
-                    <Button onClick={onEditAnnotation} variant="contained"
-                            style={{backgroundColor: DarkBlue}}>Bewerk</Button>
-                    <Button onClick={onRemoveAnnotation} variant="text"
-                            style={{backgroundColor: LightBlue, color: "#000"}}>Verwijder</Button>
+                <div style={{display: "flex", flexDirection: "row", gap: "2%", marginTop: "5%", }}>
+                    <Button onClick={onEditAnnotation} variant="outlined" size={"small"} style={{color: "#000"}}>Bewerk</Button>
+                    <Button onClick={onRemoveAnnotation} variant="text" size={"small"}>Verwijder</Button>
                 </div>
             </CardContent>
             <CardContent style={{display: annotation?.id == editable?.id ? 'flex' : 'none', flexDirection: 'column'}}>

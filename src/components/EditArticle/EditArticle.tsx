@@ -23,6 +23,7 @@ import useClearAnnotationState from "../../hooks/useClearAnnotationsState";
 import useEditorConfig from "../../hooks/useEditorConfig";
 import useAddArticleToState from "../../hooks/useAddArticleToState";
 import useClearArticleState from "../../hooks/useClearArticleState";
+import {Alert, Button, Snackbar} from "@mui/material";
 
 const EditArticle = () => {
 
@@ -154,6 +155,8 @@ const EditArticle = () => {
     );
 
     const allArticles = useRecoilValue(allArticlesState);
+    const [errorMessages, setErrorMessages] = useState<string[]>([]);
+    const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
     const saveTheLaw = async () => {
 
@@ -197,11 +200,12 @@ const EditArticle = () => {
             },
         }).then((res) => {
             if (res.errors) {
-                console.error(res.errors.map((error) => error.message));
+                const errors = res.errors.map((e) => e.message);
+                setErrorMessages(errors);
             }
-
             if (res.data) {
                 setLawData(res.data.saveAnnotatedLaw)
+                setIsSuccess(true);
             }
         });
     };
@@ -211,39 +215,56 @@ const EditArticle = () => {
     return (
         mattersLoading || lawLoading ? <p>Wet wordt geladen...</p> : (
             !matter || !mattersByName || lawDocument.length === 0 ? <p>Geen resultaat...</p> :
-                <Box sx={{flexGrow: 1}}>
-                    <Grid
-                        alignItems="center"
-                        justifyContent="end"
-                        container>
-                        <button onClick={saveTheLaw}>Opslaan</button>
-                    </Grid>
-                    <Grid
-                        alignItems="center"
-                        justifyContent="center"
-                        container
-                    >
-
-                        <h1 style={Title}>{lawData?.title}</h1>
-                    </Grid>
-                    <Grid container direction={"row"} spacing={5}>
-                        <Slate editor={editor} initialValue={lawDocument} onChange={onChangeHandler}>
-                            <Grid item lg={4}>
-                                <AnnotationMenu
-                                    selection={selection}
-                                    setSelection={setSelection}
-                                    matter={matter} setMatter={setMatter}
-                                    mattersByName={mattersByName}/>
-                            </Grid>
-                            <Grid item lg={8}>
-                                <Editable renderElement={renderElement} renderLeaf={renderLeaf} onKeyDown={(e) => {
-                                    e.preventDefault()
-                                }}/>
-                            </Grid>
-                            {/*<DebugObserver/>*/}
-                        </Slate>
-                    </Grid>
-                </Box>
+                <>
+                    <Snackbar open={isSuccess} autoHideDuration={6000} onClose={() => setIsSuccess(false)}>
+                        <Alert
+                            onClose={() => setIsSuccess(false)}
+                            severity="success"
+                            variant="filled"
+                            sx={{width: '100%', alignItems: "center"}}
+                        >
+                            Wet opgeslagen
+                        </Alert>
+                    </Snackbar>
+                    <Snackbar open={errorMessages.length != 0} autoHideDuration={6000}
+                              onClose={() => setErrorMessages([])}>
+                        <Alert
+                            onClose={() => setErrorMessages([])}
+                            severity="warning"
+                            variant="filled"
+                            sx={{width: '100%', alignItems: "center"}}
+                        >
+                            {errorMessages[0]}
+                        </Alert>
+                    </Snackbar>
+                    <Box sx={{flexGrow: 1}}>
+                        <Grid
+                            alignItems="center"
+                            justifyContent="end"
+                            container>
+                            <Button variant={"contained"} style={{marginTop: "2%"}} onClick={saveTheLaw}>Wet opslaan</Button>
+                        </Grid>
+                        <Grid container direction={"row"} spacing={5}>
+                            <Slate editor={editor} initialValue={lawDocument} onChange={onChangeHandler}>
+                                <Grid item lg={5}>
+                                    <AnnotationMenu
+                                        selection={selection}
+                                        setSelection={setSelection}
+                                        matter={matter} setMatter={setMatter}
+                                        mattersByName={mattersByName}
+                                    />
+                                </Grid>
+                                <Grid item lg={7}>
+                                    <h1 style={Title}>{lawData?.title}</h1>
+                                    <Editable renderElement={renderElement} renderLeaf={renderLeaf} onKeyDown={(e) => {
+                                        e.preventDefault();
+                                    }}/>
+                                </Grid>
+                                {/*/!*<DebugObserver/>*!/ Uncomment for debugging state */}
+                            </Slate>
+                        </Grid>
+                    </Box>
+                </>
         )
     );
 };

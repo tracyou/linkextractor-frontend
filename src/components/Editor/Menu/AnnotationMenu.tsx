@@ -37,8 +37,6 @@ const AnnotationMenu: React.FC<AnnotationProps> = ({
                                                        mattersByName,
                                                        }) => {
 
-
-
     const [activeAnnotationIds, setActiveAnnotationIds]
         = useRecoilState<Set<string>>(activeAnnotationIdsState);
 
@@ -87,7 +85,7 @@ const AnnotationMenu: React.FC<AnnotationProps> = ({
 
     return (
                 <Card
-                    style={{borderColor: LightBlue}}
+                    style={{boxShadow: "0px 7px 29px 0px rgba(100, 100, 111, 0.2)"}}
                     variant="outlined"
                 >
                     <CardContent>
@@ -178,7 +176,7 @@ const AnnotationMenu: React.FC<AnnotationProps> = ({
 
                             </Grid>
                         </div>
-                        {activeAnnotationIds.size > 0 && activeNode && (
+                        {activeAnnotationIds.size > 0 && activeNode &&  (
                             <div style={{
                                 display: "flex",
                                 flexDirection: "column",
@@ -193,9 +191,9 @@ const AnnotationMenu: React.FC<AnnotationProps> = ({
                                     />
                                 ))}
                                 <div style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
-                                    <Button variant="contained" style={{backgroundColor: DarkBlue, color: "#fff"}}
+                                    <Button variant="contained" style={{backgroundColor: DarkBlue, color: "#fff", fontSize: "24px", fontWeight: "bold"}}
                                             onClick={onAddAnnotation}>
-                                        Toevoegen
+                                        +
                                     </Button>
                                     <Button variant="contained" style={{backgroundColor: LightBlue, color: "#000"}}
                                             onClick={onBack}>
