@@ -7,7 +7,7 @@ import {Title} from "../../stylesheets/Fonts";
 import {useQuery} from "@apollo/client";
 import {GetLawRevisionsDocument, GetLawRevisionsQuery,} from "../../graphql/api-schema";
 
-const RevisionSelector = () => {
+const RevisionSelector:React.FC = () => {
     // Get id from the router
     const {id} = useParams();
     const [lawId, setLawId] = useState<string | undefined>();
@@ -18,7 +18,8 @@ const RevisionSelector = () => {
     const {
         data: queryResult,
         loading: revisionLoading,
-        error: revisionError
+        error: revisionError,
+        refetch: lawRefetch
     } = useQuery<GetLawRevisionsQuery>(GetLawRevisionsDocument, {
         variables: {
             id: lawId
@@ -26,14 +27,13 @@ const RevisionSelector = () => {
     });
 
     useEffect(() => {
-        if (revisionLoading){
+        if (revisionLoading) {
             return
         }
-        if (queryResult)
-        {
-           setValue(queryResult.lawRevisions.law.revision)
+        if (queryResult) {
+            setValue(queryResult.lawRevisions.law.revision)
         }
-        }, [revisionLoading, queryResult]);
+    }, [revisionLoading, queryResult]);
 
 
     const [value, setValue] = React.useState<number>(0);
@@ -41,7 +41,16 @@ const RevisionSelector = () => {
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
-
+    // Refetch new revision
+    const [state, setState] = useState<boolean>(false);
+        if (state) {
+            lawRefetch({
+                variables: {
+                    id: lawId,
+                }
+            })
+            setState(false)
+        }
     return (
         <Box>
             <>
@@ -66,7 +75,7 @@ const RevisionSelector = () => {
                     }
                 </Tabs>
             </>
-              <EditArticle revision={value}/>
+            <EditArticle revision={value} stateChanger={setState}/>
         </Box>
     )
 };
