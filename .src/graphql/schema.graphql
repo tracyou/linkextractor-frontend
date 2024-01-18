@@ -189,7 +189,7 @@ enum OrderByRelationWithColumnAggregateFunction {
 }
 
 type Query {
-  law(id: UUID!, revision: Int!): Law!
+  law(id: UUID!, revision: Int): Law!
   lawRevisions(id: UUID!): [LawRevision!]!
   laws: [Law!]!
   matter(id: UUID!): Matter!
