@@ -31,7 +31,14 @@ fragment ArticleRevision on ArticleRevision {
     createdAt
     updatedAt
 }
-
+fragment LawRevisions on LawRevisions{
+    law {
+        revision
+    }
+    revisions {
+        ...LawRevision
+    }
+}
 fragment LawRevision on LawRevision {
     revision
     createdAt
