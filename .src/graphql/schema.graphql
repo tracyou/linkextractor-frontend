@@ -26,9 +26,8 @@ input AnnotationInput {
 
 type Article {
   id: UUID!
-  latestRevision: ArticleRevision
   law: Law!
-  revisions: [ArticleRevision!]!
+  revision: ArticleRevision
   text: String
   title: String!
 }
@@ -76,6 +75,11 @@ type LawAnnotationPivot {
   comment: String
   cursorIndex: Int!
   id: UUID!
+}
+
+type LawRevision {
+  createdAt: DateTime!
+  revision: Int!
 }
 
 type Matter {
@@ -185,7 +189,8 @@ enum OrderByRelationWithColumnAggregateFunction {
 }
 
 type Query {
-  law(id: UUID!): Law!
+  law(id: UUID!, revision: Int!): Law!
+  lawRevisions(id: UUID!): [LawRevision!]!
   laws: [Law!]!
   matter(id: UUID!): Matter!
   matterRelationSchema(input: MatterRelationSchemaInput!): MatterRelationSchema

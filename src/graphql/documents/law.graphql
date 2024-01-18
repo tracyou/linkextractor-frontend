@@ -5,7 +5,7 @@ query getLaws{
 }
 
 query getLawById($id: UUID!){
-    law(id: $id){
+    law(id: $id, revision: 0){
         ...Law
     }
 }
