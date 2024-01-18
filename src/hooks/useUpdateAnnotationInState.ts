@@ -23,12 +23,12 @@ export default function useUpdateAnnotation() {
                     (article) => {
                         if (article) {
                             // Find and update the annotation in the article
-                            const updatedAnnotations = article.latestRevision?.annotations.map((annotation) =>
+                            const updatedAnnotations = article.revision?.annotations.map((annotation) =>
                                 annotation.id === annotationId ? updatedAnnotationData : annotation
                             );
 
                             // Create a new article object with the updated annotations
-                            let articleRevision = article.latestRevision;
+                            let articleRevision = article.revision;
                             if (!articleRevision) {
                                 articleRevision = {
                                     id: '',
@@ -42,7 +42,7 @@ export default function useUpdateAnnotation() {
                             const updatedArticle: ArticleFragment = {
                                 ...article,
 
-                                latestRevision: {
+                                revision: {
                                     ...articleRevision,
                                     annotations: updatedAnnotations || [],
                                 },
