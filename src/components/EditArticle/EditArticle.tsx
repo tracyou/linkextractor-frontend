@@ -260,7 +260,7 @@ const EditArticle = () => {
                                         e.preventDefault();
                                     }}/>
                                 </Grid>
-                                {/*/!*<DebugObserver/>*!/ Uncomment for debugging state */}
+                                <DebugObserver/>
                             </Slate>
                         </Grid>
                     </Box>
