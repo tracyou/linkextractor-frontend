@@ -83,7 +83,7 @@ fragment SimpleMatterRelation on MatterRelation {
     description
 }
 
-fragment SimpleMatterRelationSchema on MatterRelationSchema {
+fragment  SimpleMatterRelationSchema on MatterRelationSchema {
     id
     schemaLayout
     matter {

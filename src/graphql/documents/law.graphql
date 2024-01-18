@@ -21,3 +21,7 @@ mutation saveAnnotatedLaw($input: AnnotatedLawInput!){
         ...Law
     }
 }
+
+mutation deleteLaw($input: DeleteLawInput!) {
+    deleteLaw(input: $input)
+}

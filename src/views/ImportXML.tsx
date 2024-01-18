@@ -7,10 +7,19 @@ import {
     SimpleLawFragment, useGetLawsQuery
 } from "../graphql/api-schema";
 import {useMutation} from "@apollo/client";
+import {ApolloCache, DefaultContext, MutationFunctionOptions, OperationVariables, useMutation} from "@apollo/client";
 import {
     ImportXmlDocument,
     ImportXmlMutation,
+    DeleteLawDocument, DeleteLawInput,
+    DeleteLawMutation,
+    ImportXmlDocument,
+    ImportXmlMutation,
+    SimpleLawFragment,
+    useGetAllLawsQuery
 } from "../graphql/api-schema";
+import {Button} from "@mui/material";
+import {UUID} from "node:crypto";
 
 
 const ImportXML = () => {
@@ -21,6 +30,9 @@ const ImportXML = () => {
     }] = useMutation<ImportXmlMutation>(ImportXmlDocument);
 
     const [file, setFile] = useState<File>();
+
+    const [deleteLaw, {loading: loadingDelete, error: errorDelete}] = useMutation<DeleteLawMutation>(
+        DeleteLawDocument);
 
     useEffect(() => {
         refetch()
@@ -46,6 +58,19 @@ const ImportXML = () => {
 
     }
 
+    function onDeleteLaw(e: React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLButtonElement>, id: UUID) {
+        e.stopPropagation();
+
+        const input: DeleteLawInput = {
+            id: id,
+        };
+
+        deleteLaw( {
+            variables: {
+                input: input
+            },
+        })
+    }
 
     return (
         <>
@@ -66,7 +91,16 @@ const ImportXML = () => {
                                 {data?.laws.map((law) => (
 
                                     <div key={law.id} className="artikel" onClick={() => handleOnClick(law)}>
-                                        < h2> {law?.title}</h2>
+                                        <h2> {law?.title}</h2>
+                                        <Button variant={"contained"}
+                                                color={"primary"}
+                                                size={"small"}
+                                                onClick={(e) => {
+                                                    const id: any = law.id;
+                                                    onDeleteLaw(e, id);
+                                                }}
+                                        >Delete
+                                        </Button>
                                     </div>
                                 ))}
                             </div>
