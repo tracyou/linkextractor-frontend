@@ -234,7 +234,7 @@ export interface Query {
 
 export interface QueryLawArgs {
   id: Scalars['UUID']['input'];
-  revision?: InputMaybe<Scalars['Int']['input']>;
+  revision: Scalars['Int']['input'];
 }
 
 
@@ -539,7 +539,7 @@ export type GetLawsSuspenseQueryHookResult = ReturnType<typeof useGetLawsSuspens
 export type GetLawsQueryResult = Apollo.QueryResult<GetLawsQuery, GetLawsQueryVariables>;
 export const GetLawByIdDocument = gql`
     query getLawById($id: UUID!) {
-  law(id: $id) {
+  law(id: $id, revision: 0) {
     ...Law
   }
 }
