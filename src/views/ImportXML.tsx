@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import './ImportXML.css'
 import ImportButton from "../components/ImportButton/ImportButton";
+import DeleteButton from "../components/DeleteButton/DeleteButton";
 import {Title} from "../stylesheets/Fonts";
 import Grid from "@mui/material/Grid";
 import {
@@ -58,6 +59,13 @@ const ImportXML = () => {
     async function handleOnDelete(event: React.MouseEvent, id: string) {
 
         event.stopPropagation();
+
+        const shouldDelete = window.confirm('Are you sure you want to delete?');
+
+        if (!shouldDelete) {
+            return;
+        }
+
         try {
             await deleteLaw({
                 variables: {
@@ -89,12 +97,12 @@ const ImportXML = () => {
 
                                     <div key={law.id} className="artikel" onClick={() => handleOnClick(law)}>
                                         <h2> {law?.title}</h2>
-                                        <Button variant={"contained"}
-                                                color={"primary"}
-                                                size={"small"}
-                                                onClick={(event) => handleOnDelete(event, law?.id)}
-                                        >Delete
-                                        </Button>
+                                        <Grid
+                                            alignItems="right"
+                                            justifyContent="right"
+                                            container>
+                                            <DeleteButton onClick={(event) => handleOnDelete(event, law?.id)}/>
+                                        </Grid>
                                     </div>
                                 ))}
                             </div>
