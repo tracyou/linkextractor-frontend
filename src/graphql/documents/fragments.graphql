@@ -3,7 +3,7 @@ fragment Law on Law {
     title
     isPublished
     articles {
-        ...SimpleArticle
+        ...Article
     }
 }
 
@@ -12,18 +12,31 @@ fragment SimpleLaw on Law {
     title
     isPublished
 }
-fragment SimpleArticle on Article {
+
+fragment Article on Article {
     id
     title
     text
+    revision {
+        ...ArticleRevision
+    }
+}
+
+fragment ArticleRevision on ArticleRevision {
+    id
+    jsonText
     annotations {
         ...SimpleAnnotation
     }
+    createdAt
+    updatedAt
 }
 
 fragment SimpleAnnotation on Annotation {
     id
     text
+    comment
+    definition
     matter {
         ...SimpleMatter
     }

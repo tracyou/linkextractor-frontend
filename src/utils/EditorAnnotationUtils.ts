@@ -1,14 +1,15 @@
 import {v4 as uuidv4} from 'uuid';
-import {Editor, Path} from "slate";
-import {Annotation} from "../types";
+import {Editor, NodeEntry, Path} from "slate";
+import {ArticleNode} from "../types";
 import {Node} from 'slate';
-
+import {SimpleAnnotationFragment} from "../graphql/api-schema";
 const ANNOTATION_PREFIX = "annotation_";
 
 export function getMarkForAnnotationID(annotationID: string) {
     return `${ANNOTATION_PREFIX}${annotationID}`;
 }
 
+//Returns all annotations on text node
 export function getAnnotationsOnTextNode(textNode: Node): Set<string> {
     if (textNode == null) {
         debugger;
@@ -31,13 +32,18 @@ function isAnnotationIDMark(possibleAnnotation: any) {
     return possibleAnnotation.indexOf(ANNOTATION_PREFIX) === 0;
 }
 
-export function insertAnnotation(editor: Editor, addAnnotationToState: any, annotation: Annotation) {
-    annotation.id = uuidv4();
-    addAnnotationToState(annotation.id, annotation);
+export function insertAnnotation(editor: Editor, addAnnotationToState: any, annotation: SimpleAnnotationFragment) {
+    annotation = {
+        ...annotation,
+        id: uuidv4(),
+    };
+    addAnnotationToState(annotation.id, annotation, editor);
     Editor.addMark(editor, getMarkForAnnotationID(annotation.id), true);
     return annotation.id;
 }
 
+
+//Finds editor path of a node
 export const customFindPath = (editor: Editor, targetNode: Node) => {
     const findNode = (node: Node, path: Path): Path | null => {
 
@@ -70,3 +76,21 @@ export const customFindPath = (editor: Editor, targetNode: Node) => {
 
     return findNode(editor, []);
 };
+
+// Recursive function to find the ancestor with a specific type
+export const findAncestorWithType = (
+    editor: Editor,
+    path: Path | null,
+    type: string
+): ArticleNode | null => {
+    if (!path) return null;
+
+    const [node, nodePath] = Editor.node(editor, path) as NodeEntry<ArticleNode>;
+
+    if (node && node.type && node.type === type) {
+        return node;
+    }
+
+    return findAncestorWithType(editor, Path.parent(nodePath), type);
+};
+

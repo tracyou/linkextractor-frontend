@@ -5,8 +5,6 @@ import {Route, Routes} from "react-router-dom";
 import ImportXML from "../../views/ImportXML";
 import './Layout.css'
 import EditArticle from "../EditArticle/EditArticle";
-import HomePage from "../HomePage/HomePage";
-import TextAnnotator from "../TextAnnotator/TextAnnotator";
 import ApiDemo from "../ApiDemo/ApiDemo";
 import RelationSchemaIndex from "../RelationSchema/Index/RelationSchemaIndex";
 import RelationSchemaDetail from "../RelationSchema/Detail/RelationSchemaDetail";
@@ -21,8 +19,7 @@ const Layout = () => {
             <switch>
                 <div className="content-area">
                     <Routes>
-                        <Route path="/" element={<HomePage/>}/>
-                        <Route path="/import-xml" element={<ImportXML/>}/>
+                        <Route path="/" element={<ImportXML/>}/>
                         <Route path="/navbar" element={<Navbar/>}/>
                         <Route path="/editarticle/:id" element={<EditArticle/>}/>
                         <Route path={"/test"} element={<ApiDemo/>}/>

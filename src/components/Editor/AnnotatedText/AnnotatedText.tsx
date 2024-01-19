@@ -1,9 +1,9 @@
 import "./AnnotatedText.css";
 import React from "react";
 import classNames from "classnames";
-import {useSetRecoilState} from "recoil";
-import {getAnnotationsOnTextNode} from "../../../utils/EditorAnnotationUtils";
-import {activeAnnotationIdsState, activeTextNode} from "../../../recoil/AnnotationState";
+import {useRecoilValue, useSetRecoilState} from "recoil";
+import {getAnnotationIdFromMark, getAnnotationsOnTextNode} from "../../../utils/EditorAnnotationUtils";
+import {activeAnnotationIdsState, activeTextNode, annotationState} from "../../../recoil/AnnotationState";
 import {Node} from 'slate';
 
 export default function AnnotatedText(props: {
@@ -16,6 +16,9 @@ export default function AnnotatedText(props: {
     const annotationCount = Object.keys(props.textNode).filter((s) => {
         return s.includes('annotation_')
     });
+
+    const firstAnnotation = useRecoilValue(annotationState(getAnnotationIdFromMark(annotationCount[0])));
+
     const onClick = () => {
         setActiveTextNode(
             props.textNode
@@ -30,10 +33,10 @@ export default function AnnotatedText(props: {
             className={classNames({
                 annotation: true,
             })}
-            style={{backgroundColor: annotationCount.length > 1 ? "darkblue" : "lightblue", color: annotationCount.length > 1 ? "#fff" : "#000"}}
+            style={{backgroundColor: firstAnnotation ? firstAnnotation.matter.color : "lightblue"}}
             onClick={onClick}
         >
-      {props.children}
+      {props.children}<sup>{annotationCount.length}</sup>
     </span>
     );
 }

@@ -4,8 +4,6 @@ import Layout from "./components/Layout/Layout";
 import ImportXML from "./views/ImportXML";
 import EditArticle from "./components/EditArticle/EditArticle";
 import React from "react";
-import TextAnnotator from "./components/TextAnnotator/TextAnnotator";
-import HomePage from "./components/HomePage/HomePage";
 import ApiDemo from "./components/ApiDemo/ApiDemo";
 import RelationSchemaIndex from "./components/RelationSchema/Index/RelationSchemaIndex";
 import RelationSchemaDetail from "./components/RelationSchema/Detail/RelationSchemaDetail";
@@ -15,11 +13,7 @@ const router = createBrowserRouter([
         element: <Layout/>,
         children: [
             {
-                path: '',
-                element: <HomePage/>
-            },
-            {
-                path: "import-xml",
+                path: "",
                 element: <ImportXML/>
             },
             {
@@ -29,10 +23,6 @@ const router = createBrowserRouter([
             {
                 path: "editarticle/:id",
                 element: <EditArticle/>,
-            },
-            {
-                path: "annotate",
-                element: <TextAnnotator/>,
             },
             {
                 path: "test",
