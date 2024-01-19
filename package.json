@@ -20,6 +20,7 @@
     "deep-equal": "^2.2.3",
     "generate-react-cli": "^8.4.0",
     "graphql": "^16.8.1",
+    "moment-timezone": "^0.5.44",
     "react": "^18.2.0",
     "react-bootstrap": "^2.9.1",
     "react-dom": "^18.2.0",
