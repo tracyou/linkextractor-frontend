@@ -1,7 +1,8 @@
 import {v4 as uuidv4} from 'uuid';
 import {Editor, NodeEntry, Path} from "slate";
-import {Annotation, ArticleNode} from "../types";
+import {ArticleNode} from "../types";
 import {Node} from 'slate';
+import {SimpleAnnotationFragment} from "../graphql/api-schema";
 const ANNOTATION_PREFIX = "annotation_";
 
 export function getMarkForAnnotationID(annotationID: string) {
@@ -31,12 +32,16 @@ function isAnnotationIDMark(possibleAnnotation: any) {
     return possibleAnnotation.indexOf(ANNOTATION_PREFIX) === 0;
 }
 
-export function insertAnnotation(editor: Editor, addAnnotationToState: any, annotation: Annotation) {
-    annotation.id = uuidv4();
+export function insertAnnotation(editor: Editor, addAnnotationToState: any, annotation: SimpleAnnotationFragment) {
+    annotation = {
+        ...annotation,
+        id: uuidv4(),
+    };
     addAnnotationToState(annotation.id, annotation, editor);
     Editor.addMark(editor, getMarkForAnnotationID(annotation.id), true);
     return annotation.id;
 }
+
 
 //Finds editor path of a node
 export const customFindPath = (editor: Editor, targetNode: Node) => {

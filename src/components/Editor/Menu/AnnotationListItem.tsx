@@ -72,9 +72,9 @@ const AnnotationListItem: React.FC<AnnotationListItemProps> = ({id, editor, matt
         = React.useState(annotation?.comment);
     const [matter, setMatter]
         = React.useState<SimpleMatterFragment>({
-        id: annotation.matter.id,
-        name: annotation.matter.name,
-        color: annotation.matter.color
+        id: annotation?.matter.id,
+        name: annotation?.matter.name,
+        color: annotation?.matter.color
     });
 
     const onEditAnnotation = () => {

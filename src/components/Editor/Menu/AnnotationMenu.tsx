@@ -65,6 +65,7 @@ const AnnotationMenu: React.FC<AnnotationProps> = ({
             editor,
             addAnnotation,
             {
+                id: '',
                 matter: matter!,
                 definition: definition,
                 comment: comment,
