@@ -16,14 +16,11 @@ input::file-selector-button{
 
 .artikelen {
     padding-top: 2rem;
-    padding-left: 20%;
-    padding-right: 20%;
     align-items: center;
     justify-content: center;
 }
 
 .artikel {
-    margin: 15px;
     border: 1px solid black;
     border-radius: 5px;
 }

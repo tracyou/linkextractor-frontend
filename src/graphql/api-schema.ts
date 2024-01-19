@@ -99,6 +99,11 @@ export interface LawRevision {
   readonly revision: Scalars['Int']['output'];
 }
 
+export interface LawRevisions {
+  readonly law: Law;
+  readonly revisions: ReadonlyArray<LawRevision>;
+}
+
 export interface Matter {
   readonly annotations: ReadonlyArray<Annotation>;
   readonly color: Scalars['String']['output'];
@@ -220,7 +225,7 @@ export enum OrderByRelationWithColumnAggregateFunction {
 
 export interface Query {
   readonly law: Law;
-  readonly lawRevisions: ReadonlyArray<LawRevision>;
+  readonly lawRevisions: LawRevisions;
   readonly laws: ReadonlyArray<Law>;
   readonly matter: Matter;
   readonly matterRelationSchema?: Maybe<MatterRelationSchema>;
@@ -301,7 +306,13 @@ export type ArticleFragment = { readonly id: string, readonly title: string, rea
 
 export type ArticleRevisionFragment = { readonly id: string, readonly jsonText: string, readonly createdAt: string, readonly updatedAt: string, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
 
+export type LawRevisionsFragment = { readonly law: { readonly revision: number }, readonly revisions: ReadonlyArray<LawRevisionFragment> };
+
+export type LawRevisionFragment = { readonly revision: number, readonly createdAt: string };
+
 export type SimpleAnnotationFragment = { readonly id: string, readonly text: string, readonly comment?: string | null, readonly definition?: string | null, readonly matter: SimpleMatterFragment };
+
+export type SimpleRevisionFragment = { readonly id: string, readonly createdAt: string };
 
 export type MatterFragment = { readonly id: string, readonly name: string, readonly color: string, readonly annotations: ReadonlyArray<SimpleAnnotationFragment> };
 
@@ -320,6 +331,7 @@ export type GetLawsQuery = { readonly laws: ReadonlyArray<SimpleLawFragment> };
 
 export type GetLawByIdQueryVariables = Exact<{
   id: Scalars['UUID']['input'];
+  revision: Scalars['Int']['input'];
 }>;
 
 
@@ -338,6 +350,13 @@ export type SaveAnnotatedLawMutationVariables = Exact<{
 
 
 export type SaveAnnotatedLawMutation = { readonly saveAnnotatedLaw: LawFragment };
+
+export type GetLawRevisionsQueryVariables = Exact<{
+  id: Scalars['UUID']['input'];
+}>;
+
+
+export type GetLawRevisionsQuery = { readonly lawRevisions: LawRevisionsFragment };
 
 export type MattersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -450,6 +469,28 @@ export const SimpleLawFragmentDoc = gql`
   isPublished
 }
     `;
+export const LawRevisionFragmentDoc = gql`
+    fragment LawRevision on LawRevision {
+  revision
+  createdAt
+}
+    `;
+export const LawRevisionsFragmentDoc = gql`
+    fragment LawRevisions on LawRevisions {
+  law {
+    revision
+  }
+  revisions {
+    ...LawRevision
+  }
+}
+    ${LawRevisionFragmentDoc}`;
+export const SimpleRevisionFragmentDoc = gql`
+    fragment SimpleRevision on ArticleRevision {
+  id
+  createdAt
+}
+    `;
 export const MatterFragmentDoc = gql`
     fragment Matter on Matter {
   id
@@ -538,8 +579,8 @@ export type GetLawsLazyQueryHookResult = ReturnType<typeof useGetLawsLazyQuery>;
 export type GetLawsSuspenseQueryHookResult = ReturnType<typeof useGetLawsSuspenseQuery>;
 export type GetLawsQueryResult = Apollo.QueryResult<GetLawsQuery, GetLawsQueryVariables>;
 export const GetLawByIdDocument = gql`
-    query getLawById($id: UUID!) {
-  law(id: $id, revision: 0) {
+    query getLawById($id: UUID!, $revision: Int!) {
+  law(id: $id, revision: $revision) {
     ...Law
   }
 }
@@ -558,6 +599,7 @@ export const GetLawByIdDocument = gql`
  * const { data, loading, error } = useGetLawByIdQuery({
  *   variables: {
  *      id: // value for 'id'
+ *      revision: // value for 'revision'
  *   },
  * });
  */
@@ -643,6 +685,46 @@ export function useSaveAnnotatedLawMutation(baseOptions?: Apollo.MutationHookOpt
 export type SaveAnnotatedLawMutationHookResult = ReturnType<typeof useSaveAnnotatedLawMutation>;
 export type SaveAnnotatedLawMutationResult = Apollo.MutationResult<SaveAnnotatedLawMutation>;
 export type SaveAnnotatedLawMutationOptions = Apollo.BaseMutationOptions<SaveAnnotatedLawMutation, SaveAnnotatedLawMutationVariables>;
+export const GetLawRevisionsDocument = gql`
+    query getLawRevisions($id: UUID!) {
+  lawRevisions(id: $id) {
+    ...LawRevisions
+  }
+}
+    ${LawRevisionsFragmentDoc}`;
+
+/**
+ * __useGetLawRevisionsQuery__
+ *
+ * To run a query within a React component, call `useGetLawRevisionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetLawRevisionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetLawRevisionsQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetLawRevisionsQuery(baseOptions: Apollo.QueryHookOptions<GetLawRevisionsQuery, GetLawRevisionsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetLawRevisionsQuery, GetLawRevisionsQueryVariables>(GetLawRevisionsDocument, options);
+      }
+export function useGetLawRevisionsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetLawRevisionsQuery, GetLawRevisionsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetLawRevisionsQuery, GetLawRevisionsQueryVariables>(GetLawRevisionsDocument, options);
+        }
+export function useGetLawRevisionsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetLawRevisionsQuery, GetLawRevisionsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetLawRevisionsQuery, GetLawRevisionsQueryVariables>(GetLawRevisionsDocument, options);
+        }
+export type GetLawRevisionsQueryHookResult = ReturnType<typeof useGetLawRevisionsQuery>;
+export type GetLawRevisionsLazyQueryHookResult = ReturnType<typeof useGetLawRevisionsLazyQuery>;
+export type GetLawRevisionsSuspenseQueryHookResult = ReturnType<typeof useGetLawRevisionsSuspenseQuery>;
+export type GetLawRevisionsQueryResult = Apollo.QueryResult<GetLawRevisionsQuery, GetLawRevisionsQueryVariables>;
 export const MattersDocument = gql`
     query matters {
   matters {

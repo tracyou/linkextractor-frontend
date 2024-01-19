@@ -31,6 +31,18 @@ fragment ArticleRevision on ArticleRevision {
     createdAt
     updatedAt
 }
+fragment LawRevisions on LawRevisions{
+    law {
+        revision
+    }
+    revisions {
+        ...LawRevision
+    }
+}
+fragment LawRevision on LawRevision {
+    revision
+    createdAt
+}
 
 fragment SimpleAnnotation on Annotation {
     id
@@ -40,6 +52,11 @@ fragment SimpleAnnotation on Annotation {
     matter {
         ...SimpleMatter
     }
+}
+
+fragment SimpleRevision on ArticleRevision {
+    id
+    createdAt
 }
 
 fragment Matter on Matter {

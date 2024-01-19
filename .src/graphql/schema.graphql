@@ -82,6 +82,11 @@ type LawRevision {
   revision: Int!
 }
 
+type LawRevisions {
+  law: Law!
+  revisions: [LawRevision!]!
+}
+
 type Matter {
   annotations: [Annotation!]!
   color: String!
@@ -190,7 +195,7 @@ enum OrderByRelationWithColumnAggregateFunction {
 
 type Query {
   law(id: UUID!, revision: Int!): Law!
-  lawRevisions(id: UUID!): [LawRevision!]!
+  lawRevisions(id: UUID!): LawRevisions!
   laws: [Law!]!
   matter(id: UUID!): Matter!
   matterRelationSchema(input: MatterRelationSchemaInput!): MatterRelationSchema

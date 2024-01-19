@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, {Dispatch, SetStateAction, useCallback, useEffect, useState} from "react";
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import {Title} from "../../stylesheets/Fonts";
@@ -10,10 +10,13 @@ import {useRecoilSnapshot, useRecoilValue} from "recoil";
 import {
     GetLawByIdDocument,
     GetLawByIdQuery,
-    LawFragment, MattersDocument, MattersQuery,
+    LawFragment,
+    MattersDocument,
+    MattersQuery,
     SaveAnnotatedLawDocument,
     SaveAnnotatedLawMutation,
-    SimpleAnnotationFragment, SimpleMatterFragment
+    SimpleAnnotationFragment,
+    SimpleMatterFragment
 } from "../../graphql/api-schema";
 import {useMutation, useQuery} from "@apollo/client";
 import {allArticlesState} from "../../recoil/AnnotationState";
@@ -25,7 +28,16 @@ import useAddArticleToState from "../../hooks/useAddArticleToState";
 import useClearArticleState from "../../hooks/useClearArticleState";
 import {Alert, Button, Snackbar} from "@mui/material";
 
-const EditArticle = () => {
+interface EditArticleProps {
+    revision: number
+    stateChanger: Dispatch<SetStateAction<boolean>>
+}
+
+const EditArticle: React.FC<EditArticleProps> = ({
+                                                     revision,
+                                                     stateChanger
+                                                 }
+) => {
 
     const [lawId, setLawId] = useState<string | undefined>();
     const [lawData, setLawData] = useState<LawFragment | undefined>();
@@ -39,10 +51,12 @@ const EditArticle = () => {
     const {
         data: queryResult,
         loading: lawLoading,
-        error: lawError
+        error: lawError,
+        refetch: lawRefetch
     } = useQuery<GetLawByIdQuery>(GetLawByIdDocument, {
         variables: {
-            id: lawId
+            id: lawId,
+            revision: revision
         }
     });
 
@@ -58,6 +72,14 @@ const EditArticle = () => {
             }
         }
     }, [lawError]);
+    useEffect(() => {
+        lawRefetch({
+            variables: {
+                id: lawId,
+                revision: revision
+            }
+        });
+    }, [revision]);
 
     useEffect(() => {
         if (lawLoading) {
@@ -67,7 +89,7 @@ const EditArticle = () => {
         if (queryResult?.law) {
             setLawData(queryResult.law);
         }
-    }, [lawLoading]);
+    }, [lawLoading, queryResult]);
 
     const {data: matterQueryResult, loading: mattersLoading}
         = useQuery<MattersQuery>(MattersDocument)
@@ -202,6 +224,8 @@ const EditArticle = () => {
             if (res.data) {
                 setLawData(res.data.saveAnnotatedLaw)
                 setIsSuccess(true);
+                //     Update parent component
+                stateChanger(true)
             }
         }).catch((e) => {
             if (e.graphQLErrors) {
@@ -212,7 +236,6 @@ const EditArticle = () => {
     };
 
     const {renderLeaf, renderElement} = useEditorConfig(editor);
-
     return (
         mattersLoading || lawLoading ? <p>Wet wordt geladen...</p> : (
             !matter || !mattersByName || lawDocument.length === 0 ? <p>Geen resultaat...</p> :
@@ -243,7 +266,8 @@ const EditArticle = () => {
                             alignItems="center"
                             justifyContent="end"
                             container>
-                            <Button variant={"contained"} style={{marginTop: "2%"}} onClick={saveTheLaw}>Wet opslaan</Button>
+                            <Button variant={"contained"} style={{marginTop: "2%"}} onClick={saveTheLaw}>Wet
+                                opslaan</Button>
                         </Grid>
                         <Grid container direction={"row"} spacing={5}>
                             <Slate editor={editor} initialValue={lawDocument} onChange={onChangeHandler}>
@@ -253,6 +277,7 @@ const EditArticle = () => {
                                         setSelection={setSelection}
                                         matter={matter} setMatter={setMatter}
                                         mattersByName={mattersByName}
+                                        revision={revision}
                                     />
                                 </Grid>
                                 <Grid item lg={7}>
