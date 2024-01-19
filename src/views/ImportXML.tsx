@@ -1,16 +1,25 @@
 import React, {useEffect, useState} from "react";
 import './ImportXML.css'
 import ImportButton from "../components/ImportButton/ImportButton";
+import DeleteButton from "../components/DeleteButton/DeleteButton";
 import {Title} from "../stylesheets/Fonts";
 import Grid from "@mui/material/Grid";
 import {
-    SimpleLawFragment, useGetLawsQuery
+    useGetLawsQuery
 } from "../graphql/api-schema";
 import {useMutation} from "@apollo/client";
+import {ApolloCache, DefaultContext, MutationFunctionOptions, OperationVariables, useMutation} from "@apollo/client";
 import {
     ImportXmlDocument,
     ImportXmlMutation,
+    DeleteLawDocument, DeleteLawInput,
+    DeleteLawDocument,
+    DeleteLawMutation,
+    SimpleLawFragment,
+    useGetAllLawsQuery
 } from "../graphql/api-schema";
+import {Button} from "@mui/material";
+import {UUID} from "node:crypto";
 
 
 const ImportXML = () => {
@@ -22,9 +31,12 @@ const ImportXML = () => {
 
     const [file, setFile] = useState<File>();
 
+    const [deleteLaw, {data: dataDelete, loading: loadingDelete, error: errorDelete}] = useMutation<DeleteLawMutation>(
+        DeleteLawDocument);
+
     useEffect(() => {
         refetch()
-    }, [file]);
+    }, [file, dataDelete]);
 
     const handleFileSelect = async (selectedFile: File) => {
         try {
@@ -41,11 +53,29 @@ const ImportXML = () => {
     }
 
     const handleOnClick = (law: SimpleLawFragment) => {
-
         window.location.href = '/revisionselector/' + law.id;
-
     }
 
+    async function handleOnDelete(event: React.MouseEvent, id: string) {
+
+        event.stopPropagation();
+
+        const shouldDelete = window.confirm('Are you sure you want to delete?');
+
+        if (!shouldDelete) {
+            return;
+        }
+
+        try {
+            await deleteLaw({
+                variables: {
+                    input: id
+                },
+            });
+        } catch (error) {
+            console.log('er is iets fouts gegaan', error)
+        }
+    }
 
     return (
         <>
@@ -66,7 +96,13 @@ const ImportXML = () => {
                                 {data?.laws.map((law) => (
 
                                     <div key={law.id} className="artikel" onClick={() => handleOnClick(law)}>
-                                        < h2> {law?.title}</h2>
+                                        <h2> {law?.title}</h2>
+                                        <Grid
+                                            alignItems="right"
+                                            justifyContent="right"
+                                            container>
+                                            <DeleteButton onClick={(event) => handleOnDelete(event, law?.id)}/>
+                                        </Grid>
                                     </div>
                                 ))}
                             </div>

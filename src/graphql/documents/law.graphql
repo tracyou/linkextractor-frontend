@@ -16,6 +16,10 @@ mutation importXml($file: Upload!){
     }
 }
 
+mutation deleteLaw($input: UUID!) {
+    deleteLaw(input: $input)
+}
+
 mutation saveAnnotatedLaw($input: AnnotatedLawInput!){
     saveAnnotatedLaw(input: $input){
         ...Law
