@@ -277,6 +277,7 @@ const EditArticle: React.FC<EditArticleProps> = ({
                                         setSelection={setSelection}
                                         matter={matter} setMatter={setMatter}
                                         mattersByName={mattersByName}
+                                        revision={revision}
                                     />
                                 </Grid>
                                 <Grid item lg={7}>
