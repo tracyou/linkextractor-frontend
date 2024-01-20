@@ -52,10 +52,6 @@ scalar Date
 
 scalar DateTime
 
-input DeleteLawInput {
-  id: UUID!
-}
-
 """
 Arbitrary data encoded in JavaScript Object Notation. See https://www.json.org.
 """
@@ -149,7 +145,7 @@ type MatterRelationType {
 }
 
 type Mutation {
-  deleteLaw(input: DeleteLawInput!): Boolean!
+  deleteLaw(input: UUID!): Boolean!
   importXml(file: Upload!): Law!
   publishRelationSchema(id: UUID!): RelationSchema!
   saveAnnotatedLaw(input: AnnotatedLawInput!): Law!

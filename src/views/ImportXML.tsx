@@ -8,19 +8,13 @@ import {
     useGetLawsQuery
 } from "../graphql/api-schema";
 import {useMutation} from "@apollo/client";
-import {ApolloCache, DefaultContext, MutationFunctionOptions, OperationVariables, useMutation} from "@apollo/client";
 import {
     ImportXmlDocument,
     ImportXmlMutation,
-    DeleteLawDocument, DeleteLawInput,
     DeleteLawDocument,
     DeleteLawMutation,
     SimpleLawFragment,
-    useGetAllLawsQuery
 } from "../graphql/api-schema";
-import {Button} from "@mui/material";
-import {UUID} from "node:crypto";
-
 
 const ImportXML = () => {
     const {data, loading, error, refetch} = useGetLawsQuery();

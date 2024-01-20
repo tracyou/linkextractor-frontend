@@ -74,10 +74,6 @@ export interface ArticleRevision {
   readonly updatedAt: Scalars['DateTime']['output'];
 }
 
-export interface DeleteLawInput {
-  readonly id: Scalars['UUID']['input'];
-}
-
 export interface Law {
   readonly articles: ReadonlyArray<Article>;
   readonly createdAt: Scalars['DateTime']['output'];
@@ -172,7 +168,7 @@ export interface Mutation {
 
 
 export interface MutationDeleteLawArgs {
-  input: DeleteLawInput;
+  input: Scalars['UUID']['input'];
 }
 
 
@@ -343,6 +339,13 @@ export type ImportXmlMutationVariables = Exact<{
 
 
 export type ImportXmlMutation = { readonly importXml: SimpleLawFragment };
+
+export type DeleteLawMutationVariables = Exact<{
+  input: Scalars['UUID']['input'];
+}>;
+
+
+export type DeleteLawMutation = { readonly deleteLaw: boolean };
 
 export type SaveAnnotatedLawMutationVariables = Exact<{
   input: AnnotatedLawInput;
@@ -652,6 +655,37 @@ export function useImportXmlMutation(baseOptions?: Apollo.MutationHookOptions<Im
 export type ImportXmlMutationHookResult = ReturnType<typeof useImportXmlMutation>;
 export type ImportXmlMutationResult = Apollo.MutationResult<ImportXmlMutation>;
 export type ImportXmlMutationOptions = Apollo.BaseMutationOptions<ImportXmlMutation, ImportXmlMutationVariables>;
+export const DeleteLawDocument = gql`
+    mutation deleteLaw($input: UUID!) {
+  deleteLaw(input: $input)
+}
+    `;
+export type DeleteLawMutationFn = Apollo.MutationFunction<DeleteLawMutation, DeleteLawMutationVariables>;
+
+/**
+ * __useDeleteLawMutation__
+ *
+ * To run a mutation, you first call `useDeleteLawMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteLawMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteLawMutation, { data, loading, error }] = useDeleteLawMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteLawMutation(baseOptions?: Apollo.MutationHookOptions<DeleteLawMutation, DeleteLawMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteLawMutation, DeleteLawMutationVariables>(DeleteLawDocument, options);
+      }
+export type DeleteLawMutationHookResult = ReturnType<typeof useDeleteLawMutation>;
+export type DeleteLawMutationResult = Apollo.MutationResult<DeleteLawMutation>;
+export type DeleteLawMutationOptions = Apollo.BaseMutationOptions<DeleteLawMutation, DeleteLawMutationVariables>;
 export const SaveAnnotatedLawDocument = gql`
     mutation saveAnnotatedLaw($input: AnnotatedLawInput!) {
   saveAnnotatedLaw(input: $input) {
