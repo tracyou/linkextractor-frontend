@@ -17,15 +17,12 @@ import {
 } from "../graphql/api-schema";
 
 const ImportXML = () => {
-    const {data, loading, error, refetch} = useGetLawsQuery();
-    const [importXmlMutation, {
-        data: importData,
-        error: importEror
-    }] = useMutation<ImportXmlMutation>(ImportXmlDocument);
+    const {data, loading, refetch} = useGetLawsQuery();
+    const [importXmlMutation] = useMutation<ImportXmlMutation>(ImportXmlDocument);
 
     const [file, setFile] = useState<File>();
 
-    const [deleteLaw, {data: dataDelete, loading: loadingDelete, error: errorDelete}] = useMutation<DeleteLawMutation>(
+    const [deleteLaw, {data: dataDelete}] = useMutation<DeleteLawMutation>(
         DeleteLawDocument);
 
     useEffect(() => {
