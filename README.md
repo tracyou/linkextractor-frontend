@@ -1,46 +1,84 @@
-# Getting Started with Create React App
+# Annotation tool
+Dit project is gemaakt in opdracht van de Hogeschool van Amsterdam. Het project is gemaakt door een groep van zes studenten van de opleiding Software Engineering.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Developers:
+- Mo Kadib Alban
+- Mika Rövenkamp
+- Roy Wiersma
+- Stefan de Haan
+- Tracy Owusu
+- Alexander Vreeswijk
 
-## Available Scripts
+## Introductie
 
-In the project directory, you can run:
+Deze krachtige tool is ontwikkeld om juristen in staat te stellen wetten op een gestructureerde en overzichtelijke manier te annoteren. Of je nu een jurist, wetenschapper of beleidsmaker bent, deze applicatie biedt een intuïtieve omgeving om diepgaande analyses te maken, begrippen te verhelderen en de evolutie van wetten in de tijd te volgen.
 
-### `npm start`
+### Belangrijkste Kenmerken:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+#### Annotatiefunctionaliteit
+Voeg begrippen toe aan wetten en voorzie ze van een begrip, een commentaar en een definitie. Breng verhelderende opmerkingen aan bij specifieke woorden, waardoor een dieper begrip ontstaat. Maak complexe juridische taal toegankelijker door begrippen te definiëren en context toe te voegen.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+#### Relatieschema
+Stel eenvoudig relaties in tussen verschillende begrippen om de onderlinge verbondenheid te visualiseren. Creëer een helder beeld van de samenhang tussen verschillende juridische concepten en bepalingen.
 
-### `npm test`
+#### Versiebeheer
+Bewaar gemaakte annotaties veilig door regelmatig op te slaan. Navigeer eenvoudig door verschillende versies van wetten en bekijk de historische ontwikkeling.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Technische informatie
+Deze applicatie bestaat uit een front- en backend applicatie. De frontend is geschreven in React en de backend is geschreven in PHP met een Laravel framework. De backend is volledig containerized met Docker, de frontend is niet containerized.
 
-### `npm run build`
+### GraphQL
+Het fundament van deze applicatie is GraphQL. GraphQL is een querytaal voor API's en een runtime voor het uitvoeren van queries met behulp van een type systeem dat door de gebruiker wordt gedefinieerd. GraphQL is gereleased is 2021 en dient als een alternatief voor REST. Het helpt bij het versnellen van web requests, door alleen de benodigde data op te halen. Dit zorgt voor minder endpoints, een snellere applicatie en een betere gebruikerservaring. Ook zorgt GraphQL voor een betere documentatie van de API, omdat deze documentatie automatisch gegenereerd wordt en gelezen kan worden door de frontend. Met deze documentatie kan de frontend automatisch de benodigde types genereren, zodat de frontend altijd up-to-date is met de backend. Hieronder is een weergave van de architectuur te zien.
+[![GraphQL](docs/architecture.png "GraphQL")](docs/architecture.png "GraphQL")
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Datamodel
+Het datamodel is zo abstract mogelijk gehouden. Dit betekent dat het technisch mogelijk is om begrippen in de toekomst toe te voegen of verwijderen, zonder dat de code ergens stuk loopt. Ook is het mogelijk om zelf relatie schemas te creeëren met de begrippen die op dat moment actief zijn. Oude schemas blijven bewaard en zijn nog steeds van toepassing op wetten die in het verleden zijn geannoteerd. Het nieuwe schema wordt alleen op nieuwe wetten toegepast. Hieronder is een weergave van het datamodel te zien.
+[![Datamodel](docs/ERD.png "Datamodel")](docs/ERD.png "Datamodel")
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Backend
 
-### `npm run eject`
+De backend bestaat uit containers. De containers zijn te vinden in de `docker-compose.yml` file. De containers zijn als volgt:
+- `nginx`: Nginx webserver (1.18)
+- `api`: Laravel applicatie
+- `db`: PostgreSQL database (15.1-alpine)
+- `redis`: Redis database (7.0.8)
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+De laravel applicatie dient puur als API en heeft zelf geen views. De views worden gegenereerd door de frontend applicatie. De API is te benaderen op `localhost:8000/graphql`.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+#### Installatie
+Om verder te werken aan het project moet de applicatie worden opgezet. De eerste stap is om de `.env.example` te kopiëren en deze `.env` noemen. Vervolgens kan het volgende commando uitgevoerd worden:
+```
+make setup
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Dit commando zet de containers op en installeert de benodigde dependencies. Vervolgens voert het commando de database migraties uit en seed de database met test data. De applicatie is nu opgestart en klaar voor gebruik.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+#### Development
+Er zijn ook aan aantal handige commando's om de ontwikkeling te versnellen. Deze commando's zijn te vinden in de `Makefile`. De belangrijkste commando's zijn:
+- `make setup`: Zet de applicatie op
+- `make up`: Start de applicatie
+- `make down`: Stop de applicatie
+- `make db-fresh`: Maakt de database leeg en seed de test data opnieuw
+- `make test`: Voert alle tests uit
+- `make ide-helper-lighthouse`: Compileert het GraphQL schema voor de frontend (moet uitgevoerd worden na elke wijziging aan `*.graphql` bestanden)
 
-## Learn More
+### Frontend
+De frontend is geschreven in React en is niet containerized, dus moet dan ook lokaal opgezet worden. De frontend is te benaderen op `localhost:3000`.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+#### Installatie
+Om de frontend op te zetten moet eerst NPM geïnstalleerd worden. Vervolgens kan het volgende commando uitgevoerd worden:
+```
+npm install
+```
+Dit installeert alle benodigde dependencies. Vervolgens moeten alle GraphQL types worden gelezen uit de backend en gecompileerd worden naar TypeScript types. Dit kan gedaan worden met het volgende commando:
+```
+npm run gql:codegen
+```
+Als dit is gebeurd is de applicatie op te starten met:
+```
+npm run start
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+#### Development
+Wanneer de backend een wijziging heeft in het GrahpQL schema en de `make ide-helper-lighthouse` commando is uitgevoerd, moet de frontend opnieuw gecompileerd worden. Daarvoor moet dan opnieuw  het `npm run gql:codegen` uitegevoerd worden.
