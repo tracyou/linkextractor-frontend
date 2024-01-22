@@ -1,0 +1,30 @@
+
+.importButtonContainer {
+
+    display: flex;
+    justify-content: flex-end;
+    background-color: #B2D7EA;
+    height: 2.2rem;
+    align-items: center;
+    padding-bottom: 0.5rem;
+}
+
+input::file-selector-button{
+    background-color: darkgray;
+    height: 100%;
+}
+
+.artikelen {
+    padding-top: 2rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.artikel {
+    border: 1px solid black;
+    border-radius: 5px;
+}
+
+.artikel h2{
+    margin-left: 2rem;
+}

@@ -1,0 +1,14 @@
+.inputMargin  {
+    margin-top: 1rem;
+}
+button{
+    display: flex;
+    height: 3rem;
+    justify-content: space-between;
+    background-color: lightgray;
+    align-items: center;
+    padding-right: 2rem;
+    padding-left: 2rem;
+    margin-top: 2%;
+    border-radius: 5%;
+}

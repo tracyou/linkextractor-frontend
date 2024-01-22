@@ -1,7 +1,109 @@
-fragment Pancake on Pancake {
+fragment Law on Law {
     id
+    title
+    isPublished
+    articles {
+        ...Article
+    }
 }
 
-fragment PancakeStack on PancakeStack {
+fragment SimpleLaw on Law {
     id
+    title
+    isPublished
+}
+
+fragment Article on Article {
+    id
+    title
+    text
+    revision {
+        ...ArticleRevision
+    }
+}
+
+fragment ArticleRevision on ArticleRevision {
+    id
+    jsonText
+    annotations {
+        ...SimpleAnnotation
+    }
+    createdAt
+    updatedAt
+}
+fragment LawRevisions on LawRevisions{
+    law {
+        revision
+    }
+    revisions {
+        ...LawRevision
+    }
+}
+fragment LawRevision on LawRevision {
+    revision
+    createdAt
+}
+
+fragment SimpleAnnotation on Annotation {
+    id
+    text
+    comment
+    definition
+    matter {
+        ...SimpleMatter
+    }
+}
+
+fragment SimpleRevision on ArticleRevision {
+    id
+    createdAt
+}
+
+fragment Matter on Matter {
+    id
+    name
+    color
+    annotations {
+        ...SimpleAnnotation
+    }
+}
+
+fragment SimpleMatter on Matter {
+    id
+    name
+    color
+}
+
+fragment SimpleMatterRelation on MatterRelation {
+    id
+    relatedMatter {
+        ...SimpleMatter
+    }
+    relation
+    description
+}
+
+fragment  SimpleMatterRelationSchema on MatterRelationSchema {
+    id
+    schemaLayout
+    matter {
+        ...SimpleMatter
+    }
+    relations {
+        ...SimpleMatterRelation
+    }
+    relationSchema {
+        id
+    }
+}
+
+fragment SimpleRelationSchema on RelationSchema {
+    id
+    createdAt
+    updatedAt
+    isPublished
+    expiredAt
+    matterRelationSchemas {
+        ...SimpleMatterRelationSchema
+    }
 }

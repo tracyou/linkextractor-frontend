@@ -1,0 +1,7 @@
+query getLawRevisions ($id: UUID!) {
+    lawRevisions(
+        id: $id
+    ) {
+        ...LawRevisions
+    }
+}

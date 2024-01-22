@@ -1,0 +1,6 @@
+query matterRelationTypes {
+    matterRelationTypes {
+        key
+        value
+    }
+}

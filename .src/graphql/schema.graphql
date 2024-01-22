@@ -1,10 +1,51 @@
-input CreatePancakeInput {
-  diameter: Int!
+input AnnotatedLawInput {
+  articles: [ArticleInput!]!
+  isPublished: Boolean
+  lawId: UUID!
 }
 
-input CreatePancakeStackInput {
-  name: String!
-  pancakes: [ID!]!
+type Annotation {
+  articleRevision: ArticleRevision!
+  comment: String
+  createdAt: DateTime!
+  definition: String
+  id: UUID!
+  matter: Matter!
+  relationSchema: RelationSchema!
+  text: String!
+  updatedAt: DateTime!
+}
+
+input AnnotationInput {
+  comment: String
+  definition: String
+  matterId: UUID!
+  tempId: UUID!
+  text: String!
+}
+
+type Article {
+  id: UUID!
+  law: Law!
+  revision: ArticleRevision
+  text: String
+  title: String!
+}
+
+input ArticleInput {
+  annotations: [AnnotationInput!]!
+  articleId: UUID!
+  jsonText: String
+}
+
+type ArticleRevision {
+  annotations: [Annotation!]!
+  article: Article!
+  createdAt: DateTime!
+  id: UUID!
+  jsonText: String!
+  revision: Int!
+  updatedAt: DateTime!
 }
 
 scalar Date
@@ -16,13 +57,99 @@ Arbitrary data encoded in JavaScript Object Notation. See https://www.json.org.
 """
 scalar JSON
 
+type Law {
+  articles: [Article!]!
+  createdAt: DateTime!
+  id: UUID!
+  isPublished: Boolean!
+  revision: Int!
+  title: String!
+  updatedAt: DateTime!
+}
+
+type LawAnnotationPivot {
+  comment: String
+  cursorIndex: Int!
+  id: UUID!
+}
+
+type LawRevision {
+  createdAt: DateTime!
+  revision: Int!
+}
+
+type LawRevisions {
+  law: Law!
+  revisions: [LawRevision!]!
+}
+
+type Matter {
+  annotations: [Annotation!]!
+  color: String!
+  createdAt: DateTime!
+  id: UUID!
+  matterRelations: [MatterRelation!]!
+  name: String!
+  updatedAt: DateTime!
+}
+
+type MatterRelation {
+  createdAt: DateTime!
+  description: String
+  id: UUID!
+  matterRelationSchema: MatterRelationSchema!
+  relatedMatter: Matter!
+  relation: MatterRelationEnum!
+  updatedAt: DateTime!
+}
+
+"""Matter relation enum"""
+enum MatterRelationEnum {
+  """Requires one"""
+  REQUIRES_ONE
+
+  """Requires one or more"""
+  REQUIRES_ONE_OR_MORE
+
+  """Requires zero or more"""
+  REQUIRES_ZERO_OR_MORE
+
+  """Requires zero or one"""
+  REQUIRES_ZERO_OR_ONE
+}
+
+input MatterRelationInput {
+  description: String
+  relatedMatterId: UUID!
+  relation: MatterRelationEnum!
+}
+
+type MatterRelationSchema {
+  createdAt: DateTime!
+  id: UUID!
+  matter: Matter!
+  relationSchema: RelationSchema!
+  relations: [MatterRelation!]!
+  schemaLayout: String!
+  updatedAt: DateTime!
+}
+
+input MatterRelationSchemaInput {
+  matterId: UUID!
+  relationSchemaId: UUID!
+}
+
+type MatterRelationType {
+  key: MatterRelationEnum!
+  value: String!
+}
+
 type Mutation {
-  createPancake(input: CreatePancakeInput!): Pancake!
-  createPancakeStack(input: CreatePancakeStackInput!): PancakeStack!
-  deletePancake(id: ID!): Boolean!
-  deletePancakeStack(id: ID!): Boolean!
-  updatePancake(input: UpdatePancakeInput!): Pancake!
-  updatePancakeStack(input: UpdatePancakeStackInput!): PancakeStack!
+  deleteLaw(input: UUID!): Boolean!
+  importXml(file: Upload!): Law!
+  publishRelationSchema(id: UUID!): RelationSchema!
+  saveAnnotatedLaw(input: AnnotatedLawInput!): Law!
+  saveMatterRelationSchema(input: SaveMatterRelationSchemaInput!): MatterRelationSchema!
 }
 
 """Allows ordering a list of records."""
@@ -62,27 +189,35 @@ enum OrderByRelationWithColumnAggregateFunction {
   SUM
 }
 
-type Pancake {
-  createdAt: DateTime!
-  diameter: Int!
-  id: ID!
-  stack: PancakeStack
-  updatedAt: DateTime!
-}
-
-type PancakeStack {
-  createdAt: DateTime!
-  id: ID!
-  name: String!
-  pancakes: [Pancake!]!
-  updatedAt: DateTime!
-}
-
 type Query {
-  pancakeById(id: ID!): Pancake!
-  pancakeStackById(id: ID!): PancakeStack!
-  pancakeStacks: [PancakeStack!]!
-  pancakes: [Pancake!]!
+  law(id: UUID!, revision: Int!): Law!
+  lawRevisions(id: UUID!): LawRevisions!
+  laws: [Law!]!
+  matter(id: UUID!): Matter!
+  matterRelationSchema(input: MatterRelationSchemaInput!): MatterRelationSchema
+  matterRelationSchemas: [MatterRelationSchema!]!
+  matterRelationTypes: [MatterRelationType!]!
+  matters: [Matter!]!
+  relationSchema(id: UUID!): RelationSchema!
+  relationSchemas: [RelationSchema!]!
+}
+
+type RelationSchema {
+  annotations: [Annotation!]!
+  createdAt: DateTime!
+  expiredAt: DateTime
+  id: UUID!
+  isPublished: Boolean!
+  matterRelationSchemas: [MatterRelationSchema!]!
+  updatedAt: DateTime!
+}
+
+input SaveMatterRelationSchemaInput {
+  matterId: UUID!
+  matterRelationSchemaId: UUID
+  relationSchemaId: UUID
+  relations: [MatterRelationInput!]!
+  schemaLayout: String!
 }
 
 """Directions for ordering a list of records."""
@@ -108,13 +243,6 @@ enum Trashed {
   WITHOUT
 }
 
-input UpdatePancakeInput {
-  diameter: Int!
-  id: ID!
-}
+scalar UUID
 
-input UpdatePancakeStackInput {
-  id: ID!
-  name: String!
-  pancakes: [ID!]!
-}
+scalar Upload
