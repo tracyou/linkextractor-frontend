@@ -8,7 +8,7 @@ import {useQuery} from "@apollo/client";
 import {GetLawRevisionsDocument, GetLawRevisionsQuery,} from "../../graphql/api-schema";
 import moment from 'moment-timezone';
 
-const RevisionSelector:React.FC = () => {
+const RevisionSelector: React.FC = () => {
     // Get id from the router
     const {id} = useParams();
     const [lawId, setLawId] = useState<string | undefined>();
@@ -42,16 +42,19 @@ const RevisionSelector:React.FC = () => {
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
+
     // Refetch new revision
     const [state, setState] = useState<boolean>(false);
-        if (state) {
-            lawRefetch({
-                variables: {
-                    id: lawId,
-                }
-            })
-            setState(false)
-        }
+
+    if (state) {
+        lawRefetch({
+            variables: {
+                id: lawId,
+            }
+        })
+        setState(false)
+    }
+
     return (
         <Box>
             <>
@@ -71,7 +74,9 @@ const RevisionSelector:React.FC = () => {
                 >
                     {
                         queryResult?.lawRevisions.revisions.map((value) =>
-                            <Tab key={value.revision} label={moment.utc(value.createdAt).local().toDate().toLocaleString()} value={value.revision}/>
+                            <Tab key={value.revision}
+                                 label={moment.utc(value.createdAt).local().toDate().toLocaleString()}
+                                 value={value.revision}/>
                         )
                     }
                 </Tabs>

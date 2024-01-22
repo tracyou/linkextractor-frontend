@@ -28,7 +28,7 @@ export function getAnnotationIdFromMark(mark: any) {
     return mark.replace(ANNOTATION_PREFIX, "");
 }
 
-function isAnnotationIDMark(possibleAnnotation: any) {
+export function isAnnotationIDMark(possibleAnnotation: any) {
     return possibleAnnotation.indexOf(ANNOTATION_PREFIX) === 0;
 }
 
